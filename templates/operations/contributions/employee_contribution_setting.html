@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Manage Employee Contribution Settings</h2>
+
+    <!-- Table displaying contribution settings for employees who have set them -->
+    <h3>Employees with Contribution Settings</h3>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Contribution Amount</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for setting in contribution_settings %}
+                <tr>
+                    <td>{{ setting.employee.email }}</td>
+                    <td>{{ setting.amount }}</td>
+                    <td>{{ setting.status }}</td>
+                    <td>
+                        <!-- Update Button -->
+                        <a href="{% url 'update_contribution_setting' setting.id %}" class="btn btn-warning btn-sm">Update</a>
+                        
+                            <a href="{% url 'manage_employee_permissions' setting.employee.id %}" class="btn btn-info btn-sm">Manage employee permissions</a>
+                            
+                            <a href="{% url 'admin_contribution_history' setting.employee.id %}" class="btn btn-info btn-sm">History</a>
+                        
+                        <!-- Delete Button -->
+                        <a href="{% url 'delete_contribution_setting' setting.id %}" class="btn btn-danger btn-sm" 
+                           onclick="return confirm('Are you sure you want to delete this contribution setting?');">
+                           Delete
+                        </a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">No contribution settings found.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Table displaying employees who have NOT set contribution settings -->
+    <h3>Employees Without Contribution Settings</h3>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for employee in employees_without_settings %}
+                <tr>
+                    <td>{{ employee.email }}</td>
+                    <td>
+                        <!-- Create Contribution Setting Button -->
+                        <a href="{% url 'create_contribution_setting' employee.id %}" class="btn btn-success btn-sm">Create</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="2">All employees have set their contribution settings.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div>
+             <a href="{% url 'admin_dashboard' %}" class="btn btn-success">Return to dashboard</a>
+
+    </div>
+{% endblock %}

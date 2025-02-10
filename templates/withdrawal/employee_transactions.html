@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>My Transaction History</h2>
+    <h4>Total Withdrawn: ₦{{ total_withdrawn|default:"0.00" }}</h4>
+
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Amount</th>
+                <th>Charges amount</th>
+                <th>Final amount</th>
+                <th>Savings amount remained</th>
+                <th>Reference</th>
+                <th>Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+           {% for transaction in transactions %}
+            <tr>
+                <td> {{ forloop.counter }} </td>
+                <td>{{ transaction.amount }}</td>
+                <td>{{ transaction.charge }}</td>
+                <td>{{ transaction.final_amount }}</td>
+                <td>{{ transaction.savings_remain }}</td>
+                <td>{{ transaction.reference_number }}</td>
+                <td>{{ transaction.transaction_date }}</td>
+                <td>
+                    {% if transaction.request.is_paid %}
+                        <a href="{% url 'withdrawal:download_receipt' transaction.id %}" class="btn btn-primary">Download Receipt</a>
+                    {% else %}
+                        <span class="text-muted">Pending</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">No transactions found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

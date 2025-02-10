@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h2>Loan Committee Members</h2>
+    <a href="{% url 'loan:committee_add' %}" class="btn btn-primary mb-3">Add New Member</a>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Date Added</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for committee in committees %}
+            <tr>
+                <td>{{ committee.member.email }}</td>
+                <td>{{ committee.role }}</td>
+                <td>{{ committee.committee_member_status }}</td>
+                <td>{{ committee.date_added|date:"Y-m-d" }}</td>
+                <td>
+                    <a href="{% url 'loan:committee_edit' committee.id %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'loan:committee_delete' committee.id %}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">No committee members found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="my-4">
+        <a class="btn btn-secondary" href="{% url 'loan:admin_loan_dashboard' %}">Return to loan management dashboard</a>
+    </div>
+</div>
+{% endblock %}

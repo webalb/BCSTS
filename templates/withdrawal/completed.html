@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center">Your Withdrawal Request is Complete</h1>
+    <p class="text-center mt-3">Wait for management to review your request.</p>
+    <p class="text-center">You can check the progress of your request on your dashboard.</p>
+    <div class="d-flex justify-content-center">
+        <a href="{% url 'dashboard' %}" class="btn btn-success">Go to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

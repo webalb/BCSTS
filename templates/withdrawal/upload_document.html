@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Upload Document for Withdrawal Request</h2>
+    <p><strong>Withdrawal Type:</strong> {{ withdrawal_request.get_withdrawal_type_display }}</p>
+    <p><strong>Reason:</strong> {{ withdrawal_request.get_reason_display }}</p>
+    <p><strong>Required Document:</strong> {{ withdrawal_request.document_type }}</p>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Upload</button>
+    </form>
+
+    <a href="{% url 'dashboard' %}" class="btn btn-secondary mt-3">Back to dashboard</a>
+</div>
+{% endblock %}

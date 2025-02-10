@@ -1,0 +1,82 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Bank Account</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+
+    <h2>Add Employee Bank Account</h2>
+
+    <form id="accountForm" method="POST">
+        {% csrf_token %}
+        
+        <label>Account Number:</label>
+        <input type="text" id="account_number" name="account_number" required>
+
+        <label>Bank Name:</label>
+        <input type="text" id="bank_name" name="bank_name" list="bankList" required autocomplete="off">
+        <datalist id="bankList"></datalist>
+
+        <label>Account Name (Auto-filled):</label>
+        <input type="text" id="account_holder_name" name="account_holder_name" readonly>
+
+        <button type="button" id="verifyButton">Verify</button>
+        <button type="submit" id="saveButton" style="display:none;">Save</button>
+    </form>
+
+    <script>
+        let bankData = {};
+
+        // Load bank list from JSON
+        fetch("{% static 'js/banks.json' %}")
+            .then(response => response.json())
+            .then(data => {
+                bankData = data;
+                let bankList = document.getElementById("bankList");
+                Object.keys(bankData).forEach(bank => {
+                    let option = document.createElement("option");
+                    option.value = bank;
+                    bankList.appendChild(option);
+                });
+            })
+            .catch(error => console.error("Error loading bank list:", error));
+
+        document.getElementById("verifyButton").addEventListener("click", function () {
+            let accountNumber = document.getElementById("account_number").value;
+            let bankName = document.getElementById("bank_name").value;
+            let bankCode = bankData[bankName];
+
+            if (!accountNumber || !bankCode) {
+                alert("Please enter a valid account number and select a bank.");
+                return;
+            }
+            // axios.get(`https://nubapi.com/api/verify?account_number=${accountNumber}&bank_code=${bankCode}`, {
+
+            axios.get(`https://api.paystack.co/bank/resolve?account_number=${accountNumber}&bank_code=${bankCode}`, {
+                headers: {
+                    'Authorization': 'Bearer {{API_KEY}}',
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                if (response.data.status) {
+                    document.getElementById("account_holder_name").value = response.data.data.account_name;
+                    document.getElementById("verifyButton").style.display = "none";
+                    document.getElementById("saveButton").style.display = "block";
+                } else {
+                    alert("Account verification failed.");
+                }
+            }).catch(error => {
+                console.log(error)
+                console.error("Verification error:", error);
+                alert("Error verifying account.");
+            });
+        });
+    </script>
+
+</body>
+</html>

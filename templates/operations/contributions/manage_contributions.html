@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+{% block content %}
+
+<h2>Manage Contributions</h2>
+
+<!-- Filter Form for Month & Year Selection -->
+<form method="GET" action="{% url 'manage_contributions' %}">
+    <label for="month">Month:</label>
+    <select name="month" id="month">
+        {% for m in available_months %}
+            <option value="{{ m }}" {% if selected_month == m %}selected{% endif %}>{{ m }}</option>
+        {% endfor %}
+    </select>
+    
+    <label for="year">Year:</label>
+    <select name="year" id="year">
+        {% for y in available_years %}
+            <option value="{{ y }}" {% if selected_year == y %}selected{% endif %}>{{ y }}</option>
+        {% endfor %}
+    </select>
+    
+    <button type="submit" class="btn btn-primary">Filter</button>
+</form>
+
+<hr>
+
+<!-- Contributions List -->
+<h3>Recorded Contributions</h3>
+<table class="table table-dark">
+    <tr>
+        <th>Employee</th>
+        <th>Amount</th>
+        <th>Month</th>
+        <th>Year</th>
+        <th>Status</th>
+        <th>Action</th>
+    </tr>
+    {% for contribution in contributions %}
+    <tr>
+        <td>{{ contribution.employee.nitda_id }}</td>
+        <td>{{ contribution.amount }}</td>
+        <td>{{ contribution.month|month_name }}</td>
+        <td>{{ contribution.year }}</td>
+        <td>{{ contribution.get_status_display }}</td>
+        <td>
+            <a href="{% url 'delete_contribution' contribution.id %}" class="btn btn-danger btn-sm">Delete</a>
+        </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="6">No contributions recorded.</td></tr>
+    {% endfor %}
+</table>
+
+<hr>
+
+<!-- Missing Contributions -->
+<h3>Employees with Missing Contributions</h3>
+{% if missing_contributions %}
+<table class="table">
+    <tr>
+        <th>Employee</th>
+        <th>Action</th>
+    </tr>
+    {% for employee in missing_contributions %}
+    <tr>
+        <td>{{ employee.nitda_id }}</td>
+        <td>
+            <a href="{% url 'record_individual_contribution' employee.id %}" class="btn btn-success btn-sm">Record Contribution</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<a href="{% url 'record_all_missing_contributions' %}" class="btn btn-primary">Record All Missing Contributions</a>
+
+{% else %}
+<p>All employees have recorded contributions.</p>
+{% endif %}
+<a href="{% url 'admin_dashboard' %}" class="btn btn-primary">Return to dashboard</a>
+{% endblock %}

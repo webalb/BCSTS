@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Are you sure you want to delete this account?</h2>
+<p>{{ account.employee.nitda_id }} - {{ account.bank_name }} - {{ account.account_number }}</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Yes, Delete</button>
+    <a href="{% url 'dashboard' %}">Cancel</a>
+</form>
+{% endblock %}

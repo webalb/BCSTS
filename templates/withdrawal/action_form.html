@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">{{ action }} Withdrawal Request</h2>
+    
+    <form method="post" class="card p-4 shadow-sm">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label class="form-label">Employee:</label>
+            <input type="text" class="form-control" value="{{ withdrawal_request.employee.email }}" disabled>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Amount:</label>
+            <input type="text" class="form-control" value="{{ withdrawal_request.amount }}" disabled>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Action Note:</label>
+            {{ form.action_note }}
+        </div>
+        <button type="submit" class="btn btn-primary">{{ action }}</button>
+        <a href="{% url 'withdrawal:withdrawal_requests_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

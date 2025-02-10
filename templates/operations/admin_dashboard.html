@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    
+
+    <h2 class="text-center mb-4 mt-4">Admin Dashboard</h2>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title text-small" style="font-size: 14px">Total Employees</h5>
+                    <p class="card-text display-6 text-end fw-bold">{{ total_employees }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title " style="font-size: 14px">Total Amount withdrawed</h5>
+                    <p class="card-text display-6 fw-bold">₦{{ total_withdrawn|floatformat:2 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3" >
+                <div class="card-body">
+                    <h5 class="card-title" style="font-size: 14px">>Total Amount Raised</h5>
+                    <p class="card-text display-6 fw-bold">₦{{ total_amount_raised|floatformat:2 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title" style="font-size: 14px">>Total Amount Remained</h5>
+                    <p class="card-text display-6 fw-bold">₦{{ total_remained|floatformat:2 }}</p>
+                </div>
+            </div>
+        </div>
+        <!-- Graph for Contribution Trends -->
+        <div class="col-md-6">
+            <div class="card p-4 shadow mb-4">
+                <h5 class="mb-3">Contribution Trends</h5>
+                <canvas id="contributionChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="mt-3">
+        <a href="{% url 'withdrawal:withdrawal_requests_list' %}" class="btn btn-primary">
+            View Withdrawal Requests
+        </a>
+
+    </div>
+    <div class="mt-3">
+        <a href="{% url 'loan:admin_loan_dashboard' %}" class="btn btn-primary">
+            Loan Management dashboard
+        </a>
+
+    </div>
+    <div>
+        <a href="{% url 'withdrawal:admin_transactions' %}" class="btn btn-primary w-100 my-4">BCS transaction history</a>
+    </div>
+    <div class="mt-3">
+        <a href="{% url 'manage_employee_contributions' %}" class="btn btn-info">Manage employee contributions settings</a>
+    </div>
+    <div class="mt-3">
+        <a href="{% url 'withdrawal:charge_create' %}" class="btn btn-primary">Manage withdrawal charges setting</a>
+    </div>
+
+    <div class="mt-4">
+        <a href="{% url 'employee_list' %}" class="btn btn-primary">Manage employee</a>
+    </div>
+    <div class="mt-4">
+        <a href="{% url 'manage_contributions' %}" class="btn btn-primary">Manage contributions</a>
+    </div>
+    {% if today.day >= 7 and not contributions_exist %}
+        <div class="mt-4">
+            <a href="{% url 'record_all_contributions' %}" class="btn btn-primary">
+                Save Contributions for This Month
+            </a>
+        </div>
+    {% endif %}
+
+    <h3 class="mt-4">Employee Contributions</h3>
+    <!-- templates/contributions/employee_list.html -->
+    <table class="table table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Employee Name</th>
+                <th>Email</th>
+                <th>Total Contributed (₦)</th>
+                <th>Contribution History</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in employee_contributions %}
+            <tr>
+                <td>{{ record.employee.get_full_name }}</td>
+                <td>{{ record.employee.email }}</td>
+                <td>₦{{ record.total_contributed|floatformat:2 }}</td>
+                <td>
+                    <!-- Link to the detailed contributions page -->
+                    <a href="{% url 'view_contributions' record.employee.id %}" class="btn btn-info btn-sm">View Contributions</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="text-center text-muted">No employees found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<!-- Include Chart.js for Graph -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+var ctx = document.getElementById('contributionChart').getContext('2d');
+var contributionChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: {{ chart_labels|safe }},
+        datasets: [{
+            label: 'Total Contributions Over Time',
+            data: {{ chart_data|safe }},
+            borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            x: { beginAtZero: true },
+            y: { beginAtZero: true }
+        }
+    }
+});
+</script>
+{% endblock %}

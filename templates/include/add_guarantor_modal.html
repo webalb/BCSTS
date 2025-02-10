@@ -1,0 +1,35 @@
+<!-- Modal to Add Guarantors -->
+<div class="modal fade" id="addGuarantorModal" tabindex="-1" aria-labelledby="addGuarantorModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addGuarantorModalLabel">Add New Guarantor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{% url 'loan:add_guarantor' loan.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    {% if remaining_guarantors == 1 %}
+                        <div class="mb-3">
+                            <label for="guarantor_email" class="form-label">Guarantor's Email</label>
+                            <input type="email" class="form-control" id="guarantor_email" name="guarantor_email_1" required>
+                        </div>
+                    {% elif remaining_guarantors == 2 %}
+                        <div class="mb-3">
+                            <label for="guarantor_email_1" class="form-label">First Guarantor's Email</label>
+                            <input type="email" class="form-control" id="guarantor_email_1" name="guarantor_email_1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="guarantor_email_2" class="form-label">Second Guarantor's Email</label>
+                            <input type="email" class="form-control" id="guarantor_email_2" name="guarantor_email_2" required>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add Guarantor(s)</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

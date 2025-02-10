@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center">Withdrawal Request</h1><br><br>
+
+    <p class="fw-bold text-muted text-center">
+        Maximum withdrawal amount: <span id="maxAmount">N{{ available_to_withdraw }}</span>
+    </p>
+
+    <div class="d-flex justify-content-center">
+        <form id="withdrawalForm" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label for="id_withdrawal_type" class="form-label">Withdrawal Type</label>
+                {{ form.withdrawal_type }}
+            </div>
+
+            <div class="mb-3">
+                <label for="id_amount" class="form-label">Amount</label>
+                {{ form.amount }}
+                <small id="amountError" class="text-danger" style="display:none;">Invalid amount!</small>
+            </div>
+
+            <div class="mb-3">
+                <label for="id_reason" class="form-label">Reason</label>
+                {{ form.reason }}
+                <small id="reasonError" class="text-danger" style="display:none;">Please select a reason.</small>
+            </div>
+
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary">Submit Request</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const withdrawalTypeField = document.getElementById('id_withdrawal_type');
+        const amountField = document.getElementById('id_amount');
+        const reasonField = document.getElementById('id_reason');
+        const maxAmountText = document.getElementById('maxAmount');
+        const amountError = document.getElementById('amountError');
+        const reasonError = document.getElementById('reasonError');
+        const form = document.getElementById('withdrawalForm');
+
+        const availableToWithdraw = {{ available_to_withdraw }};
+        const totalSaving = {{ total_saving }};
+
+        function updateFormFields() {
+            if (withdrawalTypeField.value === 'complete') {
+                amountField.value = totalSaving;
+                amountField.readOnly = true;
+                reasonField.disabled = false;
+                maxAmountText.innerText = `N${totalSaving}`;
+            } else {
+                amountField.value = "";
+                amountField.readOnly = false;
+                reasonField.value = "";
+                reasonField.disabled = true;
+                amountField.placeholder = `Max: N${availableToWithdraw}`;
+                maxAmountText.innerText = `N${availableToWithdraw}`;
+            }
+        }
+
+        function validateAmount() {
+            const amountValue = parseFloat(amountField.value);
+            if (withdrawalTypeField.value === 'partial' && (amountValue > availableToWithdraw || amountValue <= 0)) {
+                amountError.style.display = 'block';
+                return false;
+            }
+            amountError.style.display = 'none';
+            return true;
+        }
+
+        function validateReason() {
+            if (withdrawalTypeField.value === 'complete' && !reasonField.value) {
+                reasonError.style.display = 'block';
+                return false;
+            }
+            reasonError.style.display = 'none';
+            return true;
+        }
+
+        withdrawalTypeField.addEventListener('change', updateFormFields);
+        amountField.addEventListener('input', validateAmount);
+        reasonField.addEventListener('change', validateReason);
+
+        form.addEventListener('submit', function(event) {
+            if (!validateAmount() || !validateReason()) {
+                event.preventDefault();
+            }
+        });
+
+        updateFormFields(); // Initialize on page load
+    });
+    </script>
+
+</div>
+{% endblock %}

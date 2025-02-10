@@ -1,0 +1,51 @@
+<!-- templates/contribution_history.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Contribution History</h1>
+
+<!-- Display messages (Success/Error) -->
+{% if messages %}
+    <ul class="alert alert-info">
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Employee Name</th>
+            <th>Amount</th>
+            <th>Change Reason</th>
+            <th>Changed By</th>
+            <th>Changed At</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in records %}
+            <tr>
+                <td>{{ record.contribution_setting.employee.get_full_name }}</td>
+                <td>₦{{ record.amount|floatformat:2 }}</td>
+                <td>{{ record.change_reason }}</td>
+                <td>{{ record.changed_by.get_full_name }}</td>
+                <td>{{ record.changed_at }}</td>
+                <td>
+                    <!-- Check if the user has permission to delete -->
+                        <a href="{% url 'delete_contribution_history' record.id %}" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="6" class="text-center">No contribution history available.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<div class="mt-3">
+    
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary btn-sm">Back to dashboard</a>
+</div>
+{% endblock %}

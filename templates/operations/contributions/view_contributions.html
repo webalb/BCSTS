@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Contribution History for {{ employee.get_full_name }}</h1>
+
+    <p><strong>Email:</strong> {{ employee.email }}</p>
+    <p><strong>Total Contributed:</strong> ₦{{ total_contributed|floatformat:2 }}</p>
+
+    <table class="table table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Month/Year</th>
+                <th>Amount (₦)</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for contribution in contributions %}
+            <tr>
+                <td>{{ contribution.month }}/{{ contribution.year }}</td>
+                <td>₦{{ contribution.amount|floatformat:2 }}</td>
+                <td>
+                    <span class="badge bg-success">{{ contribution.status|title }}</span>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" class="text-center text-muted">No contributions recorded</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Back to Employees</a>
+</div>
+{% endblock %}
