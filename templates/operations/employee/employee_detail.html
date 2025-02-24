@@ -1,39 +1,148 @@
-{% extends 'base.html' %}
-
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% load custom_filters %}
+{% block title %}
+Employee Details | Benovelance Cooperative
+{% endblock title %}
 {% block content %}
-<div class="container mt-4">
-    <h2>Employee Details</h2>
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title">{{ employee.first_name }} {{ employee.last_name }}</h5>
-            <p class="card-text"><strong>Email:</strong> {{ employee.email }}</p>
-            <p class="card-text"><strong>Phone Number:</strong> {{ employee.phone_number }}</p>
-            <p class="card-text"><strong>NITDA ID:</strong> {{ employee.nitda_id }}</p>
-            <p class="card-text"><strong>Gender:</strong> {{ employee.get_gender_display }}</p>
-            <p class="card-text"><strong>Position:</strong> {{ employee.position|default:"Not Set" }}</p>
-
-            <h4>Next of Kin Details</h4>
-            <p><strong>Name:</strong> {{ employee.next_of_kin_name }}</p>
-            <p><strong>Phone:</strong> {{ employee.next_of_kin_phone }}</p>
-            <p><strong>Relationship:</strong> {{ employee.next_of_kin_relationship }}</p>
-
-            <h4>Account Status</h4>
-            <p><strong>Email Verified:</strong> {% if employee.is_email_verified %} Yes {% else %} No {% endif %}</p>
-
-            {% if employee.passport_photo %}
-                <h4>Passport Photo</h4>
-                <img src="{{ employee.passport_photo.url }}" alt="Passport Photo" class="img-fluid" style="max-width: 200px;">
-            {% endif %}
-
-            <div class="mt-3">
-                <a href="{% url 'update_employee' employee.id %}" class="btn btn-warning">Edit</a>
-                <a href="{% url 'delete_employee' employee.id %}" class="btn btn-danger"
-                   onclick="return confirm('Are you sure you want to delete this employee?');">
-                   Delete
-                </a>
-                <a href="{% url 'employee_list' %}" class="btn btn-secondary">Back to List</a>
+<!-- sidenav  -->
+{% include 'include/admin_sidebar.html' %}
+<!-- end sidenav -->
+<main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200">
+    <!-- Navbar -->
+    {% include 'include/dashboard_navbar.html' %}
+    <!-- end Navbar -->
+    <!-- cards -->
+    <div class="w-full mx-auto ">
+        <div class="relative flex flex-col flex-auto min-w-0 p-4 mx-6 overflow-hidden min-h-10 break-words border-0 shadow-blur rounded-2xl bg-white/80 bg-clip-border backdrop-blur-2xl backdrop-saturate-200">
+            <div class="flex flex-wrap -mx-3">
+                <div class="flex-none w-auto max-w-full px-3">
+                    <div class="text-base ease-soft-in-out h-18.5 w-18.5 relative inline-flex items-center justify-center rounded-xl text-white transition-all duration-200">
+                        {% if employee.passport_photo %}
+                        <img src="{{ employee.passport_photo.url }}" alt="profile_image" class="shadow-soft-sm rounded-xl" style="width: 74px !important; height: 74px !important">
+                        {% else %}
+                        <img src="{% static 'assets/img/default.png' %}" alt="profile_image" class="shadow-soft-sm rounded-xl" style="width: 74px !important; height: 74px !important">
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="flex-none w-auto max-w-full px-3 my-auto">
+                    <div class="h-full">
+                        <h5 class="mb-1"> {{ employee.get_full_name }} </h5>
+                        <p class="mb-0 font-semibold leading-normal text-sm">{{ employee.email }}</p>
+                    </div>
+                </div>
+                <div class="w-full max-w-full px-3 mx-auto mt-4 sm:my-auto sm:mr-0 md:w-1/2 md:flex-none lg:w-4/12 ">
+                    <div class="relative right-0">
+                        <ul class="relative flex gap-2 flex-wrap p-1 list-none bg-transparent rounded-xl sm:flex-row" nav-pills="" role="tablist">
+                            <!-- Buttons Inside UL -->
+                            <li class="z-30 flex-auto text-center">
+                                <a href="{% url 'update_employee' employee.id %}" class="px-3 py-2 mb-0 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer shadow-soft-md leading-pro text-xs bg-blue-500 hover:scale-102 hover:shadow-soft-xs active:opacity-85">Edit</a>
+                            </li>
+                            <li class="z-30 flex-auto text-center">
+                                <a href="{% url 'employee_list' %}" class="px-3 py-2 mb-0 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer shadow-soft-md leading-pro text-xs bg-green-500 hover:scale-102 hover:shadow-soft-xs active:opacity-85">Back to List</a>
+                            </li>
+                            <li class="z-30 flex-auto text-center">
+                                <a href="{% url 'delete_employee' employee.id %}" class="px-3 py-2 mb-0 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer shadow-soft-md leading-pro text-xs bg-red-500 hover:scale-102 hover:shadow-soft-xs active:opacity-85" onclick="return confirm('Are you sure you want to delete this employee?');">Delete</a>
+                            </li>
+                            <li class="z-30 flex-auto text-center sm:mt-6 lg-max:mt-6">
+                                <a href="{% url 'toggle_employee_active' employee.id %}" class="px-3 py-2 mb-0 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer shadow-soft-md leading-pro text-xs {% if employee.is_active %}bg-yellow-500 hover:scale-102 hover:shadow-soft-xs active:opacity-85{% else %}bg-gray-600 hover:scale-102 hover:shadow-soft-xs active:opacity-85{% endif %} " onclick="return confirm('Are you sure you want to {% if employee.is_active %}deactivate{% else %}activate{% endif %} this employee?');">
+                                    {% if employee.is_active %}
+                                    Deactivate
+                                    {% else %}
+                                    Activate
+                                    {% endif %}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
+    <div class="w-full p-6 mx-auto">
+        <div class="flex flex-wrap -mx-3">
+            <div class="w-full max-w-full px-3 xl:w-4/12">
+                <div class="relative flex flex-col h-full min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
+                    <div class="p-4 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
+                        <div class="flex flex-wrap -mx-3">
+                            <div class="flex items-center w-full max-w-full px-3 shrink-0 md:w-8/12 md:flex-none">
+                                <h6 class="mb-0">Profile Information</h6>
+                            </div>
+                            <div class="w-full max-w-full px-3 text-right shrink-0 md:w-4/12 md:flex-none">
+                                <a href="{% url 'update_employee' employee.id %}" data-target="tooltip_trigger" data-placement="top">
+                                    <i class="leading-normal fas fa-user-edit text-sm text-slate-400"></i>
+                                </a>
+                                <div data-target="tooltip" class="hidden px-2 py-1 text-center text-white bg-black rounded-lg text-sm" role="tooltip" data-popper-placement="top" style="position: absolute; inset: auto auto 0px 0px; margin: 0px; transform: translate(960px, 256px);" data-popper-reference-hidden="" data-popper-escaped="">
+                                    Edit Profile
+                                    <div class="invisible absolute h-2 w-2 bg-inherit before:visible before:absolute before:h-2 before:w-2 before:rotate-45 before:bg-inherit before:content-['']" data-popper-arrow="" style="position: absolute; left: 0px; transform: translate(0px, 0px);"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex-auto p-4">
+                        <h6 class="font-bold leading-tight uppercase text-xs text-slate-500 mt-4 mb-2">Personal Details</h6>
+                        <ul class="flex flex-col pl-0 mb-0 rounded-lg">
+                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-t-lg text-sm"><strong class="text-slate-700">Full Name:</strong> &nbsp; {{ employee.get_full_name }}</li>
+                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-slate-700">Mobile:</strong> &nbsp; {{ employee.phone_number }}</li>
+                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-slate-700">Email:</strong> &nbsp; {{ employee.email }}</li>
+                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-slate-700">Staff ID:</strong> &nbsp; {{ employee.nitda_id }}</li>
+                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-slate-700">Gender:</strong> &nbsp; {{ employee.get_gender_display }}</li>
+                        </ul>
+                        <h6 class="font-bold leading-tight uppercase text-xs text-slate-500 mt-4 mb-2">Next of Kin Details</h6>
+                        <ul class="flex flex-col pl-0 mb-0 rounded-lg">
+                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-t-lg text-sm"><strong class="text-slate-700">Full Name:</strong> &nbsp; {{ employee.next_of_kin_name }}</li>
+                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-slate-700">Mobile:</strong> &nbsp; {{ employee.next_of_kin_phone }}</li>
+                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-slate-700">Relationship:</strong> &nbsp; {{ employee.next_of_kin_relationship }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full max-w-full px-3 lg-max:mt-6 xl:w-4/12">
+                <div class="relative flex flex-col h-full min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
+                    <div class="p-4 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
+                        <h6 class="mb-0">Financial Informations</h6>
+                    </div>
+                    <div class="flex-auto p-4">
+                        <h6 class="font-bold leading-tight uppercase text-xs text-slate-500">Accounts</h6>
+                        <ul class="flex flex-col pl-0 mb-0 rounded-lg">
+                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-t-lg text-sm"><strong class="text-slate-700">Total Balance:</strong> &nbsp; ₦{{ total_remained_balance|floatformat:2|intcomma }}</li>
+                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 text-sm">
+                                <strong class="text-slate-700">Savings (60%):</strong> &nbsp; ₦{{ savings_balance|floatformat:2|intcomma }}
+                            </li>
+                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-b-lg text-sm">
+                                <strong class="text-slate-700">Investment (40%):</strong> &nbsp; ₦{{ investment_balance|floatformat:2|intcomma }} {# New Line #}
+                            </li>
+                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-b-lg text-sm">
+                                <strong class="text-slate-700">Monthly Contribution:</strong> &nbsp; ₦{{ employee.contribution_setting.amount|floatformat:2|intcomma }} {# New Line #}
+                            </li>
+                        </ul>
+                        <h6 class="mt-6 font-bold leading-tight uppercase text-xs text-slate-500">Financial Summary</h6>
+                        <ul class="flex flex-col pl-0 mb-0 rounded-lg">
+                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-b-lg text-sm">
+                                <strong class="text-slate-700">Total Withdrawed:</strong> &nbsp; ₦{{ total_withdrawn|floatformat:2|intcomma }} {# New Line #}
+                            </li>
+                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-b-lg text-sm">
+                                <strong class="text-slate-700">Austanding Credit:</strong> &nbsp; ₦{{ total_withdrawn|floatformat:2|intcomma }}                            </li>
+                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-b-lg text-sm">
+                                <strong class="text-slate-700">Total Money Contributed:</strong> &nbsp; ₦{{ total_contributions|floatformat:2|intcomma }} {# New Line #}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full max-w-full px-3 lg-max:mt-6 xl:w-4/12">
+                <div class="relative flex flex-col h-full min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
+                    <div class="p-4 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
+                        <h6 class="mb-0">Conversations</h6>
+                    </div>
+                    <div class="flex-auto p-4">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include 'include/dashboard_footer.html' %}
+    </div> <!-- end cards -->
+</main>
 {% endblock %}

@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% load static %}
+{% load custom_filters %}
+{% load humanize %}
+{% block title %}
+Upload Contributions | Benevolence Cooperative
+{% endblock title %}
+{% block header %}
+<!-- DataTables CSS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+{% endblock header %}
+{% block content %}
+<!-- sidenav  -->
+{% include 'include/admin_sidebar.html' %}
+<!-- end sidenav -->
+<main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200 text-gray-900">
+    <!-- Navbar -->
+    {% include 'include/dashboard_navbar.html' %}
+    <!-- end Navbar -->
+    <div class="w-full py-6 px-6 mx-auto">
+        <div class="min-w-0 p-4">
+            <h2 class="text-xl font-bold">Upload Contributions</h2>
+        </div>
+        <div class="relative flex flex-col flex-auto min-w-0 p-4 mb-4 overflow-hidden min-h-10 break-words border-0 rounded-2xl bg-white/80 bg-clip-border backdrop-blur-2xl backdrop-saturate-200">
+            <div class="flex flex-wrap -mx-3">
+                <div class="flex-none w-auto max-w-full px-3 my-auto">
+                    <div class="h-full">
+                        <div class="mt-4">
+                            <p>Upload Contributions:</p>
+                            <div id="progress-container" style="display: none;">
+                                <div id="progress-bar">
+                                    <div class="mx-auto">
+                                        <div>
+                                            <div>
+                                                <span id="progress-text" class="font-semibold leading-tight text-xs">0%</span>
+                                            </div>
+                                        </div>
+                                        <div class="text-xs h-0.75 w-30 m-0 flex overflow-visible rounded-lg bg-gray-200">
+                                            <div id="progress-inner" class="duration-600 ease-soft bg-gradient-to-tl from-green-600 to-lime-400 -mt-0.38 -ml-px flex h-1.5 w-0 flex-col justify-center overflow-hidden whitespace-nowrap rounded bg-fuchsia-500 text-center text-white transition-all" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="success-message" class=" hidden p-2 bg-green-100 rounded-lg my-6"></div>
+                            <div id="error-message" class="hidden p-2 bg-red-100 rounded-lg"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full max-w-full px-3 mx-auto mt-4 sm:my-auto sm:mr-0 md:w-1/2 md:flex-none lg:w-4/12 ">
+                    <div class="inline-block">
+                        <label for="month" class=" text-sm font-medium text-gray-700">Upload (.xlsx):</label>
+                        <input class="p-2 border rounded-md w-full sm:w-auto" type="file" id="file-upload" />
+                    </div>
+                    <div class="inline-block">
+                        <button id="upload-btn" type="button" class="px-3 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 w-full sm:w-auto" onclick="uploadFile()" aria-label="Upload File">
+                            Upload
+                        </button>
+                        <a href="{% url 'manage_contributions' %}" class="text-red-500">Go back</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Contributions List -->
+        <div class="bg-white p-4 rounded-lg shadow-md">
+            <h3 class="text-lg font-bold mb-2">Preview Data</h3>
+            <!-- Missing Contributions -->
+            <button id="confirm-btn" disabled onclick="confirmUpload()" class="px-3 py-1 bg-gray-500 text-white rounded hover:bg-green-600">Confirm upload</button>
+            <div class="" id="preview-table-container">
+                <table id="contributionsTable" class="w-full text-sm text-left border border-gray-200 overflow-x-auto, overflow-y-auto">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="p-2">Employee Email</th>
+                            <th class="p-2">Amount</th>
+                            <th class="p-2">Month</th>
+                            <th class="p-2">Year</th>
+                        </tr>
+                    </thead>
+                    <tbody id="preview-table">
+                        <tr class="border-t border-gray-300">
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% include 'include/dashboard_footer.html' %}
+    </div>
+</main>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script>
+$(document).ready(function() {
+    let table = $('#contributionsTable').DataTable({
+        // "paging": true,
+        "searching": true,
+        "ordering": true,
+        "responsive": true,
+        "scrollY": "300px",
+        "scrollCollapse": true, 
+        "paging": false
+    });
+
+    $("#preview-table-container").hide(); // Initially hide preview table
+});
+
+function uploadFile() {
+    let fileInput = document.getElementById("file-upload");
+    let file = fileInput.files[0];
+
+    if (!file) {
+        alert("Please select a file.");
+        return;
+    }
+
+    let formData = new FormData();
+    formData.append("file", file);
+    formData.append("csrfmiddlewaretoken", "{{ csrf_token }}");
+
+    // Reset UI elements
+    $("#progress-container").show();
+    $("#progress-bar").css("width", "0%");
+    $("#progress-text").text("0%");
+    $("#success-message, #error-message").hide();
+    $("#preview-table-container").hide();
+
+    // Disable upload button & change text
+    $("#upload-btn").prop("disabled", true).addClass("bg-gray-500").removeClass("bg-green-500").text("Uploading...");
+
+    $.ajax({
+        url: "{% url 'bulk_upload_contributions' %}",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        xhr: function() {
+            let xhr = new window.XMLHttpRequest();
+            xhr.upload.addEventListener("progress", function(evt) {
+                if (evt.lengthComputable) {
+                    let percentComplete = Math.round((evt.loaded / evt.total) * 100);
+                    $("#progress-bar").css("width", percentComplete + "%");
+                    $("#progress-text").text(percentComplete + "%");
+                }
+            }, false);
+            return xhr;
+        },
+        success: function(response) {
+            $("#progress-bar").css("width", "100%");
+            $("#progress-text").text("100%");
+
+            // Append success message
+            $("#success-message").text("Review the preview data below and confirm!").show();
+            $("#error-message").hide();
+
+            // Populate preview table
+            let tableBody = $("#preview-table");
+            tableBody.empty();
+            response.preview_data.forEach(row => {
+                tableBody.append(`<tr class="border-t border-gray-300">
+                                    <td class="p-2">${row.Email}</td>
+                                    <td class="p-2">${row.Amount}</td>
+                                    <td class="p-2">${row.Month}</td>
+                                    <td class="p-2">${row.Year}</td>
+                                  </tr>`);
+            });
+
+            // Show the table
+            $("#preview-table-container").show();
+        },
+        error: function(xhr) {
+            let errorMessage = xhr.responseJSON?.error || "An error occurred. Please try again.";
+            $("#error-message").text(errorMessage).show();
+            $("#success-message").hide();
+            $("#progress-container").hide();
+        },
+        complete: function() {
+            // Re-enable the upload button
+            $("#upload-btn").text("Click confirm below to save");
+            $("#confirm-btn").prop("disabled", false).removeClass("bg-gray-500").addClass("bg-green-500");
+        }
+    });
+}
+
+function confirmUpload() {
+    $.ajax({
+        url: "{% url 'confirm_bulk_upload' %}",
+        type: "POST",
+        data: { csrfmiddlewaretoken: "{{ csrf_token }}" },
+        success: function(response) {
+            $("#success-message").html(`Successfully uploaded ${response.uploaded} records. <br>Skipped ${response.duplicates} duplicates. Upload another file if needed.`).show();
+            $("#error-message").hide();
+
+            // Clear preview table
+            $("#preview-table").empty();
+            $("#preview-table-container").hide();
+            $("#confirm-btn").prop("disabled", true).removeClass("bg-green-500").addClass("bg-gray-500");
+            $("#upload-btn").prop("disabled", false).removeClass("bg-gray-500").addClass("bg-green-500").text("Upload another record");
+        },
+        error: function(response) {
+            $("#error-message").text(response.responseJSON.error).show();
+        }
+    });
+}
+</script>
+{% endblock %}

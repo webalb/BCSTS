@@ -2,7 +2,9 @@ from django.contrib.auth.views import LoginView
 from django.urls import path
 from django.contrib.auth import views as auth_views
 
-from .views import register, activate_email, logout_view, change_password, my_login_view, employee_list, create_employee, update_employee, delete_employee, employee_detail
+from .views import (register, activate_email, logout_view, change_password, my_login_view, 
+    employee_list, create_employee, update_employee, delete_employee, 
+    employee_detail, toggle_employee_active,employee_specific_detail )
 
 urlpatterns = [
     path("register/", register, name="register"),
@@ -22,6 +24,9 @@ urlpatterns = [
     path('update/<int:employee_id>/', update_employee, name='update_employee'),
     path('delete/<int:employee_id>/', delete_employee, name='delete_employee'),
     path('details/<int:employee_id>/', employee_detail, name='employee_detail'),
+    path('my-details/<int:employee_id>/', employee_specific_detail, name='employee_specific_detail'),
+
+    path('toggle_active/<int:employee_id>/', toggle_employee_active, name='toggle_employee_active'),
 
 
 ]

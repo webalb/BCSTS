@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Apply for a credit</h2>
+    <p>Please fill out the credit application form.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label class="form-label">credit Type</label>
+            {{ form.loan_type }}
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Purpose</label>
+            {{ form.purpose }}
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Repayment Period (Months)</label>
+            {{ form.repayment_period }}
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit Application</button>
+    </form>
+</div>
+{% endblock %}

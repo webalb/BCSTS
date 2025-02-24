@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% load custom_filters %}
+{% block title %}
+Withdrawal management | Benovelance Cooperative
+{% endblock title %}
+{% block header %}
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+{% endblock header %}
+{% block content %}
+<!-- sidenav  -->
+{% include 'include/admin_sidebar.html' %}
+<!-- end sidenav -->
+<main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200">
+    <!-- Navbar -->
+    {% include 'include/dashboard_navbar.html' %}
+    <!-- end Navbar -->
+    <!-- cards -->
+    <div class="w-full px-6 py-6 mx-auto">
+        <!-- row 1 -->
+        <div class="flex flex-wrap -mx-3">
+            <!-- card1 -->
+            <div class="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/2">
+                <div class="relative flex flex-col min-w-0 break-words bg-white shadow-soft-xl rounded-2xl bg-clip-border">
+                    <div class="flex-auto p-4">
+                        <div class="flex flex-row -mx-3">
+                            <div class="flex-none w-2/3 max-w-full px-3">
+                                <div>
+                                    <p class="mb-0 font-sans font-semibold leading-normal text-sm">Savings Balance</p>
+                                    <h4 class="mb-0 font-bold text-gray-900">
+                                        ₦{{ savings_balance|intcomma }}
+                                    </h4>
+                                    <p>
+                                        <span class="leading-normal text-sm font-weight-bolder text-lime-500">60%</span> of BCS total balance</p>
+                                </div>
+                            </div>
+                            <div class="px-3 text-right basis-1/3">
+                                <div class="inline-block w-12 h-12 text-center rounded-lg bg-green-500">
+                                    <i class="fa fa-coins leading-none  text-lg relative top-3.5 text-white"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- card2 -->
+            <div class="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/2">
+                <div class="relative flex flex-col min-w-0 break-words bg-white shadow-soft-xl rounded-2xl bg-clip-border">
+                    <div class="flex-auto p-4">
+                        <div class="flex flex-row -mx-3">
+                            <div class="flex-none w-2/3 max-w-full pl-3">
+                                <div>
+                                    <p class="mb-0 font-sans font-semibold leading-normal text-sm">Total Withdrawn</p>
+                                    <h4 class="mb-0 font-bold text-gray-900">
+                                        ₦{{ total_withdrawn|intcomma }}
+                                    </h4>
+                                    <p class="leading-normal text-sm font-weight-bolder">Total amount withdrawn</p>
+                                </div>
+                            </div>
+                            <div class="px-3 text-right basis-1/3">
+                                <div class="inline-block w-12 h-12 text-center rounded-lg bg-green-500">
+                                    <i class="fas fa-chart-line leading-none text-lg relative top-3.5  text-white"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-wrap mt-6 -mx-3">
+            <div class="w-full max-w-full px-3 mt-0 mb-6 md:mb-0 md:flex-none lg:flex-none">
+                <div class="border-black/12.5 shadow-soft-xl relative flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid bg-white bg-clip-border">
+                    <div class="border-black/12.5 mb-0 rounded-t-2xl border-b-0 border-solid bg-white p-6 pb-0">
+                        <div class="flex flex-wrap mt-0 -mx-3">
+                            <div class="flex-none w-12/12 max-w-full px-3 mt-0 lg:w-1/2 lg:flex-none">
+                                <h6 class="text-black-800">Withdrawal Requests</h6>
+                                <p class="mb-0 leading-normal text-sm">
+                                    <a class="inline-block px-3 py-1 font-bold text-white uppercase transition-all bg-green-500 rounded-lg hover:scale-105 " href="{% url 'withdrawal:charge_management' %}">
+                                        <i class="fa fa-cog text-white"></i> Manage withdrawal charges</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex-auto p-6 px-0 pb-2">
+                        <div class="overflow-x-auto">
+                            {% if withdrawal_requests %}
+                            <table class="items-center w-full mb-0 align-top border-gray-200 text-slate-500">
+                                <thead class="align-bottom">
+                                    <tr>
+                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800">Employee</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800">Amount</th>
+                                        <th class="px-6 py-3 pl-2 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800">Charges Applied</th>
+                                        <th class="px-6 py-3 pl-2 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800">Date Requested</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle text-sm border-b letter border-b-solid whitespace-nowrap border-b-gray-200 text-black-800">Status</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle text-sm border-b letter border-b-solid whitespace-nowrap border-b-gray-200 text-black-800">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for request in withdrawal_requests %}
+                                    <tr>
+                                        <td class="ml-3 p-2 align-middle bg-transparent border-b whitespace-nowrap text-center">
+                                            <h6 class="mb-0 leading-normal text-sm">{{ request.employee.nitda_id }}</h6>
+                                        </td>
+                                        <td class="ml-3 p-2 align-middle bg-transparent border-b whitespace-nowrap text-center">
+                                            <h6 class="mb-0 leading-normal text-sm">₦{{ request.amount_requested|intcomma }}</h6>
+                                        </td>
+                                        <td class="ml-3 p-2 align-middle bg-transparent border-b whitespace-nowrap text-center">
+                                            <h6 class="mb-0 leading-normal text-sm">₦{{ request.charges_applied|intcomma }}</h6>
+                                        </td>
+                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap text-center">
+                                            <h6 class="mb-0 leading-normal text-sm">{{ request.request_date }}</h6>
+                                            {% if request.status == 'approved' %}
+                                            <h6 class="mb-0 leading-normal text-sm">Approved on: {{ request.action_date }}</h6>
+                                            {% endif %}
+                                        </td>
+                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap text-center">
+                                            <h6 class="mb-0 leading-normal text-sm">{{ request.get_status_display }}</h6>
+                                        </td>
+                                        {% if request.status == 'approved' %}
+                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap text-center">
+                                            <h6 class="mb-0 leading-normal text-sm">{{ request.action_date }}</h6>
+                                        </td>
+                                        {% endif %}
+                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap text-center">
+                                            {% if request.status == 'pending' %}
+                                            <a href="{% url 'withdrawal:approve_request' request.id %}" class="text-green-700 font-bold border-solid border-black" onclick="return confirm('Are you sure you want to Approve this withdrawal request?');">Approve</a> |
+                                             <a href="#" class="text-red-700 font-bold border-solid border-black" onclick="openDeclineModal('{{ request.id }}')">
+                                                    Decline
+                                                </a> |
+                                                <a href="#" class="text-blue-700 font-bold border-solid border-black" onclick="openPayModal('{{ request.id }}')">
+                                                    Pay
+                                                </a>
+                                            {% elif request.status == 'approved' %}
+                                                <a href="#" class="text-blue-700 font-bold border-solid border-black" onclick="openPayModal('{{ request.id }}')">
+                                                    Pay
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% else %}
+                            <p class="p-4">No outstanding withdrawal request</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- cards row 3 -->
+        <div class="flex flex-wrap my-6 -mx-3">
+            <!-- card 1 -->
+            <div class="w-full max-w-full px-3 mt-0 mb-6 md:mb-0 md:flex-none lg:flex-none">
+                <div class="border-black/12.5 shadow-soft-xl relative flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid bg-white bg-clip-border">
+                    <div class="border-black/12.5 mb-0 rounded-t-2xl border-b-0 border-solid bg-white p-6 pb-0">
+                        <div class="flex flex-wrap mt-0 -mx-3">
+                            <div class="flex-none w-12/12 max-w-full px-3 mt-0 lg:w-1/2 lg:flex-none">
+                                <h6 class="text-black-800">Withdrawal Transactions History</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex-auto p-6 px-0 pb-2">
+                        <div class="p-4">
+                            <table id="withdrawalHistory" class="items-center w-full mb-0 align-top border-gray-200 text-slate-500 ">
+                                <thead class="align-bottom">
+                                    <tr>
+                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800">#</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800">Employee</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800">Amount</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800">Request Date</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800">Status</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800">Action Date</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800">Charges Applied</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800">Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for record in withdrawal_history %}
+                                    <tr class="p-2">
+                                        <td class="ml-3 p-2 align-middle bg-transparent border-b whitespace-nowrap">
+                                            <h6 class="mb-0 leading-normal text-sm">{{ forloop.counter }}</h6>
+                                        </td>
+                                        <td class="ml-3 p-2 align-middle bg-transparent border-b whitespace-nowrap">
+                                            <h6 class="mb-0 leading-normal text-sm">{{ record.employee.email }}</h6>
+                                        </td>
+                                        <!-- Amount Requested -->
+                                        <td class="ml-3 p-2 align-middle bg-transparent border-b whitespace-nowrap">
+                                            <h6 class="mb-0 leading-normal text-sm">₦{{ record.amount_requested|intcomma }}</h6>
+                                        </td>
+                                        <!-- Request Date -->
+                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap ">
+                                            <h6 class="mb-0 leading-normal text-sm">{{ record.request_date }}</h6>
+                                        </td>
+                                        <!-- Status -->
+                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap ">
+                                            <h6 class="mb-0 leading-normal text-sm">{{ record.get_status_display }}</h6>
+                                        </td>
+                                        <!-- Action Date (Different Based on Status) -->
+                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap">
+                                            <h6 class="mb-0 leading-normal text-sm">
+                                                {% if record.status == 'cancelled' or record.status == 'declined' %}
+                                                {{ record.action_date }}
+                                                {% elif record.status == 'paid' %}
+                                                {{ record.approved_date }}
+                                                {% endif %}
+                                            </h6>
+                                        </td>
+                                        <!-- Charges Applied -->
+                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap">
+                                            <h6 class="mb-0 leading-normal text-sm">₦{{ record.charges_applied|default:"0.00" }}</h6>
+                                        </td>
+                                        <!-- Additional Details Based on Status -->
+                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap text-xs">
+                                            {% if record.status == 'declined' %}
+                                            <strong>Action Note:</strong> {{ record.action_note }}
+                                            {% elif record.status == 'paid' %}
+                                            <strong>Payment Ref:</strong> {{ record.payment_reference }}<br>
+                                            <strong>Payment Date:</strong> {{ record.payment_date }}<br>
+                                            <strong>Total Withdrawn:</strong> ₦{{ record.total_amount_withdrawn|default:"0.00" }}
+                                            {% else %}
+                                            N/A
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">No withdrawal history available.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% include 'include/dashboard_footer.html' %}
+    </div> <!-- end cards -->
+</main>
+<div id="declineModal" class="hidden fixed bottom-4 right-4 z-50 bg-gray-900 bg-opacity-50 p-4">
+    <div class="bg-red-200 p-6 rounded-lg shadow-lg w-80 border-black/12.5 shadow-soft-xl bg-clip-border " style="position: fixed; bottom: 20px; right: 20px;">
+        <h2 class="text-lg font-bold mb-4 text-red-800">Decline Withdrawal Request</h2>
+        <form id="declineForm" method="POST" action="{% url 'withdrawal:update_withdrawal_status' %}">
+            {% csrf_token %}
+            <input type="hidden" id="declineRequestId" name="request_id">
+            <input type="hidden" id="action" name="action" value="decline">
+            <label for="declineNote" class="block mb-2 text-red-800">Reason for Decline:</label>
+            <textarea id="declineNote" name="action_note" required class="w-full p-2 border rounded"></textarea>
+            <div class="mt-4 flex justify-end">
+                <button type="button" onclick="closeDeclineModal()" class="px-4 py-2 bg-gray-500 text-white rounded mr-2">Cancel</button>
+                <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded">Decline</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="payModal" class="hidden fixed bottom-4 right-4 z-50 bg-gray-900 bg-opacity-50 p-4">
+    <div class="bg-green-500 p-6 rounded-lg shadow-lg w-80 border-black/12.5 shadow-soft-xl bg-clip-border" style="position: fixed; bottom: 20px; right: 20px;">
+        <h2 class="text-lg font-bold mb-4 text-white">Process Payment</h2>
+        <form id="payForm" method="POST" action="{% url 'withdrawal:update_withdrawal_status' %}">
+            {% csrf_token %}
+            <input type="hidden" id="payRequestId" name="request_id">
+            <input type="hidden" id="action" name="action" value="pay">
+            <label for="paymentRef" class="block mb-2 text-white">Payment Reference No:</label>
+            <input type="text" id="paymentRef" name="payment_reference" required class="w-full p-2 border rounded">
+            <div class="mt-4 flex justify-end">
+                <button type="button" onclick="closePayModal()" class="px-4 py-2 bg-gray-500 text-white rounded mr-2">Cancel</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Pay</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- JavaScript for Charge Calculation & Submit Control -->
+<script>
+    function openDeclineModal(requestId) {
+        document.getElementById("declineRequestId").value = requestId;
+        console.log(requestId)
+        document.getElementById("declineModal").classList.remove("hidden");
+    }
+
+    function closeDeclineModal() {
+        document.getElementById("declineModal").classList.add("hidden");
+    }
+
+    function openPayModal(requestId) {
+        document.getElementById("payRequestId").value = requestId;
+        console.log(requestId)
+        document.getElementById("payModal").classList.remove("hidden");
+    }
+
+    function closePayModal() {
+        document.getElementById("payModal").classList.add("hidden");
+    }
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#withdrawalHistory').DataTable({
+        "paging": true,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "responsive": true,
+        "scrollX": true,
+        "autoWidth": false,
+    });
+});
+</script>
+{% endblock %}

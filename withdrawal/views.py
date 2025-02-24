@@ -1,19 +1,57 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
-from .models import EmployeeAccountDetails, WithdrawalCharge, EmployeeSavings
+from .models import EmployeeAccountDetails, Charges, Withdrawals
 from .forms import EmployeeAccountForm, WithdrawalChargeForm
 from django.conf import settings
 from django.urls import reverse
 from django.core.exceptions import ValidationError
-
-
+from operations.utils import get_employee_financial_summary, get_system_financial_summary
+from decimal import Decimal
+from django.utils import timezone
 # Admin check function
 def is_admin(user):
     return user.groups.filter(name="admin").exists()
 
 def is_employee(user):
     return user.groups.filter(name="Employee").exists()
+
+
+
+@login_required
+@user_passes_test(is_employee)
+def employee_withdrawal_management(request):
+    employee = request.user
+    withdrawal_request = Withdrawals.get_employee_withdrawal_request(employee=employee)
+    withdrawal_history = Withdrawals.get_employee_withdrawal_history(employee=employee)
+    financial_summary = get_employee_financial_summary(employee)
+    charge = Charges.get_current_charge()
+    context = {
+        "withdrawal_request": withdrawal_request,
+        "withdrawal_history": withdrawal_history,
+        "savings_balance": financial_summary["savings_balance"],
+        "total_withdrawn": financial_summary["total_withdrawn"],
+        "charge": charge,
+    }
+
+    return render(request, "withdrawal/employee_withdrawals.html", context)
+
+@login_required
+@user_passes_test(is_admin)
+def admin_withdrawal_management(request):
+    withdrawal_requests = Withdrawals.get_withdrawal_requests()
+    withdrawal_history = Withdrawals.get_withdrawal_history()
+    financial_summary = get_system_financial_summary()
+    charge = Charges.get_current_charge()
+    context = {
+        "withdrawal_requests": withdrawal_requests,
+        "withdrawal_history": withdrawal_history,
+        "savings_balance": financial_summary["total_system_savings_balance"],
+        "total_withdrawn": financial_summary["total_withdrawn"],
+        "charge": charge,
+    }
+    
+    return render(request, "withdrawal/admin_withdrawals.html", context)
 
 @login_required
 @user_passes_test(is_employee)
@@ -47,311 +85,169 @@ def delete_account(request, pk):
 
 
 
-# ==========================
-# WITHDRAWAL CHARGE MODEL
-# ==========================
-@login_required
-@user_passes_test(is_admin)
-def withdrawal_charge_create(request):
-    """Handles the creation of a new withdrawal charge."""
-    charges = WithdrawalCharge.objects.all()
-    if request.method == "POST":
-        form = WithdrawalChargeForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Withdrawal charge added successfully!")
-            return redirect('withdrawal:charge_create')  # Redirect to the charge list page
-    else:
-        form = WithdrawalChargeForm()
-
-    return render(request, "withdrawal/charge_form.html", {"form": form, 'charges': charges})
-
+# # ==========================
+# # WITHDRAWAL CHARGE MODEL
+# # ==========================
+from django.http import JsonResponse
+from django.db import transaction
 
 @login_required
 @user_passes_test(is_admin)
-def withdrawal_charge_delete(request, pk):
-    """Delete a withdrawal charge."""
-    charge = get_object_or_404(WithdrawalCharge, pk=pk)
+def charge_management(request):
+    """Admin view to manage withdrawal charges."""
+    current_charge = Charges.get_current_charge()
+    charge_history = Charges.objects.all().order_by("-created_at")  # List all charges
 
-    if request.method == "POST":
-        charge.delete()
-        messages.success(request, "Withdrawal charge deleted successfully!")
-        return redirect('withdrawal:charge_create')
-
-    return redirect('withdrawal:charge_create')
-
-
-# 
-# WITHDRAWAL REQUEST IMPLEMENTATION VIEWS
-# 
-from django.http import HttpResponseRedirect
-
-@login_required
-def withdrawal_policy(request):
-    """ Display the withdrawal policy page with download option. """
-    if request.method == "POST":
-        return HttpResponseRedirect(reverse('withdrawal:request_form'))
-    
-    return render(request, "withdrawal/withdrawal_policy.html")
-
-
-from .models import WithdrawalRequest
-from .forms import WithdrawalRequestForm
-
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from .models import WithdrawalRequest, EmployeeSavings
-from .forms import WithdrawalRequestForm
-
-@login_required
-def withdrawal_request_form(request):
-    """Form for employees to request withdrawal."""
-    
-    # Get or create EmployeeSavings for the logged-in user
-    savings, _ = EmployeeSavings.objects.get_or_create(employee=request.user)
-    
-    available_to_withdraw = savings.available_for_withdrawal()
-    total_saving = savings.total_to_withdraw
-
-    if request.method == 'POST':
-        form = WithdrawalRequestForm(request.POST, request.FILES)
-        if form.is_valid():
-            withdrawal_request = form.save(commit=False)
-            withdrawal_request.employee = request.user  # Assign logged-in employee
-            if withdrawal_request.withdrawal_type == 'partial':
-                withdrawal_request.status = 'pending'
-
-            try:
-                withdrawal_request.save()  # Runs model validation
-                messages.success(request, "Withdrawal request submitted successfully.")
-                
-                if withdrawal_request.withdrawal_type == 'complete':
-                    return redirect('withdrawal:upload_documents', withdrawal_request.id)
-                return redirect('withdrawal:completed')
-
-            except ValidationError as e:
-                messages.error(request, e)
-
-        else:
-            messages.error(request, "Please correct the errors below.")
-
-    else:
-        form = WithdrawalRequestForm()
-
-    return render(
-        request,
-        "withdrawal/request_form.html",
-        {
-            "form": form,
-            "available_to_withdraw": available_to_withdraw,
-            "total_saving": total_saving,
-        },
-    )
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from .models import WithdrawalRequest
-from .forms import DocumentUploadForm
-
-@login_required
-def upload_document(request, withdrawal_request_id):
-    withdrawal_request = get_object_or_404(WithdrawalRequest, id=withdrawal_request_id, employee=request.user)
-
-    if request.method == "POST":
-        form = DocumentUploadForm(request.POST, request.FILES, withdrawal_request=withdrawal_request)
-        if form.is_valid():
-            withdrawal_request.document = form.cleaned_data['document']
-            withdrawal_request.document_type = WithdrawalRequest.DOCUMENT_TYPES.get(withdrawal_request.reason)
-            withdrawal_request.status = 'pending'
-            withdrawal_request.save()
-
-            messages.success(request, f"{withdrawal_request.document_type} uploaded successfully!")
-            return redirect('withdrawal:completed')  # Redirect to the list of withdrawals
-    else:
-        form = DocumentUploadForm(withdrawal_request=withdrawal_request)
-
-    return render(request, 'withdrawal/upload_document.html', {'form': form, 'withdrawal_request': withdrawal_request})
-
-@login_required
-def completed(request):
-    """ Page showing the completion message after request submission. """
-    return render(request, "withdrawal/completed.html")
-
-
-@login_required
-def cancel_withdrawal_request(request):
-    """ employee intentionally cancelled the request"""
-    if request.method == "POST":
-        withdrawal_request_id = request.POST.get('withdrawal_request_id')
-        withdrawal_request = get_object_or_404(WithdrawalRequest, id=withdrawal_request_id, employee=request.user)
-
-        # Cancel the request
-        withdrawal_request.cancel_request()
-
-        # Redirect to the dashboard
-        return redirect('dashboard')
+    context = {
+        "current_charge": current_charge,
+        "charge_history": charge_history,
+    }
+    return render(request, "withdrawal/charge_form.html", context)
 
 
 @login_required
 @user_passes_test(is_admin)
-def withdrawal_requests_list(request):
-    """ View to list all withdrawal requests categorized by status. """
-    withdrawal_requests = WithdrawalRequest.objects.all()
+def update_charge(request):
+    """Handles charge update and re-renders the charge form."""
+    if request.method == "POST":
+        charge_percentage = request.POST.get("charge_percentage")
 
-    # Categorize requests
-    cancelled_requests = withdrawal_requests.filter(status='cancelled')
-    approved_requests = withdrawal_requests.filter(status='approved').exclude(transactions__isnull=False)  # Approved but not paid
-    rejected_requests = withdrawal_requests.filter(status='rejected')
-    pending_requests = withdrawal_requests.filter(status='pending')  # Pending (needs approval)
-    complete_requests = withdrawal_requests.filter(transactions__isnull=False)  # Completed (has at least one related transaction)
+        if not charge_percentage:
+            return redirect("withdrawal:charge_management")
+        with transaction.atomic():
+            Charges.objects.filter(status="current").update(status="deprecated")  # Deprecate old charge
+            new_charge = Charges.objects.create(charge_percentage=charge_percentage, status="current")
 
-    return render(request, 'withdrawal/withdrawal_requests_list.html', {
-        'cancelled_requests': cancelled_requests,
-        'complete_requests': complete_requests,
-        'approved_requests': approved_requests,
-        'rejected_requests': rejected_requests,
-        'pending_requests': pending_requests,
-    })
+        return redirect("withdrawal:charge_management")
+
+    return redirect("withdrawal:charge_management")
+# # =======================================
+# # WITHDRAWAL REQUEST IMPLEMENTATION VIEWS
+# # ======================================
+# from django.http import HttpResponseRedirect
+
 
 @login_required
-def delete_withdrawal_request(request, withdrawal_request_id):
-    """ View to delete a withdrawal request with confirmation. """
-    withdrawal_request = get_object_or_404(WithdrawalRequest, id=withdrawal_request_id)
+def withdrawal_request(request):
+    """Processes employee withdrawal request and redirects to the management page."""
+    if request.method == "POST":
+        amount_requested = request.POST.get("amount_requested")
 
-    if request.method == 'POST':  # Delete only if it's a POST request
-        withdrawal_request.delete()
-        messages.success(request, "Withdrawal request deleted successfully!")
+        # Ensure valid amount
+        if not amount_requested or Decimal(amount_requested) <= 0:
+            messages.error(request, "Invalid withdrawal amount.")
+            return redirect("withdrawal:employee_withdrawal_management")
+
+        user = request.user  # Logged-in employee
+
+        # Get current charge percentage
+        charge_obj = Charges.get_current_charge()
+        charge_percentage = Decimal(charge_obj.charge_percentage) if charge_obj else Decimal("0.00")
+        
+        # Calculate charges
+        charges_applied = (Decimal(amount_requested) * charge_percentage) / 100
+        total_deduction = Decimal(amount_requested) + charges_applied  # Total amount to be deducted
+
+        savings_balance = get_employee_financial_summary(user)["savings_balance"]
+        # Ensure withdrawal + charges do not exceed the employee's saving balance
+        if savings_balance and total_deduction > savings_balance:
+            messages.error(request, "Insufficient savings balance for this withdrawal.")
+            return redirect("withdrawal:employee_withdrawal_management")
+
+        # Save withdrawal request
+        Withdrawals.objects.create(
+            employee=user,
+            amount_requested=Decimal(amount_requested),
+            charges_applied=charges_applied,
+            status="pending",
+        )
+
+        messages.success(request, "Withdrawal request submitted successfully.")
+        return redirect("withdrawal:employee_withdrawal_management")
+
+    return redirect("withdrawal:employee_withdrawal_management")  # Fallback for GET request
+
+@login_required
+@user_passes_test(is_employee)
+def cancel_request(request, request_id):
+    withdrawal = get_object_or_404(Withdrawals, id=request_id)
+
+    # Ensure only pending requests can be canceled
+    if withdrawal.status == 'pending' or withdrawal.status == 'approved':
+        withdrawal.status = 'cancelled'
+        withdrawal.action_date = timezone.now()
+        withdrawal.save()
+        messages.success(request, "Withdrawal request has been canceled.")
+    else:
+        messages.error(request, "You can only cancel pending or approved requests.")
+
+    return redirect('withdrawal:employee_withdrawal_management')  # Adjust redirect URL
+
+def approve_request(request, request_id):
     
-    return redirect('withdrawal:withdrawal_requests_list')
+    withdrawal = get_object_or_404(Withdrawals, id=request_id)
+    if withdrawal.status == 'pending':
+        withdrawal.status = 'approved'
+        withdrawal.action_date = timezone.now()
+        withdrawal.save()
+        messages.success(request, "Withdrawal request approved successfully.")
+    return redirect('withdrawal:admin_withdrawal_management')
 
-
-from .forms import WithdrawalActionForm
 from django.utils.timezone import now
 
-@login_required
-@user_passes_test(is_admin)
-def approve_withdrawal_request(request, request_id):
-    withdrawal_request = get_object_or_404(WithdrawalRequest, id=request_id)
-
+def update_withdrawal_status(request):
     if request.method == 'POST':
-        form = WithdrawalActionForm(request.POST, instance=withdrawal_request)
-        if form.is_valid():
-            withdrawal_request.status = 'approved'
-            withdrawal_request.action_on = now()
-            withdrawal_request.save()
-            return redirect('withdrawal:withdrawal_requests_list')
-    else:
-        form = WithdrawalActionForm()
+        withdrawal_id = int(request.POST.get('request_id'))
+        action = request.POST.get('action')
 
-    return render(request, 'withdrawal/action_form.html', {
-        'form': form,
-        'withdrawal_request': withdrawal_request,
-        'action': 'Approve'
-    })
+        withdrawal = get_object_or_404(Withdrawals, id=withdrawal_id)
 
-@login_required
-@user_passes_test(is_admin)
-def reject_withdrawal_request(request, request_id):
-    withdrawal_request = get_object_or_404(WithdrawalRequest, id=request_id)
+        if action == 'decline':
+            if withdrawal.status != Withdrawals.Status.PENDING:
+                messages.error(request, "Invalid status for declined.")
+                return redirect('withdrawal:admin_withdrawal_management')
 
-    if request.method == 'POST':
-        form = WithdrawalActionForm(request.POST, instance=withdrawal_request)
-        if form.is_valid():
-            withdrawal_request.status = 'rejected'
-            withdrawal_request.action_on = now()
-            withdrawal_request.save()
-            return redirect('withdrawal:withdrawal_requests_list')
-    else:
-        form = WithdrawalActionForm()
+            reason = request.POST.get('action_note')
+            withdrawal.status = Withdrawals.Status.DECLINED
+            withdrawal.action_note = reason
+            withdrawal.action_date = now()
+            messages.success(request, "Withdrawal request declined successfully.")
 
-    return render(request, 'withdrawal/action_form.html', {
-        'form': form,
-        'withdrawal_request': withdrawal_request,
-        'action': 'Reject'
-    })
+        elif action == 'pay':
+            if withdrawal.status not in [Withdrawals.Status.PENDING, Withdrawals.Status.APPROVED]:
+                messages.error(request, "Invalid status for payment.")
+                return redirect('withdrawal:admin_withdrawal_management')
 
-from .models import WithdrawalRequest, WithdrawalTransaction
-from .forms import WithdrawalTransactionForm
+            payment_reference = request.POST.get('payment_reference')
+            withdrawal.payment_reference = payment_reference
+            withdrawal.payment_date = now()
 
-@login_required
-@user_passes_test(is_admin)
-def process_payment(request, request_id):
-    withdrawal_request = get_object_or_404(WithdrawalRequest, id=request_id)
+            if withdrawal.status == Withdrawals.Status.PENDING:
+                withdrawal.action_date = now()
 
-    if withdrawal_request.is_paid:
-        messages.warning(request, "This withdrawal request has already been processed.")
-        return redirect('withdrawal:withdrawal_requests_list')
+            withdrawal.status = Withdrawals.Status.PAID
+            withdrawal.total_amount_withdrawn = withdrawal.amount_requested + withdrawal.charges_applied
+            messages.success(request, "Withdrawal request marked as paid successfully.")
 
-    if request.method == "POST":
-        form = WithdrawalTransactionForm(request.POST)
-        if form.is_valid():
-            transaction = form.save(commit=False)
-            transaction.request = withdrawal_request  # Link to the withdrawal request
-            transaction.save()
-
-            # Mark request as paid
-            withdrawal_request.is_paid = True
-            withdrawal_request.save()
-
-            # Update Employee Savings
-            withdrawal_request.employee.savings.update_savings()
-
-            messages.success(request, "Transaction successfully processed.")
-            return redirect('withdrawal:withdrawal_requests_list')
-    else:
-        form = WithdrawalTransactionForm(initial={'amount': withdrawal_request.amount})
-
-    return render(request, 'withdrawal/process_withdrawal.html', {'form': form, 'request_data': withdrawal_request})
-
-from django.shortcuts import render
-from django.db.models import Sum
-from .models import WithdrawalTransaction
-
-@login_required
-@user_passes_test(is_admin)
-def admin_transactions(request):
-    transactions = WithdrawalTransaction.objects.all().order_by('-transaction_date')
-    total_withdrawn = transactions.aggregate(Sum('final_amount'))['final_amount__sum'] or 0
-
-    context = {
-        'transactions': transactions,
-        'total_withdrawn': total_withdrawn
-    }
-    return render(request, 'withdrawal/admin_transactions.html', context)
-
-from django.contrib.auth.decorators import login_required
-
-@login_required
-@user_passes_test(is_employee)
-def employee_transactions(request):
-    employee = request.user
-    transactions = WithdrawalTransaction.objects.filter(request__employee=employee).order_by('-transaction_date')
-    total_withdrawn = transactions.aggregate(Sum('final_amount'))['final_amount__sum'] or 0
-
-    context = {
-        'transactions': transactions,
-        'total_withdrawn': total_withdrawn
-    }
-    return render(request, 'withdrawal/employee_transactions.html', context)
-
-from django.shortcuts import get_object_or_404
-from django.http import FileResponse, HttpResponse
-from .models import WithdrawalTransaction
-from .utils import generate_withdrawal_receipt
-
-@login_required
-@user_passes_test(is_employee)
-def download_receipt(request, transaction_id):
-    """ Generate and return the withdrawal receipt as a PDF. """
-
-    transaction = get_object_or_404(WithdrawalTransaction, id=transaction_id, request__employee=request.user)
+        withdrawal.save()
     
-    if not transaction.request.is_paid:
-        return HttpResponse("Receipt unavailable. Payment is not completed yet.", status=403)
-    
-    buffer = generate_withdrawal_receipt(transaction)
-    response = FileResponse(buffer, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="receipt_{transaction.reference_number}.pdf"'
-    
-    return response
+    return redirect('withdrawal:admin_withdrawal_management')
+
+def decline_request(request, request_id):
+    pass
+    # withdrawal = get_object_or_404(WithdrawalRequest, id=request_id)
+    # if withdrawal.status == 'pending':
+    #     withdrawal.status = 'declined'
+    #     withdrawal.save()
+    #     messages.error(request, "Withdrawal request declined.")
+    # return redirect('withdrawal:admin_withdrawal_management')
+
+def pay_request(request, request_id):
+    pass
+    # withdrawal = get_object_or_404(WithdrawalRequest, id=request_id)
+    # if withdrawal.status == 'approved':
+    #     withdrawal.status = 'paid'
+    #     withdrawal.save()
+    #     messages.success(request, "Withdrawal request marked as paid.")
+    # return redirect('withdrawal:admin_withdrawal_management')
+

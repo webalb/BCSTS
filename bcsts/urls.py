@@ -25,7 +25,9 @@ urlpatterns = [
     path('employees/', include('accounts.urls')),#employees
     path('', include('operations.urls')),
     path('withdrawal/', include('withdrawal.urls', namespace="withdrawal")),
-    path('loan/', include('loan.urls', namespace="loan")),
+    path('credit/', include('credit.urls', namespace="credit")),
+    path('notifications/', include('notification.urls')),
+    
     
 ]
 # Ensure Django serves media files during development

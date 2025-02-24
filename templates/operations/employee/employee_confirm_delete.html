@@ -1,10 +1,32 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% block title %} Delete Employee | Benovelance Cooperative {% endblock title %}
 {% block content %}
-<h2>Confirm Delete</h2>
-<p>Are you sure you want to delete {{ employee.first_name }} {{ employee.last_name }}?</p>
-<form method="POST">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Delete</button>
-    <a href="{% url 'employee_list' %}" class="btn btn-secondary">Cancel</a>
-</form>
+<main class="mt-0 transition-all duration-200 ease-soft-in-out ">
+    <section class="min-h-screen flex items-center justify-center">
+        <div class="container flex justify-center">
+            <div class="w-full max-w-full px-3 mx-auto md:flex-0 shrink-0 md:w-12/12">
+                <div class="w-full max-w-full px-3 mx-auto mt-0 md:flex-0 shrink-0 md:w-7/12 lg:w-5/12 xl:w-4/12">
+                    <div class="relative z-0 flex flex-col min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
+                        <div class="p-6 mb-0 text-center bg-white border-b-0 rounded-t-2xl items-center justify-center">
+
+
+                            <h3>Confirm this Action</h3>
+                            <p>Are you sure you want to delete {{ employee.first_name }} {{ employee.last_name }}?
+                            </p>
+                            <p class="text-red-500 font-bold ">This action will cause his financial record to be completly removed from BCS Database.</p>
+                            <form method="POST">
+                                {% csrf_token %}
+                                <button type="submit" class="px-6 py-3 mb-0 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer shadow-soft-md leading-pro text-xs bg-red-500 hover:scale-102 hover:shadow-soft-xs active:opacity-85">Delete</button>
+                            </form>
+                            <p class="mt-4 mb-0 leading-normal text-sm">                       
+                             <a href="{% url 'employee_list' %}" class="px-6 py-3 mb-0 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer shadow-soft-md leading-pro text-xs bg-green-500 hover:scale-102 hover:shadow-soft-xs active:opacity-85">Cancel</a> </p>
+                         
+                        </div>
+                      
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
 {% endblock %}

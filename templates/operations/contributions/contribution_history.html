@@ -1,51 +1,90 @@
-<!-- templates/contribution_history.html -->
-{% extends 'base.html' %}
+<!-- admin -->
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% block title %}Employee Contribution Settings History | Benevolence Cooperative{% endblock title %}
+
+{% block header %}
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+{% endblock header %}
 
 {% block content %}
-<h1>Contribution History</h1>
+<!-- Side Navigation -->
+{% include 'include/admin_sidebar.html' %}
 
-<!-- Display messages (Success/Error) -->
-{% if messages %}
-    <ul class="alert alert-info">
-        {% for message in messages %}
-            <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
-
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Employee Name</th>
-            <th>Amount</th>
-            <th>Change Reason</th>
-            <th>Changed By</th>
-            <th>Changed At</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for record in records %}
-            <tr>
-                <td>{{ record.contribution_setting.employee.get_full_name }}</td>
-                <td>₦{{ record.amount|floatformat:2 }}</td>
-                <td>{{ record.change_reason }}</td>
-                <td>{{ record.changed_by.get_full_name }}</td>
-                <td>{{ record.changed_at }}</td>
-                <td>
-                    <!-- Check if the user has permission to delete -->
-                        <a href="{% url 'delete_contribution_history' record.id %}" class="btn btn-danger btn-sm">Delete</a>
-                </td>
-            </tr>
-        {% empty %}
-            <tr>
-                <td colspan="6" class="text-center">No contribution history available.</td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
-<div class="mt-3">
+<main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200 text-gray-900">
+    <!-- Navbar -->
+    {% include 'include/dashboard_navbar.html' %}
     
-    <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary btn-sm">Back to dashboard</a>
-</div>
+    <div class="w-full py-6 px-6 mx-auto">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Employee Contribution Setting History</h2>
+            
+            <div class="">
+                {% if records %}
+                   
+                <table id="contributionTable" class="min-w-full bg-white border border-gray-200 rounded-lg text-xs word-wrap ">
+                    <thead class="bg-gray-50">
+                        <tr class="text-left">
+                            <th class="border">S/N</th>
+                            <th class="border">Employee</th>
+                            <th class="border">Contribution Amount</th>
+                            <th class="border">Start Date</th>
+                            <th class="border">End Date</th>
+                            <th class="border">Duration (Months)</th>
+                            <th class="border">Total Paid</th>
+                            <th class="border">Change Reason</th>
+                            <th class="border">Action</th>
+                            </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in records %}
+                
+                        <tr class="border-t">
+                            <td class="border">{{ forloop.counter }}</td>
+                            <td class="border word-wrap">{{ record.employee_email }}</td>
+                            <td class="border">₦{{ record.amount|floatformat:2|intcomma }}</td>
+                            <td class="border">{{ record.start_date|date:"F Y" }}</td>
+                            <td class="border">{{ record.end_date|date:"F Y"|default:"Still in use" }}</td>
+                            <td class="border">{{ record.duration_months|floatformat:0 }}</td>
+                            <td class="border">₦{{ record.total_paid|floatformat:2|intcomma }}</td>
+                            <td class="border">{{ record.change_reason }}</td>
+                            <td class="border">
+                                <a href="{% url 'delete_contribution_history' record.id %}" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600" onclick="return confirm('Are you sure you want to delete this?');">Delete</a>
+                            </td>
+                        </tr>
+                        
+                        {% endfor %}
+                    </tbody>
+                </table>
+                 {% else %}
+                        <p class="text-center p-4">No contribution settings found.</p>
+                
+                {% endif %}
+               
+            </div>
+        </div>
+    </div>
+     <div class="ml-4">
+                    <a href="{% url 'manage_employee_contributions' %}" class="px-4 py-2 bg-green-500 text-sm font-bold shadow-md text-white uppercase rounded hover:bg-red-600">Back to contribution settings</a>
+                </div>
+    {% include 'include/dashboard_footer.html' %}
+</main>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#contributionTable').DataTable({
+        "paging": true,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "responsive": true,
+        "scrollX": true,
+        "autoWidth": false,
+    });
+});
+</script>
+
 {% endblock %}

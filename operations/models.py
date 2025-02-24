@@ -31,7 +31,7 @@ class ContributionSetting(models.Model):
                 contribution_setting=self,
                 amount=self.amount,
                 changed_by=self.employee,
-                change_reason="Amount updated"
+                change_reason="Amount updated, Approved by Admin"
             )
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -47,6 +47,25 @@ class ContributionSettingHistory(models.Model):
 
     def __str__(self):
         return f"{self.contribution_setting.employee.nitda_id} - Amount: {self.amount} - Changed at: {self.changed_at}"  
+
+class ContributionChangeRequest(models.Model):
+    """ Stores requests from employees to update their contribution amount. """
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+
+    employee = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="contribution_requests")
+    requested_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    requested_at = models.DateTimeField(auto_now_add=True)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    reviewed_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name="reviewed_contribution_requests")
+
+    def __str__(self):
+        return f"{self.employee.nitda_id} - Requested: {self.requested_amount} - Status: {self.status}"
+
 class ContributionRecord(models.Model):
     """Logs monthly salary deductions and payment status."""
     
@@ -68,6 +87,18 @@ class ContributionRecord(models.Model):
 
     def __str__(self):
         return f"{self.employee.nitda_id} - {self.month}/{self.year}: {self.status}"
+
+    @classmethod
+    def get_employee_total_contribution(cls, employee):
+        """Calculate the total contribution of a specific employee."""
+        total = cls.objects.filter(employee=employee, status='paid').aggregate(total=Sum('amount'))['total']
+        return total or 0  # Return 0 if no contributions found
+
+    @classmethod
+    def get_system_total_contribution(cls):
+        """Calculate the total contribution of all employees."""
+        total = cls.objects.filter(status='paid').aggregate(total=Sum('amount'))['total']
+        return total or 0  # Return 0 if no contributions found
 
     @classmethod
     def bulk_record_contributions(cls):
@@ -97,23 +128,16 @@ class ContributionRecord(models.Model):
                     status='paid' 
                 )
                 
-                # Send email notification
-                send_mail(
-                    subject="Monthly Contribution Deducted",
-                    message=f"Dear {employee.nitda_id},\n\nYour monthly contribution of {contribution_amount} "
-                            f"has been recorded for {current_month}/{current_year}. Please ensure timely payment.",
-                    from_email="no-reply@benevolence.com",
-                    recipient_list=[employee.email],
-                    fail_silently=True
-                )
+                # # Send email notification
+                # send_mail(
+                #     subject="Monthly Contribution Deducted",
+                #     message=f"Dear {employee.nitda_id},\n\nYour monthly contribution of {contribution_amount} "
+                #             f"has been recorded for {current_month}/{current_year}. Please ensure timely payment.",
+                #     from_email="no-reply@benevolence.com",
+                #     recipient_list=[employee.email],
+                #     fail_silently=True
+                # )
 
                 records_created += 1
 
         return records_created  # Return number of created records
-
-class ContributionSettingPermissions(models.Model):
-    employee = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    can_update = models.BooleanField(default=False)
-    
-    def __str__(self):
-        return f"{self.employee.username} permissions"

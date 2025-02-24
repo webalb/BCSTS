@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% load custom_filters %}
+{% block title %}
+Withdrawal management | Benovelance Cooperative
+{% endblock title %}
+{% block header %}
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+{% endblock header %}
+{% block content %}
+<!-- sidenav  -->
+{% include 'include/sidebar.html' %}
+<!-- end sidenav -->
+<main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200">
+    <!-- Navbar -->
+    {% include 'include/dashboard_navbar.html' %}
+    <!-- end Navbar -->
+    <!-- cards -->
+    <div class="w-full px-6 py-6 mx-auto">
+        <!-- row 1 -->
+          <div class="flex flex-wrap -mx-3">
+              <!-- card1 -->
+              <div class="w-full max-w-full px-3 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/2">
+                  <div class="relative flex flex-col mb-6 min-w-0 break-words shadow-soft-xl rounded-2xl bg-clip-border bg-white">
+                      <div class="flex-auto p-4">
+                          <div class="flex flex-row -mx-3">
+                              <div class="flex-none w-2/3 max-w-full px-3">
+                                  <div>
+                                      <p class="mb-0 font-sans font-semibold leading-normal text-sm">Savings Balance</p>
+                                      <h4 class="mb-0 font-bold text-gray-900">
+                                          ₦{{ savings_balance|intcomma }}
+                                      </h4>
+                                      <p>
+                                          <span class="leading-normal text-sm font-weight-bolder text-lime-500">60%</span> of your total balance</p>
+                                  </div>
+                              </div>
+                              <div class="px-3 text-right basis-1/3">
+                                  <div class="inline-block w-12 h-12 text-center rounded-lg bg-green-500">
+                                      <i class="fa fa-coins leading-none  text-lg relative top-3.5 text-white"></i>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <!-- card2 -->
+              <div class="w-full max-w-full px-3 sm:w-1/2  mb-6 sm:flex-none xl:mb-0 xl:w-1/2">
+                  <div class="relative flex flex-col min-w-0 break-words shadow-soft-xl rounded-2xl bg-white bg-clip-border">
+                      <div class="flex-auto p-4">
+                          <div class="flex flex-row -mx-3">
+                              <div class="flex-none w-2/3 max-w-full pl-3">
+                                  <div>
+                                      <p class="mb-0 font-sans font-semibold leading-normal text-sm">Total Withdrawn</p>
+                                      <h4 class="mb-0 font-bold text-gray-900">
+                                          ₦{{ total_withdrawn|intcomma }}
+                                      </h4>
+                                      <p class="leading-normal text-sm font-weight-bolder">Total amount you withdreewed</p>
+                                  </div>
+                              </div>
+                              <div class="px-3 text-right basis-1/3">
+                                  <div class="inline-block w-12 h-12 text-center rounded-lg bg-green-500">
+                                      <i class="fas fa-chart-line leading-none text-lg relative top-3.5  text-white"></i>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          
+        {% include 'include/dashboard_footer.html' %} </div> <!-- end cards -->
+</main>
+<!-- JavaScript for Charge Calculation & Submit Control -->
+<script>
+var chargeRate = {{charge.charge_percentage|default:"0"|escapejs}};
+var savingsBalance = {{savings_balance|default:"0"|escapejs}};
+
+function validateAmount() {
+    let amountInput = document.getElementById("amount_requested");
+    let chargeDisplay = document.getElementById("charges");
+    let warning = document.getElementById("amount_warning");
+    let submitBtn = document.getElementById("submit_btn");
+
+    let amount = parseFloat(amountInput.value) || 0;
+    let chargeAmount = (amount * parseFloat(chargeRate) / 100).toFixed(2);
+    let totalAmount = amount + parseFloat(chargeAmount);
+
+    chargeDisplay.textContent = chargeAmount;
+
+    if (totalAmount > savingsBalance) {
+        warning.classList.remove("hidden"); // Show warning
+        submitBtn.disabled = true; // Disable submit
+    } else {
+        warning.classList.add("hidden"); // Hide warning
+        toggleSubmit(); // Only enable if checkbox is checked
+    }
+}
+
+function toggleSubmit() {
+    let checkbox = document.getElementById("agree_terms");
+    let submitBtn = document.getElementById("submit_btn");
+    let amount = parseFloat(document.getElementById("amount_requested").value) || 0;
+    let chargeAmount = (amount * parseFloat(chargeRate) / 100).toFixed(2);
+    let totalAmount = amount + parseFloat(chargeAmount);
+
+    if (checkbox.checked && totalAmount <= savingsBalance) {
+        submitBtn.disabled = false;
+    } else {
+        submitBtn.disabled = true;
+    }
+}
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#withdrawalHistory').DataTable({
+        "paging": true,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "responsive": true,
+        "scrollX": true,
+        "autoWidth": false,
+    });
+});
+</script>
+{% endblock %}

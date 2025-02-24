@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="apple-touch-icon" sizes="76x76" href="{% static 'assets/img/apple-icon.png' %}" />
+    <link rel="icon" type="image/png" href="{% static 'assets/img/favicon.png' %}" />
+    <title>{% block title %}
+        {% endblock title %}</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <link href="{% static 'assets/css/nucleo-icons.css' %}" rel="stylesheet" />
+    <link href="{% static 'assets/css/nucleo-svg.css' %}" rel="stylesheet" />
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="{% static 'assets/css/soft-ui-dashboard-tailwind.css' %}?v=1.0.5" rel="stylesheet" />
+    <script defer data-site="YOUR_DOMAIN_HERE" src="https://api.nepcha.com/js/nepcha-analytics.js"></script>
+</head>
+
+<body class="m-0 font-sans antialiased font-normal text-base leading-default bg-gray-50 text-slate-500">
+    <main class="h-screen flex items-center justify-center">
+    <div class="w-full max-w-md px-3 mx-auto">
+        <div class="relative z-0 flex flex-col min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
+            <div class="p-6 mb-0 text-center bg-white border-b-0 rounded-t-2xl">
+                <h5 class="text-green-800">Request Monthly Contribution Change</h5>
+                {% if form.errors %}
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                    <strong class="font-bold">Error!</strong>
+                    <span class="block sm:inline">
+                        {% for error in form.non_field_errors %}
+                        {{ error }}<br> 
+                        {% endfor %}
+                    </span>
+                    <button class="absolute top-0 bottom-0 right-0 px-3 py-1 text-red-500 hover:text-red-700 focus:outline-none" type="button" data-dismiss="alert" aria-label="Close">
+                        <span>&times;</span>                        
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+            <div class="flex-auto p-6">
+                <form role="form text-left" method="post">
+                    {% csrf_token %}
+                    <label class="mb-2 ml-1 font-bold text-xs text-gray-700">New Contribution Amount:</label>
+                    <div class="mb-4">
+                        <input type="number" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" placeholder="New Contribution Amount" aria-label="New Contribution Amount" step="5000" value="15000" min="15000" aria-describedby="New-Contribution-Amount-addon" id="requested_amount" name="requested_amount" required />
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="inline-block w-full px-6 py-3 mt-6 mb-2 font-bold text-center text-white uppercase align-middle transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-green-500">Submit Request</button>
+                    </div>
+                    <p class="mt-4 mb-0 leading-normal text-sm">Changed your mind? <a href="{% url 'contribution_setting_history' %}" class="font-bold text-slate-700">Cancel</a></p>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+</body>
+
+</html>

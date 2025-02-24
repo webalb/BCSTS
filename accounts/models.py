@@ -1,3 +1,6 @@
+import os, re
+from django.core.exceptions import ValidationError
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import RegexValidator
@@ -5,6 +8,11 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.crypto import get_random_string
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+
+def validate_nitda_email(value):
+    """Ensure the email belongs to the nitda.gov.ng domain."""
+    if not re.match(r"^[a-zA-Z0-9._%+-]+@nitda\.gov\.ng$", value):
+        raise ValidationError(_("Only @nitda.gov.ng emails are allowed."), code='invalid')
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -27,6 +35,7 @@ class CustomUserManager(BaseUserManager):
 class CustomUser(AbstractUser):
     email = models.EmailField(
         unique=True,
+        validators=[validate_nitda_email],
         error_messages={"unique": _("A user with this email already exists.")},
     )
 

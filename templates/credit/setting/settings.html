@@ -1,0 +1,195 @@
+<!-- ADMIN PAGE -->
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% block title %}
+Manage Credit Settings | Benevolence Cooperative
+{% endblock title %}
+{% block header %}
+<!-- Add this to your base template or credit settings template -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+
+{% endblock header %}
+{% block content %}
+<!-- sidenav  -->
+{% include 'include/admin_sidebar.html' %}
+<!-- end sidenav -->
+<main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200 text-gray-900">
+    <!-- Navbar -->
+    {% include 'include/dashboard_navbar.html' %}
+    <!-- end Navbar -->
+    <div class="w-full py-6 px-6 mx-auto">
+        <div class="flex flex-wrap -mx-3">
+            <div class="w-full max-w-full px-3 mt-6 md:w-7/12 md:flex-none">
+                <div class="relative flex flex-col min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
+                    <div class="p-6 px-4 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
+                        <h6 class="mb-0">Credit Settings</h6>
+                    </div>
+                    <div class="flex-auto p-4 pt-6">
+                        <ul class="flex flex-col pl-0 mb-0 rounded-lg">
+                            <form method="post" class="border-0 p-4 rounded-t-inherit rounded-xl bg-gray-50">
+                                {% csrf_token %}
+                                <!-- Display Non-Field Errors -->
+                                {% if form.non_field_errors %}
+                                    <div class="mb-4 p-3 text-red-700 bg-red-100 border border-red-400 rounded">
+                                        {% for error in form.non_field_errors %}
+                                            <p class="text-sm">{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% for field in form %}
+                                <li class="">
+                                    <div class="flex flex-col">
+                                        <label for="{{ field.id_for_label }}" class="mb-4 leading-normal text-sm">
+                                            {{ field.label }}
+                                        </label>
+                                        <div class="mb-4">
+                                            {% if field.name == "open_days" %}
+                                            <div class="flex flex-wrap gap-3">
+                                                {% for choice in field.field.choices %}
+                                                <label class="flex items-center space-x-2 p-4">
+                                                    <input type="checkbox" name="{{ field.name }}" value="{{ choice.0 }}" {% if choice.0 in field.value %}checked{% endif %} class="mt-0.54 rounded-10 duration-250 ease-soft-in-out after:rounded-circle after:shadow-soft-2xl after:duration-250 checked:after:translate-x-5.25 h-5 relative float-left ml-auto w-10 cursor-pointer appearance-none border border-solid border-gray-200 bg-slate-800/10 bg-none bg-contain bg-left bg-no-repeat align-top transition-all after:absolute after:top-px after:h-4 after:w-4 after:translate-x-px after:bg-white after:content-[''] checked:border-slate-800/95 checked:bg-slate-800/95 checked:bg-none checked:bg-right" />
+                                                    <span class="text-sm text-gray-700 ml-4">{{ choice.1 }}</span>
+                                                </label>
+                                                {% endfor %}
+                                            </div>
+                                            {% elif field.widget_type == "checkbox" %}
+                                            <input type="checkbox" name="{{ field.name }}" id="{{ field.id_for_label }}" class="mt-0.54 rounded-10 duration-250 ease-soft-in-out after:rounded-circle after:shadow-soft-2xl after:duration-250 checked:after:translate-x-5.25 h-5 relative float-left ml-auto w-10 cursor-pointer appearance-none border border-solid border-gray-200 bg-slate-800/10 bg-none bg-contain bg-left bg-no-repeat align-top transition-all after:absolute after:top-px after:h-4 after:w-4 after:translate-x-px after:bg-white after:content-[''] checked:border-slate-800/95 checked:bg-slate-800/95 checked:bg-none checked:bg-right" {% if field.value %}checked{% endif %} />
+                                            {% elif field.widget_type == "select" %}
+                                            <select name="{{ field.name }}" id="{{ field.id_for_label }}" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow">
+                                                {% for choice in field.field.choices %}
+                                                <option value="{{ choice.0 }}" {% if choice.0 == field.value %}selected{% endif %}>
+                                                    {{ choice.1 }}
+                                                </option>
+                                                {% endfor %}
+                                            </select>
+                                            {% else %}
+                                            <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" id="{{ field.id_for_label }}" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" placeholder="{{ field.label }}" value="{{ field.value|default:'' }}" required />
+                                            {% endif %}
+                                        </div>
+                                        <p class="text-xs text-gray-500">{{ field.help_text }}</p>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                                <button type="submit" name="settings_submit" class="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg">Save Settings</button>
+                            </form>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full max-w-full px-3 mt-6 md:w-5/12 md:flex-none">
+                <div class="relative flex flex-col h-full min-w-0 mb-6 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
+                    <div class="p-6 px-4 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
+                        <div class="flex flex-wrap -mx-3">
+                            <div class="max-w-full px-3 md:flex-none">
+                                <h6 class="mb-0">Set Credit Committee Members</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex-auto p-4 pt-6">
+                        <ul class="flex flex-col pl-0 mb-0 rounded-lg">
+                            
+                            <form method="post">
+                                {% csrf_token %}
+                                <!-- Display Non-Field Errors -->
+                                {% if committee_form.non_field_errors %}
+                                    <div class="mb-4 p-3 text-red-700 bg-red-100 border border-red-400 rounded">
+                                        {% for error in committee_form.non_field_errors %}
+                                            <p class="text-sm">{{ error }}</p>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% if field.errors %}
+                                    <ul class="errorlist">
+                                        {% for error in field.errors %}
+                                            <li class="text-red-500 text-xs mt-1">{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                                    <!-- Member Selection Field -->
+                                    <li class="px-4 py-2 pl-0 mb-2 bg-white border-0">
+                                        <label for="member" class="text-gray-700 text-sm font-semibold mb-1">Type Member Email</label>
+                                        <input list="members-list" name="member" id="member" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" required value="{{ committee_form.member.value|default:'' }}">
+
+                                        <datalist id="members-list">
+                                            {% for user in members %}
+                                                <option value="{{ user.email }}" data-id="{{ user.id }}"></option>
+                                            {% endfor %}
+                                        </datalist>
+                                        <!-- Display field error -->
+                                        {% if committee_form.member.errors %}
+                                            <p class="text-red-500 text-xs mt-1">{{ committee_form.member.errors.0 }}</p>
+                                        {% endif %}
+                                    </li>
+
+                                    <!-- Role Selection Field -->
+                                    <li class="px-4 py-2 pl-0 mb-2 bg-white border-0">
+                                        <label for="{{ committee_form.role.id_for_label }}" class="text-gray-700 text-sm font-semibold mb-1">Role</label>
+                                        {{ committee_form.role }}
+                                        <!-- Display field error -->
+                                        {% if committee_form.role.errors %}
+                                            <p class="text-red-500 text-xs mt-1">{{ committee_form.role.errors.0 }}</p>
+                                        {% endif %}
+                                    </li>
+
+                                    <!-- Submit Button -->
+                                    <li class="px-4 py-2 pl-0 mb-2 bg-white border-0">
+                                        <button type="submit" name="committee_submit" class="px-4 py-2 bg-green-500 text-white rounded text-sm font-semibold">Submit</button>
+                                    </li>
+                            </form>
+
+                        </ul>
+                        <h6 class="my-4 font-bold leading-tight uppercase text-xs text-slate-500">Current committee</h6>
+                        <ul class="flex flex-col pl-0 mb-0 rounded-lg">
+                           {% for member in committee_members %}
+                            <li class="relative flex items-center px-0 py-2 mb-2 bg-white border-0 rounded-t-lg text-inherit">
+                                <div class="inline-flex items-center justify-center w-12 h-12 mr-4 text-white transition-all duration-200 text-base ease-soft-in-out rounded-xl">
+                                    
+                                         {% if member.member.profile_picture %}
+                                            <img src="{{ member.member.passport_photo.url }}" alt="{{ member.member.get_full_name }}" 
+                                         class="w-full shadow-soft-2xl rounded-xl">
+                                        {% else %}
+                                            <img src="{% static 'assets/img/default.png' %}" alt="{{ member.member.get_full_name }}" 
+                                         class="w-full shadow-soft-2xl rounded-xl">
+                                        {% endif %}
+
+                                </div>
+                                <div class="flex flex-col items-start justify-center">
+                                    <h6 class="mb-0 leading-normal text-sm">{{ member.member.get_full_name }}</h6>
+                                    <p class="mb-0 leading-tight text-xs">{{ member.member.email }}</p>
+                                    <p class="mb-0 leading-tight text-xs">{{ member.role }}</p>
+                                </div>
+                                <a class="inline-block py-3 pl-0 pr-4 mb-0 ml-auto font-bold text-center uppercase align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer leading-pro text-xs ease-soft-in hover:scale-102 hover:active:scale-102 active:opacity-85 text-fuchsia-500 hover:text-fuchsia-800 hover:shadow-none active:scale-100"
+                                   href="{% url 'credit:remove_credit_committee_member' member.id %}"
+                                   onclick="return confirm('Are you sure you want to remove this committee member?');">
+                                    Remove
+                                </a>
+                            </li>
+                            {% empty %}
+                            <p class="text-gray-500 text-sm">No committee members found.</p>
+                            {% endfor %}
+</ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% include 'include/dashboard_footer.html' %}
+    </div>
+</main>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    let memberInput = document.getElementById("member");
+    let membersList = document.getElementById("members-list");
+
+    memberInput.addEventListener("input", function() {
+        let selectedOption = Array.from(membersList.options).find(option => option.value === memberInput.value);
+        if (selectedOption) {
+            memberInput.setAttribute("data-selected-id", selectedOption.getAttribute("data-id"));
+        } else {
+            memberInput.removeAttribute("data-selected-id");
+        }
+    });
+});
+</script>
+
+{% endblock %}

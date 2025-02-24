@@ -6,7 +6,7 @@
                 <h5 class="modal-title" id="addGuarantorModalLabel">Add New Guarantor</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="POST" action="{% url 'loan:add_guarantor' loan.id %}">
+            <form method="POST" action="{% url 'credit:add_guarantor' credit.id %}">
                 {% csrf_token %}
                 <div class="modal-body">
                     {% if remaining_guarantors == 1 %}
