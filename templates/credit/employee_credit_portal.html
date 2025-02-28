@@ -3,10 +3,10 @@
 {% load humanize %}
 {% load custom_filters %}
 {% block title %}
-Withdrawal management | Benovelance Cooperative
+Credit Portal | Benovelance Cooperative
 {% endblock title %}
 {% block header %}
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 {% endblock header %}
 {% block content %}
 <!-- sidenav  -->
@@ -19,98 +19,302 @@ Withdrawal management | Benovelance Cooperative
     <!-- cards -->
     <div class="w-full px-6 py-6 mx-auto">
         <!-- row 1 -->
-          <div class="flex flex-wrap -mx-3">
-              <!-- card1 -->
-              <div class="w-full max-w-full px-3 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/2">
-                  <div class="relative flex flex-col mb-6 min-w-0 break-words shadow-soft-xl rounded-2xl bg-clip-border bg-white">
-                      <div class="flex-auto p-4">
-                          <div class="flex flex-row -mx-3">
-                              <div class="flex-none w-2/3 max-w-full px-3">
-                                  <div>
-                                      <p class="mb-0 font-sans font-semibold leading-normal text-sm">Savings Balance</p>
-                                      <h4 class="mb-0 font-bold text-gray-900">
-                                          ₦{{ savings_balance|intcomma }}
-                                      </h4>
-                                      <p>
-                                          <span class="leading-normal text-sm font-weight-bolder text-lime-500">60%</span> of your total balance</p>
-                                  </div>
-                              </div>
-                              <div class="px-3 text-right basis-1/3">
-                                  <div class="inline-block w-12 h-12 text-center rounded-lg bg-green-500">
-                                      <i class="fa fa-coins leading-none  text-lg relative top-3.5 text-white"></i>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-              <!-- card2 -->
-              <div class="w-full max-w-full px-3 sm:w-1/2  mb-6 sm:flex-none xl:mb-0 xl:w-1/2">
-                  <div class="relative flex flex-col min-w-0 break-words shadow-soft-xl rounded-2xl bg-white bg-clip-border">
-                      <div class="flex-auto p-4">
-                          <div class="flex flex-row -mx-3">
-                              <div class="flex-none w-2/3 max-w-full pl-3">
-                                  <div>
-                                      <p class="mb-0 font-sans font-semibold leading-normal text-sm">Total Withdrawn</p>
-                                      <h4 class="mb-0 font-bold text-gray-900">
-                                          ₦{{ total_withdrawn|intcomma }}
-                                      </h4>
-                                      <p class="leading-normal text-sm font-weight-bolder">Total amount you withdreewed</p>
-                                  </div>
-                              </div>
-                              <div class="px-3 text-right basis-1/3">
-                                  <div class="inline-block w-12 h-12 text-center rounded-lg bg-green-500">
-                                      <i class="fas fa-chart-line leading-none text-lg relative top-3.5  text-white"></i>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-          
-        {% include 'include/dashboard_footer.html' %} </div> <!-- end cards -->
+        <div class="flex flex-wrap -mx-3">
+            <!-- card1 -->
+            <div class="w-full max-w-full px-3 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/2">
+                <div class="relative flex flex-col mb-6 min-w-0 break-words shadow-soft-xl rounded-2xl bg-clip-border bg-white">
+                    <div class="flex-auto p-4">
+                        <div class="flex flex-row -mx-3">
+                            <div class="flex-none w-2/3 max-w-full px-3">
+                                <div>
+                                    <p class="mb-0 font-sans font-semibold leading-normal text-sm">Total Balance</p>
+                                    <h4 class="mb-0 font-bold text-gray-900">
+                                        ₦{{ total_balance|intcomma }}
+                                    </h4>
+                                    <p class="text-xs">Credit limit: <span class="leading-normal text-xs font-weight-bolder text-green-500">200%</span> of your Total Balance</p>
+                                </div>
+                            </div>
+                            <div class="px-3 text-right basis-1/3">
+                                <div class="inline-block w-12 h-12 text-center rounded-lg bg-green-500">
+                                    <i class="fa fa-coins leading-none  text-lg relative top-3.5 text-white"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- card2 -->
+            <div class="w-full max-w-full px-3 sm:w-1/2  mb-6 sm:flex-none xl:mb-0 xl:w-1/2">
+                <div class="relative flex flex-col min-w-0 break-words shadow-soft-xl rounded-2xl bg-white bg-clip-border">
+                    <div class="flex-auto p-4">
+                        <div class="flex flex-row -mx-3">
+                            <div class="flex-none w-2/3 max-w-full pl-3">
+                                <div>
+                                    <p class="mb-0 font-sans font-semibold leading-normal text-sm">Total Credit Taken</p>
+                                    <h4 class="mb-0 font-bold text-gray-900">
+                                        ₦{{ total_withdrawn|intcomma }}
+                                    </h4>
+                                    <p class="leading-normal text-xs font-weight-bolder">Total amount you of credit you took in the past</p>
+                                </div>
+                            </div>
+                            <div class="px-3 text-right basis-1/3">
+                                <div class="inline-block w-12 h-12 text-center rounded-lg bg-green-500">
+                                    <i class="fas fa-chart-line leading-none text-lg relative top-3.5  text-white"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if guarantor_requests %}
+        <div class="w-full max-w-full mt-0 mb-6 md:mb-0 lg:flex-none" style="margin-bottom: 1rem;">
+            <div class="border-black/12.5 shadow-soft-xl relative flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid bg-gray-100 bg-clip-border">
+                <div class="border-black/12.5 mb-0 rounded-t-2xl border-b-0 border-solid p-6 pb-0">
+                    <div class="flex flex-wrap mt-0 -mx-3">
+                        <div class="flex-none w-full px-3 mt-0">
+                            <h6 class="text-xl font-bold text-gray-900">Credit Guarantor Requests</h6>
+                            <p class="text-gray-700 mt-2 text-sm">
+                                These are credit applications for which you have been designated as a guarantor. 
+                                Please review the details carefully and take appropriate action as required.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-auto p-6 px-0 pb-2" style="padding-top: 0px;">
+                    <div class="h-[600px] overflow-y-auto p-4">
+                        <table class="items-center w-full border mb-0 align-top border-gray-200 text-gray-900 overflow-x-auto overflow-y-auto" style="border:#ccc solid 1px">
+                            <thead class="align-bottom">
+                                <tr class="bg-gray-50 mt-1">
+                                    <th class="border px-3 py-2 text-left text-xs font-bold uppercase border-b border-gray-900">Tracking ID</th>
+                                    <th class="border px-3 py-2 text-left text-xs font-bold uppercase border-b border-gray-900">Applicant</th>
+                                    <th class="border px-3 py-2 text-left text-xs font-bold uppercase border-b border-gray-900">Credit Type</th>
+                                    <th class="border px-3 py-2 text-left text-xs font-bold uppercase border-b border-gray-900">Amount Requested</th>
+                                    <th class="border px-3 py-2 text-left text-xs font-bold uppercase border-b border-gray-900">Date Applied</th>
+                                    <th class="border px-3 py-2 text-left text-xs font-bold uppercase border-b border-gray-900">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                    {% for request in guarantor_requests %}
+                                        <tr class="border-b border-gray-300">
+                                            <td class="border p-2 align-middle whitespace-nowrap text-left">
+                                                <span class="mb-0 leading-normal bg-gray-300 rounded-lg text-center py-1 px-2 text-xs font-bold">#{{ request.tracking_id }}</span>
+                                            </td>
+                                            <td class="p-2 align-middle bg-transparent whitespace-nowrap shadow-transparent">
+                                                <div class="flex px-2 py-1">
+                                                    <div>
+                                                        {% if request.applicant.passport_photo %}
+                                                            <img src="{{ request.applicant.passport_photo.url }}" class="inline-flex items-center justify-center mr-4 text-sm text-white transition-all duration-200 ease-soft-in-out h-9 w-9 rounded-xl" alt="{{ request.applicant.get_full_name }}">
+                                                        {% else %}
+                                                            <img src="{% static 'assets/img/default.png' %}" class="inline-flex items-center justify-center mr-4 text-sm text-white transition-all duration-200 ease-soft-in-out h-9 w-9 rounded-xl" alt="default">
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="flex flex-col justify-center">
+                                                        <h6 class="mb-0 text-sm leading-normal text-gray-900">{{ request.applicant.get_full_name }}</h6>
+                                                        <p class="mb-0 text-xs leading-tight text-gray-400">{{ request.applicant.email }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="p-2 align-middle bg-transparent whitespace-nowrap text-left border">
+                                                <h6 class="mb-0 leading-normal text-xs text-gray-900">{{ request.get_credit_type_display }}</h6>
+                                            </td>
+                                            <td class="border p-2 align-middle bg-transparent whitespace-nowrap text-left">
+                                                <h6 class="mb-0 leading-normal text-xs text-gray-900">NGN{{ request.amount_requested|intcomma }}</h6>
+                                            </td>
+                                            <td class="border p-2 align-middle bg-transparent whitespace-nowrap text-left">
+                                                <h6 class="mb-0 leading-normal text-xs text-gray-900">{{ request.date_applied|date:"d M Y" }}</h6>
+                                            </td>
+                                            <td class="border p-2 align-middle bg-transparent whitespace-nowrap text-left">
+                                                <a href="{% url 'credit:credit_detail' request.tracking_id %}" class="px-3 py-2 mb-0 font-bold text-xs text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer shadow-soft-md leading-pro text-xs ease-soft-in tracking-tight-soft bg-green-500 hover:scale-102 hover:shadow-soft-xs active:opacity-85">Detail</a>
+                                                {# Add Approve/Reject actions if needed #}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        <div class="flex flex-wrap -mx-3">
+            <div class="w-full max-w-full px-3">
+                <div class="relative flex flex-col h-full min-w-0 break-words bg-gray-100 border-0 shadow-soft-xl rounded-2xl bg-clip-border">
+                    <div class="p-4 pb-0 mb-0 border-b-0 rounded-t-2xl">
+                        <div class="flex flex-wrap -mx-3">
+                            <div class="flex items-center w-full max-w-full px-3 shrink-0 md:flex-none">
+                                <h2 class="text-xl font-bold text-center text-gray-900">Welcome to BCS Credit Portal</h2>
+                            </div>
+                        </div>
+                    </div>
+                    {% if current_credit %}
+                    <fieldset style="border: 2px solid #ccc; padding: 10px; border-radius: 8px; margin-top: 20px;">
+                        <legend style="font-weight: bold; padding: 0 10px;">Your Current Credit Status</legend>
+                        <div class="flex flex-wrap">
+                            
+                            <div class="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
+                                <div class="px-3 text-center basis-1/3 text-xs">
+                                    <span class="bg-green-200 py-2 px-3 rounded-lg mb-4 text-sm text-green-600">
+                                        
+                                        <i class="fa fa-check-circle"></i> Credit Request</span> <br>
+                                    <p class="mt-4">
+                                    <span> <b> Type:</b> {{ current_credit.credit_type }}</span> <br>
+                                    <span> <b>Date:</b> {{ current_credit.date_applied|date:"F j, Y" }}</span> <br>
+                                    <span> <b>Amount:</b> NGN{{ current_credit.amount_requested|intcomma }}</span> <br>
+                                </p>
+                                </div>
+                            </div>
+
+                            <div class="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
+                                <div class="px-3 text-center basis-1/3 text-xs">
+                                    <!-- Status Badge with Icon and Color -->
+                                    <span class="py-2 px-3 rounded-lg mb-4 text-sm 
+                                        {% if guarantor.status == 'Approved' %}
+                                            bg-green-200 text-green-600
+                                        {% elif guarantor.status == 'Pending' %}
+                                            bg-yellow-200 text-yellow-600
+                                        {% elif guarantor.status == 'Declined' %}
+                                            bg-red-200 text-red-600
+                                        {% endif %}">
+                                        <i class="fa 
+                                            {% if guarantor.status == 'Approved' %}
+                                                fa-check-circle
+                                            {% elif guarantor.status == 'Pending' %}
+                                                fa-hourglass-half
+                                            {% elif guarantor.status == 'Declined' %}
+                                                fa-times-circle
+                                            {% endif %}"></i> 
+                                        Guarantor Action
+                                    </span> 
+                                    <br>
+
+                                    <!-- Guarantor Details -->
+                                    <p class="mt-4">
+                                        <span><b>Guarantor:</b> {{ guarantor.guarantor.get_full_name }}</span> <br>
+                                        <span><b>Action:</b> {{ guarantor.status }}</span> <br>
+                                        <span><b>Action Date:</b> {{ guarantor.action_date|date:"F j, Y" }}</span> <br>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
+                                <div class="px-3 text-center basis-1/3 text-xs">
+                                    <!-- Status Badge with Icon and Color -->
+                                    <span class="py-2 px-3 rounded-lg mb-4 text-sm 
+                                        {% if current_credit.status == 'Approved' or current_credit.status == 'Disbursed' %}
+                                            bg-green-200 text-green-600
+                                        {% elif current_credit.status == 'Pending' %}
+                                            bg-yellow-200 text-yellow-600
+                                        {% elif current_credit.status == 'Rejected' %}
+                                            bg-red-200 text-red-600
+                                        {% endif %}">
+                                        <i class="fa 
+                                            {% if current_credit.status == 'Approved' or current_credit.status == 'Disbursed' %}
+                                                fa-check-circle
+                                            {% elif current_credit.status == 'Pending' %}
+                                                fa-hourglass-half
+                                            {% elif current_credit.status == 'Rejected' %}
+                                                fa-times-circle
+                                            {% endif %}"></i> 
+                                        Committee Action
+                                    </span> 
+                                    <br>
+
+                                    <!-- Committee Action Details -->
+                                    <p class="mt-4">
+                                        <span><b>Committee Action Count:</b> {{ committee_info.actions_count }}</span> <br>
+                                        <span><b>Credit status:</b> {{ current_credit.status }}</span> <br>
+                                        <span><b>Action Date:</b> {{ committee_info.newest_action_date|date:"F j, Y" }}</span> <br>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
+                                <div class="px-3 text-center basis-1/3 text-xs">
+                                    <!-- Status Badge with Icon and Color -->
+                                    <span class="py-2 px-3 rounded-lg mb-4 text-sm 
+                                        {% if current_credit.status == 'Disbursed' %}
+                                            bg-green-200 text-green-600
+                                        {% elif current_credit.status == 'Approved' %}
+                                            bg-yellow-200 text-yellow-600
+                                        {% elif current_credit.status == 'Rejected' %}
+                                            bg-red-200 text-red-600
+                                        {% endif %}">
+                                        <i class="fa 
+                                            {% if current_credit.status == 'Disbursed' %}
+                                                fa-check-circle
+                                            {% elif current_credit.status == 'Approved' %}
+                                                fa-hourglass-half
+                                            {% elif current_credit.status == 'Rejected' %}
+                                                fa-times-circle
+                                            {% endif %}"></i> 
+                                            Disbursed
+                                    </span> 
+                                    <br>
+
+                                    <!-- Committee Action Details -->
+                                    <p class="mt-4">
+                                        <span><b>Status:</b> {{ current_credit.status }}</span> <br>
+                                        <span><b>Date:</b> {{ current_credit.newest_action_date|date:"F j, Y" }}</span> <br>
+                                    </p>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </fieldset>
+                    {% else %}
+                    <div class="flex-auto p-4">
+                        <p class="text-gray-600 text-sm mt-2">
+                            Are you seeking financial assistance? BCS offers Shariah-compliant credit options tailored to your needs.
+                            Our approach ensures ethical and transparent financing while aligning with Islamic principles.
+                            <a href="{% url 'credit:credit_policy' %}" class="text-blue-500 underline" target="_blank">Learn more</a>.
+                        </p>
+                        <hr class="h-px my-6 bg-transparent bg-gradient-to-r from-transparent via-white to-transparent">
+                        <div class="mt-4">
+                            <p class="text-gray-700 text-sm">To apply, please read the
+                                <a href="{% url 'credit:credit_policy' %}" class="text-green-500 underline">BCS Credit Policy and Agreement</a>.
+                            </p>
+                            <label class="flex items-center mt-2">
+                                <input type="checkbox" id="agree_terms" class="mr-2">
+                                <span class="text-sm text-gray-600">I agree to the terms and conditions</span>
+                            </label>
+                        </div>
+                        <div class="mt-4 text-sm text-gray-700">
+                            <strong>Allowed Credit Application Days:</strong> {{ allowed_days }}
+                        </div>
+                        {% if is_open_today %}
+                        <fieldset style="border: 2px solid #ccc; padding: 10px; border-radius: 8px; margin-top: 20px;">
+                            <legend style="font-weight: bold; padding: 0 10px;">Select Credit Type</legend>
+                            <div class="flex flex-wrap">
+                                {% for credit_type, enabled in enabled_credits.items %}
+                                {% if enabled %}
+                                <div class="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
+                                    <div class="px-3 text-right basis-1/3">
+                                        <a href="{% url 'credit:apply_credit' credit_type %}" class="inline-block w-full px-6 py-3 my-4 font-bold text-center text-white uppercase align-middle transition-all ease-in border-0 rounded-lg select-none shadow-soft-md bg-150 bg-x-25 leading-pro text-xs bg-green-500">
+                                            {{ credit_type }}
+                                        </a>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% empty %}
+                                <p class="text-red-600 text-center font-bold mt-4">
+                                    All credit application options are currently closed. Please check back later.
+                                </p>
+                                {% endfor %}
+                            </div>
+                        </fieldset>
+                        {% else %}
+                        <p class="text-red-600 text-center font-bold mt-4">
+                            Credit applications are currently closed. Please check back on allowed days.
+                        </p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% include 'include/dashboard_footer.html' %}
+    </div> <!-- end cards -->
 </main>
-<!-- JavaScript for Charge Calculation & Submit Control -->
-<script>
-var chargeRate = {{charge.charge_percentage|default:"0"|escapejs}};
-var savingsBalance = {{savings_balance|default:"0"|escapejs}};
 
-function validateAmount() {
-    let amountInput = document.getElementById("amount_requested");
-    let chargeDisplay = document.getElementById("charges");
-    let warning = document.getElementById("amount_warning");
-    let submitBtn = document.getElementById("submit_btn");
-
-    let amount = parseFloat(amountInput.value) || 0;
-    let chargeAmount = (amount * parseFloat(chargeRate) / 100).toFixed(2);
-    let totalAmount = amount + parseFloat(chargeAmount);
-
-    chargeDisplay.textContent = chargeAmount;
-
-    if (totalAmount > savingsBalance) {
-        warning.classList.remove("hidden"); // Show warning
-        submitBtn.disabled = true; // Disable submit
-    } else {
-        warning.classList.add("hidden"); // Hide warning
-        toggleSubmit(); // Only enable if checkbox is checked
-    }
-}
-
-function toggleSubmit() {
-    let checkbox = document.getElementById("agree_terms");
-    let submitBtn = document.getElementById("submit_btn");
-    let amount = parseFloat(document.getElementById("amount_requested").value) || 0;
-    let chargeAmount = (amount * parseFloat(chargeRate) / 100).toFixed(2);
-    let totalAmount = amount + parseFloat(chargeAmount);
-
-    if (checkbox.checked && totalAmount <= savingsBalance) {
-        submitBtn.disabled = false;
-    } else {
-        submitBtn.disabled = true;
-    }
-}
-</script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script>

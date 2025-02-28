@@ -4,7 +4,7 @@ from django.contrib.auth.models import Group
 import json
 import calendar
 from decimal import Decimal
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from django.urls import reverse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib import messages
@@ -252,6 +252,7 @@ def manage_contributions(request):
         "selected_year": selected_year,
         "available_months": available_months,
         "available_years": available_years,
+        "today": date.today(),
     }
     
     return render(request, "operations/contributions/manage_contributions.html", context)

@@ -8,13 +8,13 @@ new Chart(ctx, {
     labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
     datasets: [
       {
-        label: "Sales",
+        label: "Repayment",
         tension: 0.4,
         borderWidth: 0,
         borderRadius: 4,
         borderSkipped: false,
         backgroundColor: "#fff",
-        data: [450, 200, 100, 220, 500, 100, 400, 230, 500],
+        data: [450000, 200000, 100000, 220000, 500000, 100000, 400000, 230000, 500000],
         maxBarThickness: 6,
       },
     ],

@@ -28,7 +28,7 @@ class CreditSettings(models.Model):
     # Max savings-to-credit ratio (e.g., 60% for credit, 40% for withdrawal)
     savings_credit_ratio = models.DecimalField(
         max_digits=5, decimal_places=2, 
-        default=60.00,
+        default=Decimal(60.00),
         validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('100.00'))],
         help_text="Percentage of savings that can be used for credit (0-100%)."
     )
@@ -39,7 +39,7 @@ class CreditSettings(models.Model):
         ('Thursday', 'Thursday'), ('Friday', 'Friday'), ('Saturday', 'Saturday'), ('Sunday', 'Sunday')
     ]
     open_days = models.JSONField(
-        default=['Tuesday', 'Wednesday'],  # ✅ Correct default
+        default=list,  # ✅ Correct default
         help_text="Days of the week when credit applications are open."
     )
 
@@ -47,7 +47,7 @@ class CreditSettings(models.Model):
     # Fixed Administrative charge
     admin_charge_value = models.DecimalField(
         max_digits=10, decimal_places=2,
-        default=3000.00,
+        default=Decimal(3000.00),
         validators=[MinValueValidator(Decimal('0.00'))],
         help_text="The fixed amount of administrative charge."
     )
@@ -55,7 +55,7 @@ class CreditSettings(models.Model):
     # Minimum credit amount
     min_credit_amount = models.DecimalField(
         max_digits=12, decimal_places=2,
-        default=10000.00,
+        default=Decimal(10000.00),
         validators=[MinValueValidator(Decimal('0.00'))],
         help_text="Minimum amount an applicant can apply for."
     )
@@ -69,7 +69,7 @@ class CreditSettings(models.Model):
     # Savings requirement before credit approval
     min_savings_required = models.DecimalField(
         max_digits=12, decimal_places=2,
-        default=5000.00,
+        default=Decimal(5000.00),
         validators=[MinValueValidator(Decimal('0.00'))],
         help_text="Minimum savings balance required before being eligible for credit."
     )
@@ -102,7 +102,7 @@ class CreditSettings(models.Model):
         super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        pass  # Prevent deletion of the single instance
+        raise ValidationError("Deletion of CreditSettings instance is not allowed.")
 
     @classmethod
     def get_instance(cls):
@@ -132,26 +132,38 @@ class Credit(models.Model):
     applicant = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="credits")
     credit_type = models.CharField(max_length=50, choices=CREDIT_TYPE_CHOICES)
     amount_requested = models.DecimalField(
-        max_digits=12, decimal_places=2, validators=[MinValueValidator(Decimal('0.01'))],
+        max_digits=12, decimal_places=2, validators=[MinValueValidator(Decimal('0.01'))], blank=True, null=True
     )
     repayment_period = models.IntegerField(
         validators=[MinValueValidator(1)], help_text="Repayment duration in months."
     )
     date_applied = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
-
-    guarantors_approval = models.BooleanField(default=False)
-    guarantors_added = models.BooleanField(default=False)
+    repayment_start_month = models.CharField(max_length=7, blank=True, null=True, help_text="Date when repayment starts (YYYY-MM).")
+    monthly_deduction = models.DecimalField(
+        max_digits=12, decimal_places=2, validators=[MinValueValidator(Decimal('0.01'))],
+        help_text="Monthly deduction amount for credit repayment.", blank=True, null=True
+    )
+    guarantor_approval = models.BooleanField(default=False)
 
     tracking_id = models.CharField(max_length=10, unique=True, blank=True, null=True)
     administrative_charge = models.DecimalField(
-        max_digits=10, decimal_places=2, default=0.00,
+        max_digits=10, decimal_places=2, default=Decimal(0.00),
         help_text="Fixed administrative charge applied."
     )
+    amount_repaid = models.IntegerField(blank=True, null=True)
 
     def can_be_cancelled(self):
         """A credit can be canceled only if it is still pending."""
         return self.status == 'Pending'
+    
+    @property
+    def repayment_start_month_as_date(self):
+        """Return the repayment start month as a date object (year, month)."""
+        if self.repayment_start_month:
+            year, month = map(int, self.repayment_start_month.split('-'))
+            return datetime.date(year, month, 1)
+        return None
 
     def save(self, *args, **kwargs):
         """Ensure credit meets policy settings before saving."""
@@ -164,11 +176,7 @@ class Credit(models.Model):
         # Ensure today is an open application day
         today = datetime.datetime.today().strftime('%A')
         if today not in settings.open_days:
-            raise ValueError(f"Credit applications are not open on {today}.")
-
-        # Ensure requested amount meets the minimum requirement
-        if self.amount_requested < settings.min_credit_amount:
-            raise ValueError(f"Minimum credit amount is {settings.min_credit_amount:,}.")
+            pass # raise ValueError(f"Credit applications are not open on {today}.")
 
         # Ensure selected credit type is enabled
         if (
@@ -194,34 +202,41 @@ class Credit(models.Model):
 class Guarantor(models.Model):
     guarantor = models.ForeignKey(CustomUser, related_name='guarantors', on_delete=models.CASCADE)
     credit = models.ForeignKey(Credit, on_delete=models.CASCADE, related_name='guarantors')
-    status_choices = [('Pending', 'Pending'), ('Approved', 'Approved'), ('Rejected', 'Rejected')]
+    status_choices = [('Pending', 'Pending'), ('Approved', 'Approved'), ('Declined', 'Declined')]
     status = models.CharField(max_length=10, choices=status_choices, default='Pending')
     action_date = models.DateTimeField(null=True, blank=True)
-    action_note = models.TextField(blank=True, null=True)
+
+from django.core.files.storage import default_storage
+import os
 
 class Murabaha(models.Model):
     credit = models.OneToOneField(Credit, on_delete=models.CASCADE, related_name='murabaha')
     asset_name = models.CharField(max_length=255)
     asset_value = models.DecimalField(max_digits=12, decimal_places=2, validators=[validate_positive])
     profit_margin = models.DecimalField(max_digits=12, decimal_places=2, validators=[validate_positive], blank=True, null=True)
-    total_credit_amount = models.DecimalField(max_digits=12, decimal_places=2, editable=False)
     vendor_invoice = models.ImageField(upload_to='murabaha/vendor_invoice/', max_length=100, blank=True, null=True)
     created_at = models.DateField(auto_now=True)
 
-    def save(self, *args, **kwargs):
+    def total_credit_amount(self):
+        """Calculate total cost including profit margin"""
         if self.profit_margin is None:
-            self.profit_margin = Decimal(0)
-        self.total_credit_amount = (self.asset_value + self.profit_margin)
-        super().save(*args, **kwargs)
+            return self.asset_value  # No profit margin
+        return self.asset_value + self.profit_margin
 
-class QardHasan(models.Model):
-    credit = models.OneToOneField(Credit, on_delete=models.CASCADE, related_name='qard_hasan')
-    total_credit_amount = models.DecimalField(max_digits=12, decimal_places=2, validators=[validate_positive])
-    administrative_fee = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, validators=[validate_positive])
-    created_at = models.DateField(auto_now=True)
+    def save(self, *args, **kwargs):
+        # If the vendor_invoice is being updated (not null) and a new file is uploaded
+        if self.pk:  # Check if the instance already exists (i.e., it's being updated)
+            existing = Murabaha.objects.get(pk=self.pk)  # Fetch existing instance
+            if self.vendor_invoice != existing.vendor_invoice:  # Check if the invoice has changed
+                # Delete the old file from the storage
+                if existing.vendor_invoice:
+                    old_invoice_path = existing.vendor_invoice.path
+                    if default_storage.exists(old_invoice_path):
+                        default_storage.delete(old_invoice_path)
+
+        super(Murabaha, self).save(*args, **kwargs)  # Call the parent class save method
 
 class Musharaka(models.Model):
-    # include bcs_contribution, ,enhance profit_sharing_ratio such that we could be able to calculate the profit percent of the bcs and the pertner.
     credit = models.OneToOneField(Credit, on_delete=models.CASCADE, related_name='musharaka')
     partner_contribution = models.DecimalField(max_digits=12, decimal_places=2, validators=[validate_positive])
     profit_sharing_ratio = models.DecimalField(max_digits=5, decimal_places=2, validators=[validate_positive])
@@ -250,8 +265,11 @@ class TransactionLog(models.Model):
     transaction_type = models.CharField(max_length=2, choices=TRANSACTION_TYPE_CHOICES)
     transaction_date = models.DateTimeField(auto_now_add=True)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
-    transaction_description = models.TextField()
+    transaction_receipt = models.FileField(upload_to='transaction_receipts/', max_length=255, blank=True, null=True)
     credit = models.ForeignKey(Credit, on_delete=models.CASCADE)
+
+
+
 
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -259,6 +277,9 @@ class CreditCommittee(models.Model):
     member = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='credit_committee_member')
     role = models.CharField(max_length=50, choices=[('Reviewer', 'Reviewer'), ('Approver', 'Approver')])
     date_added = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.member.email} - {self.role}"
 
     def save(self, *args, **kwargs):
         member_email = kwargs.pop('member', None)  # Get email from kwargs, remove it
@@ -279,6 +300,7 @@ class CreditCommittee(models.Model):
 class CommitteeAction(models.Model):
     committee_member = models.ForeignKey(CreditCommittee, on_delete=models.CASCADE, related_name="actions")
     action_date = models.DateTimeField(auto_now_add=True)
-    action_taken = models.CharField(max_length=50, choices=[('Okay', 'Okay'), ('Not Okay', 'Not Okay'), ('Approved', 'Approved'), ('Disapproved', 'Disapproved')])
+    action_taken = models.CharField(max_length=50, choices=[('Okay', 'Okay'), ('Not Okay', 'Not Okay'), ('Approved', 'Approved'), ('Declined', 'Declined')])
     action_reason = models.TextField()
     credit = models.ForeignKey(Credit, on_delete=models.CASCADE, related_name="committee_actions")
+

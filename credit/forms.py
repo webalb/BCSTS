@@ -1,18 +1,53 @@
 from django import forms
-from .models import CreditCommittee, CreditSettings, Credit
+from .models import CreditCommittee, CreditSettings, Credit, Murabaha, Musharaka
 from accounts.models import CustomUser
 from django.core.exceptions import ObjectDoesNotExist
 
 
+from django import forms
+from .models import Credit, Murabaha, Musharaka, Ijarah, Guarantor
+from django import forms
+from .models import Credit, Murabaha, Musharaka, Ijarah, Guarantor
 
 class CreditApplicationForm(forms.ModelForm):
     class Meta:
         model = Credit
-        fields = ['credit_type', 'amount_requested', 'repayment_period']
+        fields = ['repayment_period']
 
+    # Guarantor email field
+    guarantor_email = forms.EmailField(required=True)
 
+    # Credit type-specific fields (optional, will be validated in the view)
+    asset_name = forms.CharField(required=False)
+    asset_value = forms.DecimalField(required=False)
+    vendor_invoice = forms.ImageField(required=False)
+    partner_contribution = forms.DecimalField(required=False)
+    profit_sharing_ratio = forms.DecimalField(required=False)
+    lease_period = forms.IntegerField(required=False)
+    rental_amount = forms.DecimalField(required=False)
+    amount_requested = forms.DecimalField(required=False)
 
+    def __init__(self, *args, credit_type=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.credit_type = credit_type
 
+    def clean(self):
+        cleaned_data = super().clean()
+        credit_type = self.credit_type
+
+        # Validate credit type-specific fields
+        if credit_type == 'Murabaha':
+            if not cleaned_data.get('asset_name') or not cleaned_data.get('vendor_invoice'):
+                raise forms.ValidationError("Asset name and vendor invoice are required for Murabaha.")
+        elif credit_type == 'Musharaka':
+            if not cleaned_data.get('partner_contribution') or not cleaned_data.get('profit_sharing_ratio'):
+                raise forms.ValidationError("Partner contribution and profit sharing ratio are required for Musharaka.")
+        elif credit_type == 'Ijarah':
+            if not cleaned_data.get('lease_period') or not cleaned_data.get('rental_amount'):
+                raise forms.ValidationError("Lease period and rental amount are required for Ijarah.")
+
+        return cleaned_data
+    
 class CreditCommitteeForm(forms.ModelForm):
     member = forms.CharField(  # Changed to CharField for email input
         label="Member Email",
@@ -121,3 +156,4 @@ class CreditSettingsForm(forms.ModelForm):
     def clean_open_days(self):
         """Convert list of selected days into a JSON-storable format."""
         return self.cleaned_data["open_days"]
+

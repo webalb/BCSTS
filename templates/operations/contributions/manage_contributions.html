@@ -25,20 +25,15 @@ Manage Contributions | Benevolence Cooperative
                 
                 <div class="flex-none w-auto max-w-full px-3 my-auto">
                     <div class="h-full">
-                       {% if today.day >= 25 and not contributions_exist %}
+
+                       {% if today.day >= 27 and not contributions_exist %}
                             <div class="mt-4">
                                 <p>Record contributions for this month</p>
                                 <a href="{% url 'record_all_contributions' %}" class="px-3 py-2 mb-0 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer shadow-soft-md leading-pro text-xs ease-soft-in tracking-tight-soft bg-green-500 hover:scale-102 hover:shadow-soft-xs active:opacity-85">
                                     <i class="fas fa-file-invoice-dollar mr-2"></i>
                                     <span>RECORD CONTRIBUTION</span>
                                 </a>
-                                <p>
                                 
-                                <a href="{% url 'upload_contributions' %}" class="px-3 py-2 mb-0 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer shadow-soft-md leading-pro text-xs ease-soft-in tracking-tight-soft bg-green-500 hover:scale-102 hover:shadow-soft-xs active:opacity-85">
-                                    <i class="fas fa-file-invoice-dollar mr-2"></i>
-                                    <span>Upload contributions record</span>
-                                </a>
-                                </p>
 
                             </div>
                         {% else %}
@@ -46,7 +41,7 @@ Manage Contributions | Benevolence Cooperative
                                 <p>Record contributions for this month</p>
                                 <span disabled class="text-center text-white bg-gray-400">
                                     <i class="fas fa-hourglass-half mr-2"></i>
-                                    <span>WAIT UNTIL 25TH</span>
+                                    <span>WAIT UNTIL 27TH</span>
                                 </span>
                                 <p>
                                 

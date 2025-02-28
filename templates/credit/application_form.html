@@ -1,0 +1,322 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% load custom_filters %}
+{% block title %}
+Credit Portal | Benovelance Cooperative
+{% endblock title %}
+{% block header %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+{% endblock header %}
+{% block content %}
+<!-- sidenav  -->
+{% include 'include/sidebar.html' %}
+<!-- end sidenav -->
+<main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200">
+    <!-- Navbar -->
+    {% include 'include/dashboard_navbar.html' %}
+    <!-- end Navbar -->
+    <!-- cards -->
+    <div class="w-full px-6 py-6 mx-auto">
+        <div class="flex flex-wrap -mx-3">
+            <div class="w-full max-w-full px-3">
+                <div
+                    class="relative flex flex-col h-full min-w-0 break-words bg-gray-100 border-0 shadow-soft-xl rounded-2xl bg-clip-border">
+                    <div class="p-4 pb-0 mb-0 border-b-0 rounded-t-2xl">
+                        <div class="flex flex-wrap -mx-3">
+                            <div class="flex items-center w-full max-w-full px-3 shrink-0 md:flex-none">
+                                <h2 class="text-xl font-bold text-center text-gray-900 text-center">Apply for 
+                                    {{ credit_type }}</h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex-auto p-4">
+                        <p class="text-gray-600 text-sm mt-2">
+                            BCS offers Shariah-compliant credit options tailored to your needs.
+                            Our approach ensures ethical and transparent financing while aligning with Islamic
+                            principles.
+                            {% if credit_type %}
+                            <br><strong>{{ credit_type }}:</strong>
+                            {% if credit_type == "Qardu Hasan" %}
+                            An interest-free loan designed to provide financial relief without additional charges,
+                            except for minimal administrative fees.
+                            {% elif credit_type == "Murabaha" %}
+                            A cost-plus financing method where BCS purchases an asset and sells it to you at a profit,
+                            payable in installments.
+                            {% elif credit_type == "Musharaka" %}
+                            A partnership-based financing model where both BCS and the applicant invest together and
+                            share profits or losses.
+                            {% elif credit_type == "Ijarah" %}
+                            A leasing-based financing where you pay rent for using an asset owned by BCS until full
+                            ownership is transferred.
+                            {% endif %}
+                            {% endif %}
+                            <a href="{% url 'credit:credit_policy' %}" class="text-blue-500 underline"
+                                target="_blank">Learn more</a>.
+                        </p>
+
+                        <form role="form text-left" method="post" action="{% url 'credit:apply_credit' credit_type %}"
+                            enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" id="max_amount_value" value="{{ total_balance|floatformat:2 }}">
+                            
+                            {% if form.non_field_errors %}
+                            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
+                                role="alert">
+                                <strong class="font-bold">Error!</strong>
+                                <ul>
+                                    {% for error in form.non_field_errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+
+                            <!-- Repayment Period Input (Hidden for Qard Hasan) -->
+                            <label class="mb-2 ml-1 font-bold text-xs text-gray-900">
+                                Repayment Period (in months, max: {{ credit_settings.max_repayment_months }})
+                            </label>
+                            <div class="mb-4">
+                                <input type="number"
+                                    class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-gray-300 bg-white py-2 px-3 text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none"
+                                    placeholder="Enter number of months" id="repayment_period" name="repayment_period"
+                                    required oninput="validateRepayment()" min="1"
+                                    max="{{ credit_settings.max_repayment_months }}"
+                                    value="{{ request.POST.repayment_period }}">
+                                <p id="repayment_warning" class="mb-2 ml-1 font-bold text-xs text-red-600 hidden"></p>
+                                {% if form.repayment_period.errors %}
+                                <p class="mb-2 ml-1 font-bold text-xs text-red-600">
+                                    {{ form.repayment_period.errors.0 }}
+                                </p>
+                                {% endif %}
+                            </div>
+                            <!-- Credit Type-Specific Fields (Hidden for Qard Hasan) -->
+                            <fieldset
+                                style="border: 2px solid #ccc; padding: 10px; border-radius: 8px; margin-top: 20px;">
+                                <legend style="font-weight: bold; padding: 0 10px;">{{ credit_type }} Details</legend>
+                                {% if credit_type == "Qard Hasan" %}
+                                <!-- Credit Amount Input -->
+                                <label class="mb-2 ml-1 font-bold text-xs text-gray-900">Credit Amount</label>
+                                <div class="mb-4">
+                                    <input type="number"
+                                        class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-gray-300 bg-white py-2 px-3 text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none"
+                                        placeholder="Enter Amount" id="amount_requested" name="amount_requested"
+                                        required 
+                                        min="{{ credit_settings.min_credit_amount }}"
+                                        value="{{ request.POST.amount_requested }}">
+                                    <p id="amount_warning" class="mb-2 ml-1 font-bold text-xs text-red-600 hidden"></p>
+                                    {% if form.amount_requested.errors %}
+                                    <p class="mb-2 ml-1 font-bold text-xs text-red-600">
+                                        {{ form.amount_requested.errors.0 }}</p>
+                                    {% endif %}
+                                    
+                                </div>
+                                {% elif credit_type == "Murabaha" %}
+                                <label class="mb-2 ml-1 font-bold text-xs text-gray-900">Asset Name</label>
+                                <div class="mb-4">
+                                    <input type="text"
+                                        class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-gray-300 bg-white py-2 px-3 text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none"
+                                        placeholder="Enter Asset Name" name="asset_name"
+                                        value="{{ request.POST.asset_name }}" required>
+                                    {% if form.asset_name.errors %}
+                                    <p class="mb-2 ml-1 font-bold text-xs text-red-600">
+                                        {{ form.asset_name.errors.0 }}
+                                    </p>
+                                    {% endif %}
+                                </div>
+                                <label class="mb-2 ml-1 font-bold text-xs text-gray-900">Asset Value</label>
+                                <div class="mb-4">
+                                    <input type="number"
+                                        class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-gray-300 bg-white py-2 px-3 text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none"
+                                        placeholder="Enter Asset Value in Naira" name="asset_value"
+                                        min="{{ credit_settings.min_credit_amount }}"
+                                        value="{{ request.POST.asset_value }}">
+                                    <p id="asset_warning" class="mb-2 ml-1 font-bold text-xs text-red-600 hidden"></p>
+                                    {% if form.asset_value.errors %}
+                                    <p class="mb-2 ml-1 font-bold text-xs text-red-600">
+                                        {{ form.asset_value.errors.0 }}
+                                    </p>
+                                    {% endif %}
+                                </div>
+
+                                <label class="mb-2 ml-1 font-bold text-xs text-gray-900">Vendor Invoice</label>
+                                <div class="mb-4">
+                                    <input type="file"
+                                        class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-gray-300 bg-white py-2 px-3 text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none"
+                                        placeholder="Upload vendor invoice" name="vendor_invoice"
+                                        value="{{ request.POST.vendor_invoice }}" required>
+                                    {% if form.vendor_invoice.errors %}
+                                    <p class="mb-2 ml-1 font-bold text-xs text-red-600">
+                                        {{ form.vendor_invoice.errors.0 }}</p>
+                                    {% endif %}
+                                </div>
+                                {% elif credit_type == "Musharaka" %}
+                                <label class="mb-2 ml-1 font-bold text-xs text-gray-900">Partner Contribution</label>
+                                <div class="mb-4">
+                                    <input type="number"
+                                        class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-gray-300 bg-white py-2 px-3 text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none"
+                                        placeholder="Enter Partner Contribution" name="partner_contribution"
+                                        value="{{ request.POST.partner_contribution }}" required min="1">
+                                        {% if form.partner_contribution.errors %}
+                                        <p class="mb-2 ml-1 font-bold text-xs text-red-600">
+                                            {{ form.partner_contribution.errors.0 }}
+                                        </p>
+                                        {% endif %}
+                                </div>
+                                <label class="mb-2 ml-1 font-bold text-xs text-gray-900">Profit Sharing Ratio
+                                    (%)</label>
+                                <div class="mb-4">
+                                    <input type="number"
+                                        class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-gray-300 bg-white py-2 px-3 text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none"
+                                        placeholder="Enter Profit Sharing Ratio" name="profit_sharing_ratio" required
+                                        min="1" value="{{ request.POST.profit_sharing_ratio }}" max="100">
+                                        {% if form.profit_sharing_ratio.errors %}
+                                        <p class="mb-2 ml-1 font-bold text-xs text-red-600">
+                                            {{ form.profit_sharing_ratio.errors.0 }}
+                                        </p>
+                                        {% endif %}
+                                </div>
+                                {% endif %}
+                            </fieldset>
+                            <!-- Guarantor Email Input -->
+                            <label class="mb-2 ml-1 font-bold text-xs text-gray-900">Add Guarantor (enter their
+                                email)</label>
+                            <div class="mb-4">
+                                <input type="email"
+                                    class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-gray-300 bg-white py-2 px-3 text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none"
+                                    placeholder="Enter your guarantor's email" id="guarantor_email"
+                                    name="guarantor_email" value="{{ request.POST.guarantor_email }}" required>
+                                {% if form.guarantor_email.errors %}
+                                <p class="mb-2 ml-1 font-bold text-xs text-red-600">
+                                    {{ form.guarantor_email.errors.0 }}
+                                </p>
+                                {% endif %}
+                            </div>
+                            <!-- Agreement Checkbox -->
+                            <div class="flex items-center mt-4">
+                                <input type="checkbox" id="agree_terms" class="mr-2" onclick="toggleSubmit()" required>
+                                <label for="agree_terms" class="text-xs text-gray-700">
+                                    I agree to the <span class="text-red-500 font-bold">
+                                        NGN{{ credit_settings.admin_charge_value|intcomma }} administrative charges</span>.
+                                </label>
+                            </div>
+                            <!-- Submit Button -->
+                            <button type="submit" name="apply_credit"
+                                class="inline-block w-full px-6 py-3 my-4 font-bold text-center text-white uppercase align-middle transition-all ease-in border-0 rounded-lg select-none shadow-soft-md bg-150 bg-x-25 leading-pro text-xs bg-green-500">
+                                Apply for {{ credit_type }}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% include 'include/dashboard_footer.html' %}
+    </div> <!-- end cards -->
+</main>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Function to validate amount_requested or asset_value fields
+        function validateAmount() {
+            let amountInput = document.getElementById("amount_requested");
+            let assetInput = document.getElementById("asset_value");
+            let amountWarning = document.getElementById("amount_warning");
+            let assetWarning = document.getElementById("asset_warning"); // Add check for null
+            let maxAmount = parseFloat(document.getElementById("max_amount_value").value);
+
+            // Reset warnings
+            if (amountWarning) {
+                amountWarning.textContent = "";
+                amountWarning.classList.add("hidden");
+            }
+            if (assetWarning) {
+                assetWarning.textContent = "";
+                assetWarning.classList.add("hidden");
+            }
+
+            // Double the max amount for amount_requested validation
+            maxAmount = maxAmount * 2;
+
+            if (amountInput && amountInput.style.display !== "none") {
+                // Validate amount_requested field
+                validateField(amountInput, amountWarning, maxAmount);
+            } else if (assetInput && assetInput.style.display !== "none" && assetWarning) {
+                // Validate asset_value field (no max limit)
+                validateField(assetInput, assetWarning, Infinity);
+            }
+        }
+
+        // Generic function to validate a field's value
+        function validateField(input, warning, maxAmount) {
+            if (!input || !warning) return; // Prevent errors if elements are not found.
+            let minAmount = parseFloat(input.getAttribute("min"));
+            let inputValue = parseFloat(input.value);
+            if (isNaN(inputValue)) {
+                warning.textContent = "Please enter a valid number.";
+                warning.classList.remove("hidden");
+                return;
+            }
+
+            if (inputValue < minAmount) {
+                warning.textContent = `Minimum value is NGN${minAmount}.`;
+                warning.classList.remove("hidden");
+            } else if (inputValue > maxAmount) {
+                warning.textContent = `Maximum value is NGN${maxAmount}.`;
+                warning.classList.remove("hidden");
+            } else {
+                warning.textContent = "";
+                warning.classList.add("hidden");
+            }
+        }
+
+        // Function to validate repayment_period field
+        function validateRepayment() {
+            let repaymentInput = document.getElementById("repayment_period");
+            let repaymentWarning = document.getElementById("repayment_warning");
+            let maxRepayment = parseInt(repaymentInput.getAttribute("max"));
+
+            if (repaymentInput.value > maxRepayment) {
+                repaymentWarning.textContent = `Maximum repayment period is ${maxRepayment} months.`;
+                repaymentWarning.classList.remove("hidden");
+            } else {
+                repaymentWarning.textContent = "";
+                repaymentWarning.classList.add("hidden");
+            }
+        }
+
+        // Function to toggle submit button state based on agreement checkbox
+        function toggleSubmit() {
+            let agreeCheckbox = document.getElementById("agree_terms");
+            let submitButton = document.querySelector("button[type='submit']");
+
+            if (agreeCheckbox && submitButton) {
+                submitButton.disabled = !agreeCheckbox.checked;
+                if (!agreeCheckbox.checked) {
+                    submitButton.classList.add("opacity-50", "cursor-not-allowed");
+                } else {
+                    submitButton.classList.remove("opacity-50", "cursor-not-allowed");
+                }
+            }
+        }
+
+        // Attach event listeners
+        let amountInput = document.getElementById("amount_requested");
+        if (amountInput) {
+            amountInput.addEventListener("input", validateAmount);
+        }
+
+        let repaymentInput = document.getElementById("repayment_period");
+        if (repaymentInput) {
+            repaymentInput.addEventListener("input", validateRepayment);
+        }
+
+        let agreeCheckbox = document.getElementById("agree_terms");
+        if (agreeCheckbox) {
+            agreeCheckbox.addEventListener("change", toggleSubmit);
+        }
+
+        // Initialize submit button state on page load
+        toggleSubmit();
+    });
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% endblock %}

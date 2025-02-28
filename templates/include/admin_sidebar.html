@@ -1,9 +1,13 @@
+{% load static %}
 <aside class="max-w-62.5 ease-nav-brand z-990 fixed inset-y-0 my-4 ml-4 block w-full -translate-x-full flex-wrap items-center justify-between overflow-y-auto rounded-2xl border-0 bg-white p-0 antialiased shadow-none transition-transform duration-200 xl:left-0 xl:translate-x-0">
     <div class="h-19.5">
         <i class="absolute top-0 right-0 p-4 opacity-50 cursor-pointer fas fa-times text-slate-400 xl:hidden" sidenav-close></i>
-        <a class="block px-8 py-6 m-0 text-sm whitespace-nowrap text-slate-700" href="{% url 'admin_dashboard' %}" target="_blank">
-            <span class="ml-1 font-semibold transition-all duration-200 ease-nav-brand">Benovelance Cooperative</span>
-        </a>
+        <div class="flex flex-col items-center">
+            <a class="block px-1 py-2 m-0 text-sm whitespace-nowrap text-slate-700" href="{% url 'admin_dashboard' %}" target="_blank">
+            <img src="{% static 'assets/img/favicon.png' %}" class="inline transition-all duration-200 ease-nav-brand" alt="main_logo" width="30" height="30" />
+            </a>
+            <span class="font-semibold text-green-600 transition-all duration-200 ease-nav-brand">BENEVOLENCE COOPERATIVE</span>
+        </div>
     </div>
 
     <hr class="h-px mt-0 bg-transparent bg-gradient-to-r from-transparent via-black/40 to-transparent" />
@@ -73,6 +77,29 @@
                         <i class="fas fa-cogs {% if request.resolver_match.view_name == 'credit:credit_settings' %} text-white{% else %} text-gray-900{% endif %}"></i>
                     </div>
                     <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Credit Settings</span>
+                </a>
+            </li>
+            <li class="mt-0.5 w-full">
+                <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors 
+                    {% if request.resolver_match.view_name == 'credit:credit_request' %}font-bold{% endif %}" 
+                    href="{% url 'credit:credit_request' %}">
+                    <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg shadow-soft-2xl bg-white bg-center fill-current stroke-0 text-center xl:p-2.5 
+                        {% if request.resolver_match.view_name == 'credit:credit_request' %}bg-green-500{% endif %}">
+                        <i class="fas fa-arrow-circle-down {% if request.resolver_match.view_name == 'credit:credit_request' %} text-white{% else %} text-gray-900{% endif %}"></i>
+                    </div>
+                    <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Pending Requests</span>
+                </a>
+            </li>
+
+            <li class="mt-0.5 w-full">
+                <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors 
+                    {% if request.resolver_match.view_name == 'credit:approved_credit_request' %}font-bold{% endif %}" 
+                    href="{% url 'credit:approved_credit_request' %}">
+                    <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg shadow-soft-2xl bg-white bg-center fill-current stroke-0 text-center xl:p-2.5 
+                        {% if request.resolver_match.view_name == 'credit:approved_credit_request' %}bg-green-500{% endif %}">
+                        <i class="fas fa-check-circle {% if request.resolver_match.view_name == 'credit:approved_credit_request' %} text-white{% else %} text-gray-900{% endif %}"></i>
+                    </div>
+                    <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Approved Requests</span>
                 </a>
             </li>
 
