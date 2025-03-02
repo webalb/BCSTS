@@ -17,8 +17,8 @@
             <li class="mt-0.5 w-full">
                 <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap rounded-lg bg-white px-4
                 {% if request.resolver_match.view_name == 'admin_dashboard' %}font-bold{% endif %} text-slate-700 transition-colors" href="{% url 'admin_dashboard' %}">
-                    <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg shadow-soft-2xl bg-white bg-center stroke-0 text-center xl:p-2.5
-                     {% if request.resolver_match.view_name == 'admin_dashboard' %}bg-green-500{% endif %}">
+                    <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg shadow-soft-2xl bg-center stroke-0 text-center xl:p-2.5
+                     {% if request.resolver_match.view_name == 'admin_dashboard' %} bg-green-500 {%else %} bg-white {% endif %}">
                         <i class="fas fa-chart-line  {% if request.resolver_match.view_name == 'admin_dashboard' %} text-white{% else %} text-gray-900{% endif %}"></i>  </div>
                     <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft text-gray-900">Dashboard</span>
                 </a>
@@ -26,7 +26,7 @@
             <li class="mt-0.5 w-full">
                 <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors
                 {% if request.resolver_match.view_name == 'employee_list' %}font-bold{% endif %}" href="{% url 'employee_list' %}">
-                    <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg shadow-soft-2xl bg-white bg-center fill-current stroke-0 text-center xl:p-2.5 {% if request.resolver_match.view_name == 'employee_list' %} bg-green-500 {% endif %}">
+                    <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg shadow-soft-2xl bg-center fill-current stroke-0 text-center xl:p-2.5 {% if request.resolver_match.view_name == 'employee_list' %} bg-green-500 {%else %} bg-white  {% endif %}">
                         <i class="fas fa-users {% if request.resolver_match.view_name == 'employee_list' %} text-white{% else %} text-gray-900 {% endif %}"></i>
                     </div>
                     <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Manage Employees</span>
@@ -39,7 +39,7 @@
 
             <li class="mt-0.5 w-full">
                 <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors {% if request.resolver_match.view_name == 'manage_contributions' %}font-bold{% endif %}" href="{% url 'manage_contributions' %}">
-                    <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg shadow-soft-2xl bg-white bg-center stroke-0 text-center xl:p-2.5  {% if request.resolver_match.view_name == 'manage_contributions' %}bg-green-500{% endif %}">
+                    <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg shadow-soft-2xl bg-center stroke-0 text-center xl:p-2.5  {% if request.resolver_match.view_name == 'manage_contributions' %}bg-green-500 {%else %} bg-white {% endif %}">
                         <i class="fas fa-money-bill-wave {% if request.resolver_match.view_name == 'manage_contributions' %} text-white{% else %} text-gray-900{% endif %}"></i>
                     </div>
                     <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Manage Contributions</span>
@@ -47,7 +47,7 @@
             </li>
             <li class="mt-0.5 w-full">
                 <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors {% if request.resolver_match.view_name == 'manage_employee_contributions' %}font-bold{% endif %}" href="{% url 'manage_employee_contributions' %}">
-                    <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg shadow-soft-2xl bg-white bg-center fill-current stroke-0 text-center xl:p-2.5 {% if request.resolver_match.view_name == 'manage_employee_contributions' %}bg-green-500{% endif %}">
+                    <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg shadow-soft-2xl bg-center fill-current stroke-0 text-center xl:p-2.5 {% if request.resolver_match.view_name == 'manage_employee_contributions' %}bg-green-500 {%else %} bg-white {% endif %}">
                         <i class="fas fa-cog  {% if request.resolver_match.view_name == 'manage_employee_contributions' %} text-white{% else %} text-gray-900{% endif %}"></i>
                     </div>
                     <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Contribution Settings</span>
@@ -59,7 +59,7 @@
             </li>
             <li class="mt-0.5 w-full">
                 <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors {% if request.resolver_match.view_name == 'withdrawal:admin_withdrawal_management' %}font-bold{% endif %}" href="{% url 'withdrawal:admin_withdrawal_management' %}">
-                    <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg shadow-soft-2xl bg-white bg-center fill-current stroke-0 text-center xl:p-2.5 {% if request.resolver_match.view_name == 'withdrawal:admin_withdrawal_management' %}bg-green-500{% endif %}">
+                    <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg shadow-soft-2xl bg-center fill-current stroke-0 text-center xl:p-2.5 {% if request.resolver_match.view_name == 'withdrawal:admin_withdrawal_management' %}bg-green-500 {% else %} bg-white {% endif %}">
                         <i class="fas fa-exchange-alt  {% if request.resolver_match.view_name == 'withdrawal:admin_withdrawal_management' %} text-white{% else %} text-gray-900{% endif %}"></i>
                     </div>
                     <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Manage Withdrawals</span>
@@ -72,8 +72,8 @@
                 <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors 
                     {% if request.resolver_match.view_name == 'credit:credit_settings' %}font-bold{% endif %}" 
                     href="{% url 'credit:credit_settings' %}">
-                    <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg shadow-soft-2xl bg-white bg-center fill-current stroke-0 text-center xl:p-2.5 
-                        {% if request.resolver_match.view_name == 'credit:credit_settings' %}bg-green-500{% endif %}">
+                    <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg shadow-soft-2xl bg-center fill-current stroke-0 text-center xl:p-2.5 
+                        {% if request.resolver_match.view_name == 'credit:credit_settings' %}bg-green-500 {%else %} bg-white {% endif %}">
                         <i class="fas fa-cogs {% if request.resolver_match.view_name == 'credit:credit_settings' %} text-white{% else %} text-gray-900{% endif %}"></i>
                     </div>
                     <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Credit Settings</span>
@@ -83,8 +83,8 @@
                 <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors 
                     {% if request.resolver_match.view_name == 'credit:credit_request' %}font-bold{% endif %}" 
                     href="{% url 'credit:credit_request' %}">
-                    <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg shadow-soft-2xl bg-white bg-center fill-current stroke-0 text-center xl:p-2.5 
-                        {% if request.resolver_match.view_name == 'credit:credit_request' %}bg-green-500{% endif %}">
+                    <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg shadow-soft-2xl bg-center fill-current stroke-0 text-center xl:p-2.5 
+                        {% if request.resolver_match.view_name == 'credit:credit_request' %}bg-green-500 {%else %} bg-white {% endif %}">
                         <i class="fas fa-arrow-circle-down {% if request.resolver_match.view_name == 'credit:credit_request' %} text-white{% else %} text-gray-900{% endif %}"></i>
                     </div>
                     <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Pending Requests</span>
@@ -95,8 +95,8 @@
                 <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors 
                     {% if request.resolver_match.view_name == 'credit:approved_credit_request' %}font-bold{% endif %}" 
                     href="{% url 'credit:approved_credit_request' %}">
-                    <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg shadow-soft-2xl bg-white bg-center fill-current stroke-0 text-center xl:p-2.5 
-                        {% if request.resolver_match.view_name == 'credit:approved_credit_request' %}bg-green-500{% endif %}">
+                    <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg shadow-soft-2xl bg-center fill-current stroke-0 text-center xl:p-2.5 
+                        {% if request.resolver_match.view_name == 'credit:approved_credit_request' %}bg-green-500 {%else %} bg-white {% endif %}">
                         <i class="fas fa-check-circle {% if request.resolver_match.view_name == 'credit:approved_credit_request' %} text-white{% else %} text-gray-900{% endif %}"></i>
                     </div>
                     <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Approved Requests</span>
@@ -107,8 +107,8 @@
                 <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors 
                     {% if request.resolver_match.view_name == 'credit:disbursed_credits' %}font-bold{% endif %}" 
                     href="{% url 'credit:disbursed_credits' %}">
-                    <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg shadow-soft-2xl bg-white bg-center fill-current stroke-0 text-center xl:p-2.5 
-                        {% if request.resolver_match.view_name == 'credit:disbursed_credits' %}bg-green-500{% endif %}">
+                    <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg shadow-soft-2xl bg-center fill-current stroke-0 text-center xl:p-2.5 
+                        {% if request.resolver_match.view_name == 'credit:disbursed_credits' %}bg-green-500 {%else %} bg-white {% endif %}">
                         <i class="fas fa-hand-holding-usd {% if request.resolver_match.view_name == 'credit:disbursed_credits' %} text-white{% else %} text-gray-900{% endif %}"></i>
                     </div>
                     <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Disbursed Credits</span>
