@@ -1,19 +1,14 @@
 from accounts.models import CustomUser
-from django.utils import timezone
-from operations.models import ContributionRecord  # Assuming this is where contributions are stored
 from decimal import Decimal
-from django.core.validators import FileExtensionValidator
-from django.core.exceptions import ValidationError
-from django.urls import reverse
-from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Sum
 from django.db import models, transaction
+from django.utils.timezone import localtime
 
 
 class Charges(models.Model):
     """Defines the charges for withdrawals."""
-    charge_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    charge_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('0.00'))
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(
         max_length=12,
@@ -102,7 +97,6 @@ class Withdrawals(models.Model):
         total_paid = cls.objects.filter(status=cls.Status.PAID).aggregate(total=Sum('total_amount_withdrawn'))['total']
         return total_paid or Decimal('0.00')
 
-    from django.utils.timezone import localtime
     def save(self, *args, **kwargs):
         if self.payment_date:
             self.payment_date = localtime(self.payment_date)

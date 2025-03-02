@@ -29,7 +29,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG') == 'True'
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split(',')
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split(',') # ignore type
 
 # Application definition
 
@@ -188,3 +188,6 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels.layers.InMemoryChannelLayer",  # Use Redis in production
     },
 }
+
+# Define the date to assume salary will be paid on as a constant
+SALARY_PAYMENT_DATE = "1"

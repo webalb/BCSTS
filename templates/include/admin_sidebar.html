@@ -20,7 +20,7 @@
                     <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg shadow-soft-2xl bg-white bg-center stroke-0 text-center xl:p-2.5
                      {% if request.resolver_match.view_name == 'admin_dashboard' %}bg-green-500{% endif %}">
                         <i class="fas fa-chart-line  {% if request.resolver_match.view_name == 'admin_dashboard' %} text-white{% else %} text-gray-900{% endif %}"></i>  </div>
-                    <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Dashboard</span>
+                    <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft text-gray-900">Dashboard</span>
                 </a>
             </li>
             <li class="mt-0.5 w-full">
@@ -100,6 +100,18 @@
                         <i class="fas fa-check-circle {% if request.resolver_match.view_name == 'credit:approved_credit_request' %} text-white{% else %} text-gray-900{% endif %}"></i>
                     </div>
                     <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Approved Requests</span>
+                </a>
+            </li>
+
+            <li class="mt-0.5 w-full">
+                <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors 
+                    {% if request.resolver_match.view_name == 'credit:disbursed_credits' %}font-bold{% endif %}" 
+                    href="{% url 'credit:disbursed_credits' %}">
+                    <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg shadow-soft-2xl bg-white bg-center fill-current stroke-0 text-center xl:p-2.5 
+                        {% if request.resolver_match.view_name == 'credit:disbursed_credits' %}bg-green-500{% endif %}">
+                        <i class="fas fa-hand-holding-usd {% if request.resolver_match.view_name == 'credit:disbursed_credits' %} text-white{% else %} text-gray-900{% endif %}"></i>
+                    </div>
+                    <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Disbursed Credits</span>
                 </a>
             </li>
 

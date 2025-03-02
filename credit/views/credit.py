@@ -1,11 +1,12 @@
 from django.contrib.auth.decorators import login_required, user_passes_test
-from accounts.models import CustomUser
-from credit.models import Credit, CreditSettings, Murabaha, Musharaka, Guarantor, CreditCommittee
+from credit.models import Credit, CreditSettings, Guarantor, CreditCommittee
 from django.shortcuts import render, get_object_or_404, redirect
 from credit.forms import CreditApplicationForm, CreditApplicationForm 
 from django.contrib import messages
 from operations.utils import get_employee_financial_summary
 from credit.utils.utils import *
+from django.urls import reverse
+from django.db.models import Sum
 
 
 def is_admin(user):
@@ -24,6 +25,8 @@ def create_credit_application(request):
     # Get employee's financial summary
     financial_summary = get_employee_financial_summary(request.user)
     total_balance = financial_summary["total_remained_balance"]
+    took_credits = financial_summary["took_credits"]
+    print(financial_summary)
 
     # Retrieve the credit settings (Singleton pattern)
     credit_settings = CreditSettings.get_instance()
@@ -45,6 +48,9 @@ def create_credit_application(request):
         status__in=['Pending', 'Approved', 'Accepted', 'Disbursed'] # Add all active statuses.
     ).first()
 
+
+
+
     guarantor = None
     committee_info = {}
 
@@ -52,16 +58,32 @@ def create_credit_application(request):
         guarantor = Guarantor.objects.filter(credit=current_credit).first()
         committee_actions_count = current_credit.committee_actions.count() # type: ignore
         newest_action_date = current_credit.committee_actions.order_by('-action_date').first().action_date if committee_actions_count > 0 else None # type: ignore
-        committee_info = {
+        if current_credit.status == 'Disbursed' or current_credit.status == 'Repaid':
+            transaction_record = current_credit.transactionlog_set.filter(transaction_type='C').first() # type: ignore
+            repayment_records = current_credit.repayment_set.all().order_by('-repayment_date') # type: ignore
+            total_repaid = repayment_records.aggregate(total=Sum('amount'))['total'] or 0
+            
+            committee_info = {
+            "actions_count": committee_actions_count,
+            "newest_action_date": newest_action_date,
+            "transaction_record": transaction_record,
+            "repayment_records": repayment_records,
+            "total_repaid": total_repaid,
+            "months_remaining": current_credit.get_remaining_months,
+            "total_remaining": Decimal(current_credit.amount_requested) - Decimal(total_repaid), # type: ignore
+            }
+        else:
+            committee_info = {
             "actions_count": committee_actions_count,
             "newest_action_date": newest_action_date
-        }
+            }
 
     # Fetch credit requests where the user is a guarantor
     guarantor_requests = Credit.objects.filter(
         guarantors__guarantor=request.user,
         status='Pending'  # Only pending requests
     ).distinct()
+
 
     return render(request, 'credit/employee_credit_portal.html', {
         'total_balance': total_balance,
@@ -71,7 +93,10 @@ def create_credit_application(request):
         'current_credit': current_credit, 
         'guarantor_requests': guarantor_requests,
         "guarantor": guarantor,
-        "committee_info": committee_info
+        "committee_info": committee_info,
+        "took_credits": took_credits,
+        "repaid_credits": financial_summary["repaid_credits"],
+        "repaid_percentage": financial_summary["repaid_percentage"]
     })
 
 @login_required
@@ -106,6 +131,24 @@ def credit_detail(request, tracking_id):
     if user_committee_actions:
         action_taken = user_committee_actions.first().get_action_taken_display()
 
+    committee_info = {}
+    if credit:
+        guarantor = Guarantor.objects.filter(credit=credit).first()
+        committee_actions_count = credit.committee_actions.count() # type: ignore
+        newest_action_date = credit.committee_actions.order_by('-action_date').first().action_date if committee_actions_count > 0 else None # type: ignore
+        if credit.status == 'Disbursed' or credit.status == 'Repaid':
+            transaction_record = credit.transactionlog_set.filter(transaction_type='C').first() # type: ignore
+            repayment_records = credit.repayment_set.all().order_by('-repayment_date') # type: ignore
+            total_repaid = repayment_records.aggregate(total=Sum('amount'))['total'] or 0
+            committee_info = {
+            "actions_count": committee_actions_count,
+            "newest_action_date": newest_action_date,
+            "transaction_record": transaction_record,
+            "repayment_records": repayment_records,
+            "total_repaid": total_repaid,
+            "total_remaining": Decimal(credit.amount_requested) - Decimal(total_repaid), # type: ignore
+            }
+
     if guarantor:
         guarantor_balance = get_employee_financial_summary(guarantor.guarantor)["total_remained_balance"]
     else:
@@ -122,6 +165,7 @@ def credit_detail(request, tracking_id):
         'action_taken': action_taken,
         'committee_actions_count': committee_actions.count(), # type: ignore
         'committee_count': CreditCommittee.objects.all().count() - 1,  # Exclude the approver
+        'committee_info': committee_info
     }
 
     return render(request, 'credit/credit_detail.html', context)
@@ -152,12 +196,16 @@ def credit_application(request, credit_type):
     total_balance = get_employee_financial_summary(request.user)["total_remained_balance"]
 
     if request.method == "POST":
+
         if credit_form.is_valid():
             try:
                 guarantor_user = validate_guarantor_email(credit_form.cleaned_data['guarantor_email'])
                 validate_repayment_period(credit_form.cleaned_data['repayment_period'], credit_settings.max_repayment_months)
                 if credit_type == "Qard Hasan":
                     validate_credit_amount(credit_form.cleaned_data['amount_requested'], credit_settings.min_credit_amount, total_balance * 2)
+                if credit_type == "Murabaha":
+                    validate_credit_amount(credit_form.cleaned_data['asset_price'], credit_settings.min_credit_amount, total_balance * 2, type="Murabaha")
+
 
                 credit = save_credit_application(credit_form, request.user, credit_type)
                 save_guarantor(credit, guarantor_user)
@@ -181,6 +229,7 @@ def credit_application(request, credit_type):
                     credit_form.add_error(None, e)
 
         else:
+
             messages.error(request, "There was an error with your application. Please check your inputs.")
 
     return render(request, "credit/application_form.html", {
@@ -263,7 +312,38 @@ def committee_action(request, credit_id):
             return redirect(request.path)
 
         if committee_member.role == 'Approver':
-            return handle_approver_action(request, committee_member, credit, action)
+            
+
+            if credit.credit_type == "Murabaha":
+                profit_margin_percentage = request.POST.get('profit_margin_percentage')
+                profit_margin_fixed = request.POST.get('profit_margin_fixed')
+                if profit_margin_percentage and profit_margin_fixed:
+                    messages.error(request, "Please use only one option for profit margin.")
+                    return redirect(request.path)
+                if profit_margin_percentage:
+                    try:
+                        profit_margin_percentage = float(profit_margin_percentage)
+                        if profit_margin_percentage > 100:
+                            messages.error(request, "Profit margin percentage should be less than or equal to 100.")
+                            return redirect(request.path)
+                    except ValueError:
+                        messages.error(request, "Profit margin percentage should be a number.")
+                        return redirect(request.path)
+                if profit_margin_fixed:
+                    try:
+                        profit_margin_fixed = float(profit_margin_fixed)
+                    except ValueError:
+                        messages.error(request, "Profit margin fixed should be a number.")
+                        return redirect(request.path)
+
+                profit_margin = {
+                    "type": "percentage" if profit_margin_percentage else "fixed",
+                    "value": profit_margin_percentage if profit_margin_percentage else profit_margin_fixed
+                }
+            else:
+                profit_margin = None
+
+            return handle_approver_action(request, committee_member, credit, action, other_type=profit_margin)
         elif committee_member.role == 'Reviewer':
             return handle_reviewer_action(request, committee_member, credit, action)
         else:

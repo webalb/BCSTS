@@ -18,8 +18,8 @@ urlpatterns = [
     path('request-cancel/<int:request_id>/', views.cancel_request, name='cancel_request'),
     
     path('approve/<int:request_id>/', views.approve_request, name='approve_request'),
-    path('decline/<int:request_id>/', views.decline_request, name='decline_request'),
-    path('pay/<int:request_id>/', views.pay_request, name='pay_request'),
+    path('decline/<int:request_id>/', views.decline_request, name='decline_request'), # type: ignore
+    path('pay/<int:request_id>/', views.pay_request, name='pay_request'), # type: ignore
     path('update-withdrawal-status/', views.update_withdrawal_status, name='update_withdrawal_status'),
 
 

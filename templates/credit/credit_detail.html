@@ -27,146 +27,262 @@ Credit Portal | Benovelance Cooperative
     <div class="flex flex-wrap -mx-3">
       <div class="w-full max-w-full px-3">
         <div
-          class="relative flex flex-col h-full min-w-0 break-words bg-white border-0 bg-clip-border">
-          <div class="p-4 pb-0 mb-0 border-b-0 rounded-t-2xl">
-            <div class="flex flex-wrap -mx-3">
-              <div class="flex items-center w-full max-w-full px-3 shrink-0 md:flex-none">
-                <h2 class="text-xl font-bold text-center text-gray-900 text-center"> 
-                  Credit details (Tracking ID: {{ credit.tracking_id }})
-                </h2>
-              </div>
+          class="relative flex flex-col h-full min-w-0 break-words border-0 bg-clip-border">
+            <div class="p-4 pb-0 mb-0 border-b-0 rounded-t-2xl bg-white">
+                <div class="flex flex-wrap -mx-3">
+                <div class="flex items-center w-full max-w-full px-3 shrink-0 md:flex-none">
+                    <h2 class="text-xl font-bold text-center text-gray-900 text-center"> 
+                    Credit details (Tracking ID: {{ credit.tracking_id }})
+                    </h2>
+                </div>
+                </div>
             </div>
-          </div>
-          <div class="flex flex-wrap mt-6 p-6">
-            <div class="w-full max-w-full px-3 mt-0 mb-6 lg:mb-0 lg:w-4/12 lg:flex-none bg-white">
-              <fieldset class="border border-gray-300 rounded-lg p-6 mb-6">
-                <legend class="mb-4 font-bold leading-tight uppercase text-sm text-gray-900">Credit Details</legend>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Credit Type -->
-                    <div class="flex flex-col">
-                        <label class="text-sm font-medium text-gray-700 mt-1">Credit Type: <span class="text-sm text-gray-900">{{ credit.credit_type }}</span></label>
+            <div class="flex flex-wrap mt-6 p-6 bg-white">
+                <div class="w-full max-w-full px-3 mt-0 mb-6 lg:mb-0 lg:w-4/12 lg:flex-none bg-white">
+                <fieldset class="border border-gray-300 rounded-lg p-6 mb-6">
+                    <legend class="mb-4 font-bold leading-tight uppercase text-sm text-gray-900">Credit Details</legend>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Credit Type -->
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-gray-700 mt-1">Credit Type: <span class="text-sm text-gray-900">{{ credit.credit_type }}</span></label>
+                            
+                        </div>
+                
+                        <!-- Amount Requested -->
+                        <div class="flex flex-col">
+
+                            <label class="text-sm font-medium text-gray-700 mt-1">
+                                {% if credit.credit_type == "Murabaha"%}
+                                Asset Price:
+                                {% else %}
+                                Amount Requested: 
+                                {% endif %}
+                                <span class="mt-1 text-sm text-gray-900">NGN{{ credit.amount_requested|floatformat:2|intcomma }}</span></label>
+                            
+                        </div>
+                        <!-- Administrative Charge -->
+                        <div class="flex flex-col">
+                        <label class="text-sm font-medium text-gray-700 mt-1">Administrative Charge: <span class="text-sm text-gray-900">NGN{{ credit.administrative_charge|floatformat:2|intcomma }}</sp></label>
+                        
+                        </div>
+
+                        <!-- Vendor Invoice -->
+                        {% if credit.credit_type == "Murabaha" %}
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-gray-700 mt-1">Vendor Invoice: 
+                                <a href="{{ credit.murabaha.vendor_invoice.url }}" download class="text-green-600 underline">
+                                    <i class="fas fa-download"></i> Download
+                                </a>
+                            </label>
+                        </div>
+                        {% endif %}
+                
+                        <!-- Repayment Period -->
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-gray-700 mt-1">Repayment Period: <span class="text-sm text-gray-900">{{ credit.repayment_period }} months</sp></label>
+                            
+                        </div>
+                
+                        <!-- Status -->
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-gray-700 mt-1">Status: <span class="text-sm text-gray-900">{{ credit.status }}</span></label>
+                            
+                        </div>
+                
+                        <!-- Date Applied -->
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-gray-700 mt-1">Date Applied: <span class="text-sm text-gray-900">{{ credit.date_applied|date:"F j, Y" }}</p></label>
+                            
+                        </div>
+                
                         
                     </div>
-            
-                    <!-- Amount Requested -->
-                    <div class="flex flex-col">
-                        <label class="text-sm font-medium text-gray-700 mt-1">Amount Requested: <span class="mt-1 text-sm text-gray-900">NGN{{ credit.amount_requested|floatformat:2|intcomma }}</span></label>
+                </fieldset>
+                
+                </div>
+                <div class="w-full max-w-full px-3 mt-0 mb-6 lg:mb-0 lg:w-4/12 lg:flex-none">
+                <fieldset class="border border-gray-300 rounded-lg p-6 mb-6">
+                    <legend class="mb-4 font-bold leading-tight uppercase text-sm text-gray-900">Applicant Personal Details</legend>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Full Name -->
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-gray-700 mt-1">Full Name: <span class="mt-1 text-sm text-gray-900">{{ applicant.get_full_name }}</sp></label>
+                            
+                        </div>
+                
+                        <!-- Email -->
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-gray-700 mt-1">Email: <span class="mt-1 text-sm text-gray-900">{{ applicant.email }}</span></label>
+                            
+                        </div>
+                
+                        <!-- Phone Number -->
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-gray-700 mt-1">Phone Number:  <span class="mt-1 text-sm text-gray-900">{{ applicant.phone_number }}</span></label>
                         
+                        </div>
+                
+                        <!-- Employee ID -->
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-gray-700 mt-1">Staff ID: <span class="mt-1 text-sm text-gray-900">{{ applicant.nitda_id }}</span></label>
+                            
+                        </div>
+                
+                        <!-- Department -->
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-gray-700 mt-1">BCS Postion: <span class="mt-1 text-sm text-gray-900">{{ applicant.position }}</sp></label>
+                            
+                        </div>
+                
+                        <!-- Date Joined -->
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-gray-700 mt-1">Date Joined: <span class="mt-1 text-sm text-gray-900">{{ applicant.date_joined|date:"F j, Y" }}</sp></label>
+                            
+                        </div>
                     </div>
-                    <!-- Administrative Charge -->
-                    <div class="flex flex-col">
-                      <label class="text-sm font-medium text-gray-700 mt-1">Administrative Charge: <span class="text-sm text-gray-900">NGN{{ credit.administrative_charge|floatformat:2|intcomma }}</sp></label>
-                      
+                </fieldset>
+                </div>
+                <div class="w-full max-w-full px-3 mt-0 mb-6 lg:mb-0 lg:w-4/12 lg:flex-none">
+                <fieldset class="border border-gray-300 rounded-lg p-6 mb-6">
+                    <legend class="mb-4 font-bold leading-tight uppercase text-sm text-gray-900">Guarantor Details</legend>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Full Name -->
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-gray-700">Full Name: <span class="mt-1 text-sm text-gray-900">{{ guarantor.guarantor.get_full_name }}</span></label>
+                        </div>
+                
+                        <!-- Email -->
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-gray-700 mt-1">Email: <span class="mt-1 text-sm text-gray-900">{{ guarantor.guarantor.email }}</span></label>
+                            
+                        </div>
+                
+                        <!-- Phone Number -->
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-gray-700 mt-1">Phone Number: <span class="mt-1 text-sm text-gray-900">{{ guarantor.guarantor.phone_number }}</p></label>
+                            
+                        </div>
+                
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-gray-700 mt-1">Total Balance: <span class="mt-1 text-sm text-gray-900">NGN{{ guarantor_balance|intcomma }}</span></label>
+                            
+                        </div>
+                
+                        <!-- Status -->
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-gray-700 mt-1">Status: <span class="mt-1 text-sm text-gray-900">{{ guarantor.status }}</sp></label>
+                            
+                        </div>
+                
+                        <!-- Action Date -->
+                        <div class="flex flex-col">
+                            <label class="text-sm font-medium text-gray-700 mt-1">Action Date: <span class="mt-1 text-sm text-gray-900">{{ guarantor.action_date|date:"F j, Y" }}</span></label>
+                            
+                        </div>
                     </div>
-            
-                    <!-- Repayment Period -->
-                    <div class="flex flex-col">
-                        <label class="text-sm font-medium text-gray-700 mt-1">Repayment Period: <span class="text-sm text-gray-900">{{ credit.repayment_period }} months</sp></label>
-                        
+                </fieldset>
+                </div>
+            </div>
+            {% if credit.status == 'Disbursed' or credit.status == 'Repaid' %}
+                <div class="w-full max-w-full px-3 mt-0 mb-6 lg:mb-0 lg:flex-none bg-white">
+                    <div class="w-full max-w-full px-3 mb-6 sm:flex-none xl:mb-0 xl:w-full">
+                        <div class="px-3 text-center basis-1/3 text-xs">
+                            <table class="items-center w-full border mb-0 align-top border-gray-200 text-gray-900 overflow-x-auto overflow-y-auto" style="border:#ccc solid 1px">
+                                <thead class="align-bottom">
+                                    <tr class="bg-gray-50 mt-1">
+                                        <th class="border px-3 py-2 text-left text-xs font-bold uppercase border-b border-gray-900">Repayment Date</th>
+                                        <th class="border px-3 py-2 text-left text-xs font-bold uppercase border-b border-gray-900">Amount</th>
+                                        <th class="border px-3 py-2 text-left text-xs font-bold uppercase border-b border-gray-900">Repayment Method</th>
+                                        <th class="border px-3 py-2 text-left text-xs font-bold uppercase border-b border-gray-900">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for record in credit.repayment_set.all %}
+                                    <tr class="border-b border-gray-300">
+                                        <td class="border p-2 align-middle whitespace-nowrap text-left">
+                                            <span class="mb-0 leading-normal bg-blue-200 rounded-lg text-center py-1 px-2 text-xs font-bold">
+                                                <i class="fa fa-calendar-alt"></i> {{ record.repayment_date|date:"F j, Y" }}
+                                            </span>
+                                        </td>
+                                        <td class="border p-2 align-middle bg-transparent whitespace-nowrap text-left">
+                                            <h6 class="mb-0 leading-normal text-xs text-gray-900">NGN{{ record.amount|intcomma }}</h6>
+                                        </td>
+                                        <td class="border p-2 align-middle bg-transparent whitespace-nowrap text-left">
+                                            <h6 class="mb-0 leading-normal text-xs text-gray-900">{{ record.get_repayment_method_display }}</h6>
+                                        </td>
+                                        <td class="border p-2 align-middle bg-transparent whitespace-nowrap text-left">
+                                            <h6 class="mb-0 leading-normal text-xs text-gray-900">{{ record.get_status_display }}</h6>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-            
-                    <!-- Status -->
-                    <div class="flex flex-col">
-                        <label class="text-sm font-medium text-gray-700 mt-1">Status: <span class="text-sm text-gray-900">{{ credit.status }}</span></label>
-                        
+                </div>
+                {% if is_admin and credit.status == 'Disbursed' %}
+                <div class="w-full max-w-full px-3 mt-0 lg:flex-none mt-6">
+                <div class="flex-auto p-4 pt-6 rounded-" style="border: #ccc solid 2px">
+                    <h6 class="mb-4 font-bold leading-tight uppercase text-sm text-gray-900">Clear Credit</h6>
+                    <div class="flex flex-wrap -mx-3">
+                        <div class="w-full max-w-full px-3 mt-0 mb-6 lg:mb-0 lg:w-4/12">
+                            <fieldset class="border border-gray-300 rounded-lg p-6 mb-6">
+                                <legend class="mb-4 font-bold leading-tight uppercase text-sm text-gray-900">Repayment Summary</legend>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <!-- Total Amount Collected -->
+                                    <div class="flex flex-col">
+                                        <label class="text-sm font-medium text-gray-700 mt-1">Total Amount Collected: <span class="text-sm text-gray-900">NGN{{ credit.amount_requested|floatformat:2|intcomma }}</span></label>
+                                    </div>
+                                    <!-- Total Amount Repaid -->
+                                    <div class="flex flex-col">
+                                        <label class="text-sm font-medium text-gray-700 mt-1">Total Amount Repaid: <span class="text-sm text-gray-900">NGN{{ committee_info.total_repaid|floatformat:2|intcomma }}</span></label>
+                                    </div>
+                                    <!-- Remaining Balance -->
+                                    <div class="flex flex-col">
+                                        <label class="text-sm font-medium text-gray-700 mt-1">Remaining Balance: <span class="text-sm text-gray-900">NGN{{ committee_info.total_remaining|floatformat:2|intcomma }}</span></label>
+                                    </div>
+                                    <!-- Monthly Deduction -->
+                                    <div class="flex flex-col">
+                                        <label class="text-sm font-medium text-gray-700 mt-1">Monthly Deduction: <span class="text-sm text-gray-900">NGN{{ credit.monthly_deduction|floatformat:2|intcomma }}</span></label>
+                                    </div>
+                                    
+                                    <!-- Repayment Start Month -->
+                                    <div class="flex flex-col">
+                                        <label class="text-sm font-medium text-gray-700 mt-1">Repayment Start Month: <span class="text-sm text-gray-900">{{ credit.repayment_start_month_as_date|date:"F, Y" }}</span></label>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div class="w-full max-w-full px-3 mt-0 mb-6 lg:mb-0 lg:w-5/12">
+                            <!-- Action Form -->
+                            <form id="clear-credit-form" method="post" enctype="multipart/form-data" action="{% url 'credit:clear_credit' credit.tracking_id %}">
+                                {% csrf_token %}
+                                <div class="mb-4">
+                                    <label for="clear_amount" class="block text-gray-700 text-sm font-bold mb-2" 
+                                    >Amount</label>
+                                    <input type="number" id="clear_amount" name="clear_amount" required class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow">
+                                </div>
+                                <div class="mb-4">
+                                    <label for="transaction_receipt" class="block text-gray-700 text-sm font-bold mb-2">Upload Receipt</label>
+                                    <input type="file" id="transaction_receipt" name="transaction_receipt" required>
+                                </div>
+                                <button type="submit" name="action" value="clear" class="inline-block px-4 py-2 uppercase text-sm mr-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-all">
+                                    Clear Credit
+                                </button>
+                                <a href="javascript:history.back()" class="inline-block px-4 py-2 mb-0 font-bold text-center uppercase align-middle transition-all bg-gray-200 border border-solid rounded-lg shadow-none cursor-pointer leading-pro ease-soft-in text-xs hover:scale-102 active:shadow-soft-xs tracking-tight-soft border-gray-500 text-gray-700 hover:border-gray-600 hover:bg-gray-300 hover:text-gray-900">
+                                    ← Back
+                                </a>
+                            </form>
+                        </div>
                     </div>
-            
-                    <!-- Date Applied -->
-                    <div class="flex flex-col">
-                        <label class="text-sm font-medium text-gray-700 mt-1">Date Applied: <span class="text-sm text-gray-900">{{ credit.date_applied|date:"F j, Y" }}</p></label>
-                        
-                    </div>
-            
+                    
                     
                 </div>
-              </fieldset>
-              
-            </div>
-            <div class="w-full max-w-full px-3 mt-0 mb-6 lg:mb-0 lg:w-4/12 lg:flex-none">
-              <fieldset class="border border-gray-300 rounded-lg p-6 mb-6">
-                <legend class="mb-4 font-bold leading-tight uppercase text-sm text-gray-900">Applicant Personal Details</legend>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Full Name -->
-                    <div class="flex flex-col">
-                        <label class="text-sm font-medium text-gray-700 mt-1">Full Name: <span class="mt-1 text-sm text-gray-900">{{ applicant.get_full_name }}</sp></label>
-                        
-                    </div>
-            
-                    <!-- Email -->
-                    <div class="flex flex-col">
-                        <label class="text-sm font-medium text-gray-700 mt-1">Email: <span class="mt-1 text-sm text-gray-900">{{ applicant.email }}</span></label>
-                        
-                    </div>
-            
-                    <!-- Phone Number -->
-                    <div class="flex flex-col">
-                        <label class="text-sm font-medium text-gray-700 mt-1">Phone Number:  <span class="mt-1 text-sm text-gray-900">{{ applicant.phone_number }}</span></label>
-                       
-                    </div>
-            
-                    <!-- Employee ID -->
-                    <div class="flex flex-col">
-                        <label class="text-sm font-medium text-gray-700 mt-1">Staff ID: <span class="mt-1 text-sm text-gray-900">{{ applicant.nitda_id }}</span></label>
-                        
-                    </div>
-            
-                    <!-- Department -->
-                    <div class="flex flex-col">
-                        <label class="text-sm font-medium text-gray-700 mt-1">BCS Postion: <span class="mt-1 text-sm text-gray-900">{{ applicant.position }}</sp></label>
-                        
-                    </div>
-            
-                    <!-- Date Joined -->
-                    <div class="flex flex-col">
-                        <label class="text-sm font-medium text-gray-700 mt-1">Date Joined: <span class="mt-1 text-sm text-gray-900">{{ applicant.date_joined|date:"F j, Y" }}</sp></label>
-                        
-                    </div>
                 </div>
-              </fieldset>
-            </div>
-            <div class="w-full max-w-full px-3 mt-0 mb-6 lg:mb-0 lg:w-4/12 lg:flex-none">
-              <fieldset class="border border-gray-300 rounded-lg p-6 mb-6">
-                <legend class="mb-4 font-bold leading-tight uppercase text-sm text-gray-900">Guarantor Details</legend>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Full Name -->
-                    <div class="flex flex-col">
-                        <label class="text-sm font-medium text-gray-700">Full Name: <span class="mt-1 text-sm text-gray-900">{{ guarantor.guarantor.get_full_name }}</span></label>
-                    </div>
-            
-                    <!-- Email -->
-                    <div class="flex flex-col">
-                        <label class="text-sm font-medium text-gray-700 mt-1">Email: <span class="mt-1 text-sm text-gray-900">{{ guarantor.guarantor.email }}</span></label>
-                        
-                    </div>
-            
-                    <!-- Phone Number -->
-                    <div class="flex flex-col">
-                        <label class="text-sm font-medium text-gray-700 mt-1">Phone Number: <span class="mt-1 text-sm text-gray-900">{{ guarantor.guarantor.phone_number }}</p></label>
-                        
-                    </div>
-            
-                    <div class="flex flex-col">
-                        <label class="text-sm font-medium text-gray-700 mt-1">Total Balance: <span class="mt-1 text-sm text-gray-900">NGN{{ guarantor.total_balance }}</span></label>
-                        
-                    </div>
-            
-                    <!-- Status -->
-                    <div class="flex flex-col">
-                        <label class="text-sm font-medium text-gray-700 mt-1">Status: <span class="mt-1 text-sm text-gray-900">{{ guarantor.status }}</sp></label>
-                        
-                    </div>
-            
-                    <!-- Action Date -->
-                    <div class="flex flex-col">
-                        <label class="text-sm font-medium text-gray-700 mt-1">Action Date: <span class="mt-1 text-sm text-gray-900">{{ guarantor.action_date|date:"F j, Y" }}</span></label>
-                        
-                    </div>
-                </div>
-              </fieldset>
-            </div>
-          </div>
+                {% endif %}
+            {% endif %}
           
-          <div class="flex flex-wrap -mx-3">
+          <div class="flex flex-wrap -mx-3 mt-6">
             <div class="w-full max-w-full px-3 mt-0 mb-6 lg:mb-0 lg:w-5/12 lg:flex-none">
               <div class="border-black/12.5  relative z-20 flex min-w-0 flex-col break-words border-0 border-solid  bg-clip-border">
                 {% if not is_admin %}
@@ -182,31 +298,25 @@ Credit Portal | Benovelance Cooperative
                                   <p class="mt-1 mb-0 font-semibold leading-tight text-xs">Applications</p>
                               </div>
                               <h4 class="font-bold text-center">{{ applicant_credit_summary.applications }}</h4>
-                              <div class="text-xs h-0.75 flex w-3/4 mx-auto overflow-visible rounded-lg bg-gray-200">
-                                  <div class="w-{{ applicant_credit_summary.applications }}/10 h-1.5 rounded-lg bg-slate-700"></div>
-                              </div>
+                              
                           </div>
 
                           <div class="flex-none w-1/4 max-w-full py-4 pl-0 pr-3 mt-0">
                               <div class="flex flex-col items-center mb-2">
                                   <i class="fas fa-check-circle text-green-600 text-xl"></i>
-                                  <p class="mt-1 mb-0 font-semibold leading-tight text-xs">Approved</p>
+                                  <p class="mt-1 mb-0 font-semibold leading-tight text-xs">Disbursed</p>
                               </div>
-                              <h4 class="font-bold text-center">{{ applicant_credit_summary.approved }}</h4>
-                              <div class="text-xs h-0.75 flex w-3/4 mx-auto overflow-visible rounded-lg bg-gray-200">
-                                  <div class="w-{{ applicant_credit_summary.approved }}/10 h-1.5 rounded-lg bg-green-700"></div>
-                              </div>
+                              <h4 class="font-bold text-center">{{ applicant_credit_summary.disbursed }}</h4>
+                              
                           </div>
 
                           <div class="flex-none w-1/4 max-w-full py-4 pl-0 pr-3 mt-0">
                               <div class="flex flex-col items-center mb-2">
-                                  <i class="fas fa-hand-holding-usd text-purple-600 text-xl"></i>
-                                  <p class="mt-1 mb-0 font-semibold leading-tight text-xs">Disbursed</p>
+                                  <i class="fas fa-handshake text-purple-600 text-xl"></i>
+                                  <p class="mt-1 mb-0 font-semibold leading-tight text-xs">Repaid</p>
                               </div>
-                              <h4 class="font-bold text-center">{{ applicant_credit_summary.disbursed }}</h4>
-                              <div class="text-xs h-0.75 flex w-3/4 mx-auto overflow-visible rounded-lg bg-gray-200">
-                                  <div class="w-{{ applicant_credit_summary.disbursed }}/10 h-1.5 rounded-lg bg-purple-700"></div>
-                              </div>
+                              <h4 class="font-bold text-center ">{{ applicant_credit_summary.repaid }}</h4>
+                              
                           </div>
 
                           <div class="flex-none w-1/4 max-w-full py-4 pl-0 mt-0">
@@ -214,10 +324,8 @@ Credit Portal | Benovelance Cooperative
                                   <i class="fas fa-percent text-teal-600 text-xl"></i>
                                   <p class="mt-1 mb-0 font-semibold leading-tight text-xs">Repayment</p>
                               </div>
-                              <h4 class="font-bold text-center">{{ applicant_credit_summary.repayment_percentage }}%</h4>
-                              <div class="text-xs h-0.75 flex w-3/4 mx-auto overflow-visible rounded-lg bg-gray-200">
-                                  <div class="w-{{ applicant_credit_summary.repayment_percentage|floatformat:0 }}/10 h-1.5 rounded-lg bg-teal-700"></div>
-                              </div>
+                              <h4 class="font-bold text-center">{{ applicant_credit_summary.repayment_percentage|floatformat:0 }}%</h4>
+                              
                           </div>
                       </div>
                     </div>
@@ -258,83 +366,145 @@ Credit Portal | Benovelance Cooperative
                     </div>
                     </fieldset>
 
-                  <div class="w-full px-6 mt-4 mx-auto max-w-screen-2xl rounded-xl">
-                    <div class="flex flex-wrap mt-0 -mx-3">
-                        
-                        {% if not is_credit_committee and not is_admin and credit.status == 'Approved' %}
-                        <!-- Action Form -->
-                          <form id="guarantor-action-form" method="post">
-                              {% csrf_token %}
-                              <!-- Agreement Checkbox -->
-                              <div class="flex mb-4">
-                                  <input type="checkbox" id="agree_terms" name="agree_terms" required class="w-4 h-4 inline-block text-green-600 border-gray-300 rounded focus:ring-blue-500 mt-2">
-                                  <label for="agree_terms" class="ml-4 inline-block text-sm text-gray-700">
-                                      I understand that if the applicant defaults on this credit, I will be held responsible for repayment.
-                                  </label>
-                              </div>
-
-                              <!-- Action Buttons -->
-                              <div class="flex space-x-4">
-                                  <a href="{% url 'credit:guarantor_action' credit.id 'approve' %}" id="approve-btn" class="inline-block px-4 py-2 uppercase text-sm mr-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-all">
-                                      Approve
-                                  </a>
-                                  <a href="{% url 'credit:guarantor_action' credit.id 'decline' %}" id="decline-btn" class="inline-block px-4 uppercase text-sm py-2 mr-4 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-all">
-                                      Decline
-                                  </a>
-                                  <a href="javascript:history.back()" class="inline-block px-4 py-2 mb-0 font-bold text-center uppercase align-middle transition-all bg-gray-200 border border-solid rounded-lg shadow-none cursor-pointer leading-pro ease-soft-in text-xs hover:scale-102 active:shadow-soft-xs tracking-tight-soft border-gray-500 text-gray-700 hover:border-gray-600 hover:bg-gray-300 hover:text-gray-900">
-                                        ← Back
-                                  </a>
-                              </div>
-                          </form>
-                        {% elif not is_admin and credit.status == 'Approved' %}
-                            {% if not action_taken %}
+                    <div class="w-full px-6 mt-4 mx-auto max-w-screen-2xl rounded-xl">
+                        <div class="flex flex-wrap mt-0 -mx-3">
+                            
+                            {% if not is_credit_committee and not is_admin and credit.status == 'Pending' %}
                             <!-- Action Form -->
-                            <form id="committee-action-form" method="post" action="{% url 'credit:committee_action' credit.id %}">
-                                {% csrf_token %}
-                                <!-- Agreement Checkbox -->
-                                <div class="flex mb-4">
-                                    <input type="checkbox" id="agree_terms_{{ credit.id }}" name="agree_terms" required class="w-4 h-4 inline-block text-green-600 border-gray-300 rounded focus:ring-blue-500 mt-2">
-                                    <label for="agree_terms_{{ credit.id }}" class="ml-4 inline-block text-sm text-gray-700">
-                                        I have carefully reviewed this request and ensure it meets approval criteria.
-                                    </label>
-                                </div>
+                                {% if guarantor.status == 'Pending' %}
+                                <form id="guarantor-action-form" method="post">
+                                    {% csrf_token %}
+                                    <!-- Agreement Checkbox -->
+                                    <div class="flex mb-4">
+                                        <input type="checkbox" id="agree_terms" name="agree_terms" required class="w-4 h-4 inline-block text-green-600 border-gray-300 rounded focus:ring-blue-500 mt-2">
+                                        <label for="agree_terms" class="ml-4 inline-block text-sm text-gray-700">
+                                            I understand that if the applicant defaults on this credit, I will be held responsible for repayment.
+                                        </label>
+                                    </div>
 
-                                <!-- Action Buttons -->
-                                {% if is_approver %}
-                                {% if committee_count > committee_actions_count %} <p class="text-xs text-red-600">Action can only be taken once all reviewers have completed their reviews.</p> {% endif %}
+                                    <!-- Action Buttons -->
+                                    <div class="flex space-x-4">
+                                        <a href="{% url 'credit:guarantor_action' credit.id 'approve' %}" id="approve-btn" class="inline-block px-4 py-2 uppercase text-sm mr-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-all">
+                                            Approve
+                                        </a>
+                                        <a href="{% url 'credit:guarantor_action' credit.id 'decline' %}" id="decline-btn" class="inline-block px-4 uppercase text-sm py-2 mr-4 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-all">
+                                            Decline
+                                        </a>
+                                        <a href="javascript:history.back()" class="inline-block px-4 py-2 mb-0 font-bold text-center uppercase align-middle transition-all bg-gray-200 border border-solid rounded-lg shadow-none cursor-pointer leading-pro ease-soft-in text-xs hover:scale-102 active:shadow-soft-xs tracking-tight-soft border-gray-500 text-gray-700 hover:border-gray-600 hover:bg-gray-300 hover:text-gray-900">
+                                                ← Back
+                                        </a>
+                                    </div>
+                                </form>
+                                {% else %}
+                                    <p class="text-xs text-red-600">You have already <b>{{ guarantor.status }}</b> this credit request.</p>
                                 {% endif %}
-                                <div class="flex space-x-4">
-                                    {% if is_approver %}
-                                    
-                                    <button type="submit" name="action" value="approve" class="inline-block px-4 py-2 uppercase text-sm mr-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-all"
-                                    {% if committee_count > committee_actions_count %} disabled style="opacity: 0.5" {% endif %}>
-                                        Approve
-                                    </button>
-                                    <button type="submit" name="action" value="decline" class="inline-block px-4 uppercase text-sm py-2 mr-4 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-all"
-                                    {% if committee_count > committee_actions_count %} disabled style="opacity: 0.5"  {% endif %}>
-                                        Decline
-                                    </button>
-                                    {% else %}
-                                    <button type="submit" name="action" value="okay" class="inline-block px-4 py-2 uppercase text-sm mr-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all">
-                                        Vote Okay
-                                    </button>
-                                    <button type="submit" name="action" value="not_okay" class="inline-block px-4 uppercase text-sm py-2 mr-4 bg-yellow-600 text-white font-semibold rounded-lg hover:bg-yellow-700 transition-all">
-                                        Vote Not Okay
-                                    </button>
+                            {% elif not is_admin and credit.status == 'Pending' %}
+                                {% if not action_taken %}
+                                <!-- Action Form -->
+                                <form id="committee-action-form" method="post" action="{% url 'credit:committee_action' credit.id %}">
+                                    {% csrf_token %}
+                                    <!-- Agreement Checkbox -->
+                                    <div class="flex mb-4">
+                                        <input type="checkbox" id="agree_terms_{{ credit.id }}" name="agree_terms" required class="w-4 h-4 inline-block text-green-600 border-gray-300 rounded focus:ring-blue-500 mt-2">
+                                        <label for="agree_terms_{{ credit.id }}" class="ml-4 inline-block text-sm text-gray-700">
+                                            I have carefully reviewed this request and ensure it meets approval criteria.
+                                        </label>
+                                    </div>
+                                    {% if credit.credit_type == "Murabaha" and is_approver %}
+                                        <div class="flex flex-col mb-4">
+                                            <label for="profit_margin_percentage" class="block text-gray-700 text-sm font-bold mb-2">Profit Margin (Percentage)</label>
+                                            <input type="number" id="id_profit_margin_percentage" name="profit_margin_percentage" step="0.01" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:shadow-outline">
+                                            <span class="text-xs font-semibold text-red-500 hidden" id="p-warning-span">Percentage amount should not be more than 100</span>
+                                        </div>
+                                        <div class="flex flex-col mb-4">
+                                            <label for="profit_margin_fixed" class="block text-gray-700 text-sm font-bold mb-2">Profit Margin (Fixed)</label>
+                                            <input type="number" id="id_profit_margin_fixed" name="profit_margin_fixed" step="0.01" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-green-500 focus:shadow-outline">
+                                        </div>
                                     {% endif %}
-                                    <a href="javascript:history.back()" class="inline-block px-4 py-2 mb-0 font-bold text-center uppercase align-middle transition-all bg-gray-200 border border-solid rounded-lg shadow-none cursor-pointer leading-pro ease-soft-in text-xs hover:scale-102 active:shadow-soft-xs tracking-tight-soft border-gray-500 text-gray-700 hover:border-gray-600 hover:bg-gray-300 hover:text-gray-900">
-                                        ← Back
-                                    </a>
+
+                                    <!-- Action Buttons -->
+                                    {% if is_approver %}
+                                        {% if committee_count > committee_actions_count %} <p class="text-xs text-red-600">Action can only be taken once all reviewers have completed their reviews.</p> {% endif %}
+                                    {% endif %}
+                                    <div class="flex space-x-4">
+                                        {% if is_approver %}
+                                        
+                                        <button type="submit" name="action" value="approve" class="inline-block px-4 py-2 uppercase text-sm mr-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-all"
+                                        {% if committee_count > committee_actions_count %} disabled style="opacity: 0.5" {% endif %}>
+                                            Approve
+                                        </button>
+                                        <button type="submit" name="action" value="decline" class="inline-block px-4 uppercase text-sm py-2 mr-4 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-all"
+                                        {% if committee_count > committee_actions_count %} disabled style="opacity: 0.5"  {% endif %}>
+                                            Decline
+                                        </button>
+                                        {% else %}
+                                        <button type="submit" name="action" value="okay" class="inline-block px-4 py-2 uppercase text-sm mr-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all">
+                                            Vote Okay
+                                        </button>
+                                        <button type="submit" name="action" value="not_okay" class="inline-block px-4 uppercase text-sm py-2 mr-4 bg-yellow-600 text-white font-semibold rounded-lg hover:bg-yellow-700 transition-all">
+                                            Vote Not Okay
+                                        </button>
+                                        {% endif %}
+                                        <a href="javascript:history.back()" class="inline-block px-4 py-2 mb-0 font-bold text-center uppercase align-middle transition-all bg-gray-200 border border-solid rounded-lg shadow-none cursor-pointer leading-pro ease-soft-in text-xs hover:scale-102 active:shadow-soft-xs tracking-tight-soft border-gray-500 text-gray-700 hover:border-gray-600 hover:bg-gray-300 hover:text-gray-900">
+                                            ← Back
+                                        </a>
+                                    </div>
+                                </form>
+                                {% else %}
+                                <div class="flex flex-col items-center justify-center">
+                                    <p class="relative text-center m-0 font-semibold leading-normal text-sm text-gray-900">Your Action: {{ action_taken|stringformat:"s" }}</p>
                                 </div>
-                            </form>
-                            {% else %}
-                            <div class="flex flex-col items-center justify-center">
-                                <p class="relative text-center m-0 font-semibold leading-normal text-sm text-gray-900">Your Action: {{ action_taken|stringformat:"s" }}</p>
-                            </div>
+                                {% endif %}
                             {% endif %}
-                        {% endif %}
+                        </div>
                     </div>
-                  </div>
+                    {% if is_admin and credit.status == 'Approved' or credit.status == "Accepted" %}
+                    <div class="w-full max-w-full px-3 mt-0 lg:flex-none bg-white">
+                    <div class="flex-auto p-4 pt-6 rounded-2xl" style="border: #ccc solid 2px">
+                        <h6 class="mb-4 font-bold leading-tight uppercase text-sm text-gray-900">Disburse Credit</h6>
+
+                        {% if credit.applicant.get_member_bank_details %}
+                            <div class="p-4 shadow-soft-xl rounded-2xl bg-white mt-4">
+                                <h6 class="mb-4 font-bold leading-tight uppercase text-sm text-gray-900">Applicant Bank Details</h6>
+                                <p class="text-xs text-gray-700"><strong>Bank Name:</strong> {{ credit.applicant.get_member_bank_details.bank_name }}</p>
+                                <p class="text-xs text-gray-700"><strong>Account Name:</strong> {{ credit.applicant.get_member_bank_details.account_holder_name }}</p>
+                                <p class="text-xs text-gray-700"><strong>Account Number:</strong> {{ credit.applicant.get_member_bank_details.account_number }}</p>
+                            </div>
+                        {% else %}
+                            <div class="p-4 shadow-soft-xl rounded-2xl bg-white mt-4">
+                                <p class="text-sm text-red-600">The applicant did not set his bank details.</p>
+                            </div>
+                        {% endif %}
+                        {% if credit.applicant.get_member_bank_details %}
+                        
+                        <!-- Action Form -->
+                        <form id="transaction-form" method="post" enctype="multipart/form-data" action="{% url 'credit:disburse_credit' credit.tracking_id %}">
+                            {% csrf_token %}
+                            <div class="mb-4">
+                                <label for="transaction_receipt" class="block text-gray-700 text-sm font-bold mb-2">Upload Receipt</label>
+                                <input type="file" id="transaction_receipt" name="transaction_receipt" required>
+
+                            </div>
+                            <div class="mb-4">
+                                <label for="repayment_start_month" class="block text-gray-700 text-sm font-bold mb-2">Repayment Start Month</label>
+                                <input type="month" id="repayment_start_month" name="repayment_start_month" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            </div>
+                            
+
+                                <button type="submit" name="action" value="disburse" class="inline-block px-4 py-2 uppercase text-sm mr-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-all">
+                                    Disburse
+                                </button>
+                                <a href="javascript:history.back()" class="inline-block px-4 py-2 mb-0 font-bold text-center uppercase align-middle transition-all bg-gray-200 border border-solid rounded-lg shadow-none cursor-pointer leading-pro ease-soft-in text-xs hover:scale-102 active:shadow-soft-xs tracking-tight-soft border-gray-500 text-gray-700 hover:border-gray-600 hover:bg-gray-300 hover:text-gray-900">
+                                    ← Back
+                                </a>                        
+                        </form>
+                        {% endif %}
+                       
+                
+                    
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
               </div>
             </div>
@@ -425,21 +595,10 @@ Credit Portal | Benovelance Cooperative
                                   <p class="mt-1 mb-0 font-semibold leading-tight text-xs">Applications</p>
                               </div>
                               <h4 class="font-bold text-center">{{ applicant_credit_summary.applications }}</h4>
-                              <div class="text-xs h-0.75 flex w-3/4 mx-auto overflow-visible rounded-lg bg-gray-200">
-                                  <div class="w-{{ applicant_credit_summary.applications }}/10 h-1.5 rounded-lg bg-slate-700"></div>
-                              </div>
+                           
                           </div>
 
-                          <div class="flex-none w-1/4 max-w-full py-4 pl-0 pr-3 mt-0">
-                              <div class="flex flex-col items-center mb-2">
-                                  <i class="fas fa-check-circle text-green-600 text-xl"></i>
-                                  <p class="mt-1 mb-0 font-semibold leading-tight text-xs">Approved</p>
-                              </div>
-                              <h4 class="font-bold text-center">{{ applicant_credit_summary.approved }}</h4>
-                              <div class="text-xs h-0.75 flex w-3/4 mx-auto overflow-visible rounded-lg bg-gray-200">
-                                  <div class="w-{{ applicant_credit_summary.approved }}/10 h-1.5 rounded-lg bg-green-700"></div>
-                              </div>
-                          </div>
+                          
 
                           <div class="flex-none w-1/4 max-w-full py-4 pl-0 pr-3 mt-0">
                               <div class="flex flex-col items-center mb-2">
@@ -447,10 +606,17 @@ Credit Portal | Benovelance Cooperative
                                   <p class="mt-1 mb-0 font-semibold leading-tight text-xs">Disbursed</p>
                               </div>
                               <h4 class="font-bold text-center">{{ applicant_credit_summary.disbursed }}</h4>
-                              <div class="text-xs h-0.75 flex w-3/4 mx-auto overflow-visible rounded-lg bg-gray-200">
-                                  <div class="w-{{ applicant_credit_summary.disbursed }}/10 h-1.5 rounded-lg bg-purple-700"></div>
-                              </div>
+                              
                           </div>
+
+                          <div class="flex-none w-1/4 max-w-full py-4 pl-0 pr-3 mt-0">
+                            <div class="flex flex-col items-center mb-2">
+                                <i class="fas fa-handshake text-green-600 text-xl"></i>
+                                <p class="mt-1 mb-0 font-semibold leading-tight text-xs">Repaid</p>
+                            </div>
+                            <h4 class="font-bold text-center">{{ applicant_credit_summary.repaid }}</h4>
+                            
+                        </div>
 
                           <div class="flex-none w-1/4 max-w-full py-4 pl-0 mt-0">
                               <div class="flex flex-col items-center mb-2">
@@ -458,9 +624,7 @@ Credit Portal | Benovelance Cooperative
                                   <p class="mt-1 mb-0 font-semibold leading-tight text-xs">Repayment</p>
                               </div>
                               <h4 class="font-bold text-center">{{ applicant_credit_summary.repayment_percentage }}%</h4>
-                              <div class="text-xs h-0.75 flex w-3/4 mx-auto overflow-visible rounded-lg bg-gray-200">
-                                  <div class="w-{{ applicant_credit_summary.repayment_percentage|floatformat:0 }}/10 h-1.5 rounded-lg bg-teal-700"></div>
-                              </div>
+                              
                           </div>
                       </div>
                     </div>
@@ -469,37 +633,8 @@ Credit Portal | Benovelance Cooperative
                 {% endif %}
               </div>
             </div>
-            {% if is_admin and credit.status == 'Approved' %}
-            <div class="w-full max-w-full px-3 mt-0 lg:w-7/12 lg:flex-none ">
-              <div class="flex-auto p-4 pt-6 rounded-" style="border: #ccc solid 2px">
-                <h6 class="mb-4 font-bold leading-tight uppercase text-sm text-gray-900">Disburse Credit</h6>
-                
-                        <!-- Action Form -->
-                        <form id="transaction-form" method="post" enctype="multipart/form-data" action="{% url 'credit:disburse_credit' credit.tracking_id %}">
-                            {% csrf_token %}
-                            <div class="mb-4">
-                                <label for="transaction_receipt" class="block text-gray-700 text-sm font-bold mb-2">Upload Receipt</label>
-                                <input type="file" id="transaction_receipt" name="transaction_receipt" required>
-
-                            </div>
-                            <div class="mb-4">
-                                <label for="repayment_start_month" class="block text-gray-700 text-sm font-bold mb-2">Repayment Start Month</label>
-                                <input type="month" id="repayment_start_month" name="repayment_start_month" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                            </div>
-                            
-
-                                <button type="submit" name="action" value="disburse" class="inline-block px-4 py-2 uppercase text-sm mr-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-all">
-                                    Disburse
-                                </button>
-                                <a href="javascript:history.back()" class="inline-block px-4 py-2 mb-0 font-bold text-center uppercase align-middle transition-all bg-gray-200 border border-solid rounded-lg shadow-none cursor-pointer leading-pro ease-soft-in text-xs hover:scale-102 active:shadow-soft-xs tracking-tight-soft border-gray-500 text-gray-700 hover:border-gray-600 hover:bg-gray-300 hover:text-gray-900">
-                                    ← Back
-                                </a>                        
-                            </form>
-                       
-                
-              </div>
-            </div>
-            {% endif %}
+            
+            
             
           </div>
           
@@ -511,6 +646,32 @@ Credit Portal | Benovelance Cooperative
   </div> <!-- end cards -->
 </main>
 <!-- JavaScript for Confirmation -->
+{% if credit.credit_type == "Murabaha" and is_approver %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const percentageInput = document.getElementById("id_profit_margin_percentage");
+        const fixedInput = document.getElementById("id_profit_margin_fixed");
+
+        percentageInput.addEventListener("input", function() {
+            if (percentageInput.value) {
+                document.getElementById("p-warning-span").classList.toggle("hidden", parseFloat(percentageInput.value) <= 100);
+                fixedInput.disabled = true;
+            } else {
+                fixedInput.disabled = false;
+            }
+        });
+
+        fixedInput.addEventListener("input", function() {
+            if (fixedInput.value) {
+                percentageInput.disabled = true;
+            } else {
+                percentageInput.disabled = false;
+            }
+        });
+    });
+</script>
+{% endif %}
+
    
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -551,7 +712,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
-</script>
 </script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 {% endblock %}

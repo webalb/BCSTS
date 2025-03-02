@@ -1,12 +1,13 @@
+from tkinter import NO
 from django.contrib import messages
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.core.exceptions import ValidationError
 from credit.models import Credit, Murabaha, Musharaka, Ijarah, Guarantor, CommitteeAction
 from accounts.models import CustomUser
-from credit.forms import CreditApplicationForm
 from notification.services import NotificationService
 from notification.models import Notification
 from django.urls import reverse
+from operations.utils import get_employee_financial_summary, get_system_financial_summary
 
 from django.core.exceptions import ValidationError
 
@@ -20,14 +21,17 @@ def validate_repayment_period(repayment_period, max_repayment_months):
     if repayment_period > max_repayment_months:
         raise ValidationError({'repayment_period': f"Repayment period cannot exceed {max_repayment_months} months."})
 
-def validate_credit_amount(amount, min_amount, max_amount):
+def validate_credit_amount(amount, min_amount, max_amount, type="Qard Hasan"):
     if not (min_amount <= amount <= max_amount):
-        raise ValidationError({'amount_requested': f"Invalid credit amount. Must be between NGN{min_amount} and NGN{max_amount}."})
+        if type=="Qard Hasan":
+            raise ValidationError({'amount_requested': f"Invalid credit amount. Must be between NGN{min_amount} and NGN{max_amount}."})
+        raise ValidationError({'asset_price': f"Invalid asset price. Must be between NGN{min_amount} and NGN{max_amount}."})
 
 def validate_vendor_invoice(vendor_invoice):
-    allowed_extensions = ["pdf", "jpg", "jpeg", "png"]
+    allowed_extensions = ["pdf"]
     if vendor_invoice and vendor_invoice.name.split(".")[-1].lower() not in allowed_extensions:
-        raise ValidationError({'vendor_invoice': "Invalid file format for vendor invoice. Only PDF and image files are allowed."})
+        raise ValidationError({'vendor_invoice': "Invalid file format for vendor invoice. Only PDF file is allowed."})
+
 def save_credit_application(form, user, credit_type):
     try:
         credit = form.save(commit=False)
@@ -35,6 +39,8 @@ def save_credit_application(form, user, credit_type):
         credit.credit_type = credit_type
         if credit_type == "Qard Hasan":
             credit.amount_requested = form.cleaned_data['amount_requested']
+        elif credit_type == "Murabaha": 
+            credit.amount_requested = form.cleaned_data['asset_price']
         credit.status = "Pending"
         credit.save()
 
@@ -45,7 +51,7 @@ def save_credit_application(form, user, credit_type):
             Murabaha.objects.create(
                 credit=credit,
                 asset_name=form.cleaned_data['asset_name'],
-                asset_value=form.cleaned_data['asset_value'],
+                asset_price=form.cleaned_data['asset_price'],
                 vendor_invoice=vendor_invoice
             )
         elif credit_type == 'Musharaka':
@@ -112,23 +118,16 @@ def get_applicant_credit_summary(applicant):
     # Optimized query to get counts
     credit_summary = Credit.objects.filter(applicant=applicant).aggregate(
         applications=Count('id'),
-        approved=Count('id', filter=Q(status='Approved')),
         disbursed=Count('id', filter=Q(status='Disbursed')),
-        disbursed_total=Coalesce(Sum('amount_requested', filter=Q(status='Disbursed')), Decimal('0.00')),
-        repaid_total=Coalesce(Sum('amount_requested', filter=Q(status='Repaid', applicant=applicant)), Decimal('0.00')),
+        repaid=Count('id', filter=Q(status='Repaid')),
     )
-
-    # Calculate repayment percentage
-    disbursed_total = credit_summary['disbursed_total']
-    repaid_total = credit_summary['repaid_total']
-
-    repayment_percentage = (repaid_total / disbursed_total * 100) if disbursed_total else Decimal('0.00')
-
+    financial_metrics = get_employee_financial_summary(applicant)
+    
     return {
         'applications': credit_summary['applications'],
-        'approved': credit_summary['approved'],
         'disbursed': credit_summary['disbursed'],
-        'repayment_percentage': repayment_percentage.quantize(Decimal('0.00')), # round to 2 places.
+        'repaid': credit_summary['repaid'],
+        'repayment_percentage': financial_metrics['repaid_percentage'], # round to 2 places.
     }
 
 
@@ -141,23 +140,16 @@ def get_system_credit_summary():
     # Optimized query to get counts and sums
     credit_summary = Credit.objects.aggregate(
         applications=Count('id'),
-        approved=Count('id', filter=Q(status='Approved')),
         disbursed=Count('id', filter=Q(status='Disbursed')),
-        disbursed_total=Coalesce(Sum('amount_requested', filter=Q(status='Disbursed')), Decimal('0.00')),
-        repaid_total=Coalesce(Sum('amount_requested', filter=Q(status='Repaid')), Decimal('0.00')),
+        repaid=Count('id', filter=Q(status='Repaid')),
     )
-
-    # Calculate repayment percentage
-    disbursed_total = credit_summary['disbursed_total']
-    repaid_total = credit_summary['repaid_total']
-
-    repayment_percentage = (repaid_total / disbursed_total * 100) if disbursed_total else Decimal('0.00')
-
+    financial_metrics = get_system_financial_summary()
+    
     return {
         'applications': credit_summary['applications'],
-        'approved': credit_summary['approved'],
         'disbursed': credit_summary['disbursed'],
-        'repayment_percentage': repayment_percentage.quantize(Decimal('0.00')),
+        'repaid': credit_summary['repaid'],
+        'repayment_percentage': financial_metrics['repaid_percentage'], # round to 2 places.
     }
 
 
@@ -204,7 +196,7 @@ def notify_committee_members(heading, body, link):
         )
 
 
-def handle_approver_action(request, committee_member, credit, action):
+def handle_approver_action(request, committee_member, credit, action, other_type=None):
     """
     Handle actions taken by approvers.
     """
@@ -213,7 +205,7 @@ def handle_approver_action(request, committee_member, credit, action):
         return redirect(request.path)
 
     if action == 'approve':
-        process_approval(request, committee_member, credit)
+        process_approval(request, committee_member, credit, other_type)
     elif action == 'decline':
         process_decline(request, committee_member, credit)
     else:
@@ -231,12 +223,12 @@ def all_reviewers_reviewed(credit):
     reviewed_count = CommitteeAction.objects.filter(credit=credit, action_taken__in=['Okay', 'Not Okay']).count()
     return reviewed_count >= total_reviewers
 
-def process_approval(request, committee_member, credit):
+def process_approval(request, committee_member, credit, other_type=None):
     """
     Process credit approval.
     """
     credit.status = 'Approved'
-    create_committee_action(committee_member, credit, 'Approved')
+    create_committee_action(committee_member, credit, 'Approved', other_type)
     send_notifications('Credit Approved', credit)
     messages.success(request, "Credit request has been approved.")
 
@@ -267,16 +259,26 @@ def handle_reviewer_action(request, committee_member, credit, action):
     credit.save()
     return redirect('credit:committee_credit_request')
 
-def create_committee_action(committee_member, credit, action_taken):
+def create_committee_action(committee_member, credit, action_taken, other_type=None):
     """
     Create a CommitteeAction entry.
     """
+    if other_type:
+        if credit.credit_type == "Murabaha":
+            murabaha = credit.get_credit_type_model
+            if other_type["type"] == "percentage":
+                murabaha.profit_margin_percentage = int(other_type["value"])
+            else:
+                murabaha.profit_margin_fixed = other_type["value"]
+            murabaha.save()
+          
     CommitteeAction.objects.create(
         committee_member=committee_member,
         action_taken=action_taken,
         action_reason=f"Reviewed and voted {action_taken}",
         credit=credit
     )
+    return
 
 def send_notifications(heading, credit):
     """
@@ -298,3 +300,4 @@ def send_notifications(heading, credit):
         body=f"The credit application(#{credit.tracking_id}) has been {heading.lower()} by the committee.",
         link=reverse("credit:committee_credit_request")
     )
+

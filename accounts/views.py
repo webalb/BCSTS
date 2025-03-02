@@ -123,19 +123,10 @@ def change_password(request):
     
     return render(request, 'accounts/change_password.html', {'form': form})
 
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
 from django.urls import resolve, reverse
-import user_agents
-import requests
-
-def get_user_location(ip):
-    """Get approximate location from IP address (Optional)"""
-    try:
-        response = requests.get(f"https://ipinfo.io/{ip}/json").json()
-        return f"{response.get('city', 'Unknown')}, {response.get('country', 'Unknown')}"
-    except:
-        return "Unknown Location"
+import user_agents # type: ignore
 
 def my_login_view(request):
     next_url = request.GET.get('next')  # Get the 'next' URL from the query parameters
@@ -154,12 +145,8 @@ def my_login_view(request):
             browser = user_agent.browser.family or "Unknown Browser"
             os_family = user_agent.os.family or "Unknown OS"
 
-            # Get IP Address and Location
-            ip = request.META.get('REMOTE_ADDR', '')
-            location = get_user_location(ip) if ip else "Unknown Location"
-
             # Send in-app login notification
-            message = f"You have a new login from {device} ({browser}) running on {os_family} around {location}."
+            message = f"You have a new login from {browser} browser running on {os_family} OS."
             NotificationService.send_notification(
                 user,
                 "New Login Alert",
@@ -181,7 +168,7 @@ def my_login_view(request):
         else:
             for field, errors in form.errors.items():
                 for error in errors:
-                    messages.error(request, f"{field.capitalize()}: {error}")
+                    messages.error(request, f"Error: {error}")
 
     else:
         form = AuthenticationForm(request)
@@ -302,7 +289,7 @@ def update_employee(request, employee_id):
 
             <p>If you did not authorize this update, please contact the management immediately.</p>
             """
-            dashboard_link = reverse("employee_specific_detail", kwargs={"employee_id": employee.id})  # Adjust if needed
+            dashboard_link = reverse("employee_specific_detail", kwargs={"employee_id": employee.id})  # type: ignore # Adjust if needed
             NotificationService.send_notification(
                 employee,
                 "Profile Update Notification",

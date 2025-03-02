@@ -52,9 +52,9 @@ Credit Portal | Benovelance Cooperative
                                 <div>
                                     <p class="mb-0 font-sans font-semibold leading-normal text-sm">Total Credit Taken</p>
                                     <h4 class="mb-0 font-bold text-gray-900">
-                                        ₦{{ total_withdrawn|intcomma }}
+                                        ₦{{ took_credits|intcomma }}
                                     </h4>
-                                    <p class="leading-normal text-xs font-weight-bolder">Total amount you of credit you took in the past</p>
+                                    <p class="text-xs">Repaid Percentage: <span class="font-semibold text-green-600"> {{ repaid_percentage }}% </span></p>
                                 </div>
                             </div>
                             <div class="px-3 text-right basis-1/3">
@@ -148,9 +148,98 @@ Credit Portal | Benovelance Cooperative
                         </div>
                     </div>
                     {% if current_credit %}
+                        {% if current_credit.credit_type == "Murabaha" and current_credit.status == "Approved" %}
+                        <div class="flex flex-wrap mt-6 p-6 bg-white">
+                            <div class="w-full max-w-full px-3 mt-0 mb-6 lg:mb-0 lg:w-4/12 lg:flex-none bg-white">
+                                <fieldset class="border border-gray-300 rounded-lg p-6 mb-6">
+                                    <legend class="mb-4 font-bold leading-tight uppercase text-sm text-gray-900">Credit Details</legend>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        
+                                     
+                                        <!-- Asset Price -->
+                                        <div class="flex flex-col">
+                                            <label class="text-sm font-medium text-gray-700 mt-1">Asset Price: <span class="text-sm text-gray-900">NGN{{ current_credit.murabaha.asset_price|floatformat:2|intcomma }}</span></label>
+                                        </div>
+                                        <!-- Selling Price -->
+                                        <div class="flex flex-col">
+                                            <label class="text-sm font-medium text-gray-700 mt-1">Selling Price: <span class="text-sm text-gray-900">NGN{{ current_credit.murabaha.selling_price|floatformat:2|intcomma }}</span></label>
+                                        </div>
+                                        
+                                        <div class="flex flex-col">
+                                            {% if current_credit.murabaha.profit_margin_percentage %}
+                                            <label class="text-sm font-medium text-gray-700 mt-1">Profit Margin Applied: <span class="text-sm text-gray-900">{{ current_credit.murabaha.profit_margin }}</span></label>
+                                            <label class="text-sm font-medium text-gray-700 mt-1">Percetage Applied Applied: <span class="text-sm text-gray-900">{{ current_credit.murabaha.profit_margin_percentage }}%</span></label>
+                                            {% else %}
+                                            <label class="text-sm font-medium text-gray-700 mt-1">Profit Margin Applied: <span class="text-sm text-gray-900">{{ current_credit.murabaha.profit_margin }}</span></label>
+                                            {% endif %}
+                                        </div>
+                                        <!-- Accept/Reject Form -->
+                                        <div class="flex flex-col mt-4">
+                                            <form method="post" action="{% url 'credit:accept_or_reject' current_credit.tracking_id %}">
+                                                {% csrf_token %}
+                                                <button type="submit" name="action" value="accept" class="px-4 py-2 mb-2 font-bold text-white bg-green-500 rounded-lg" onclick="return confirm('Are you sure you want to accept this credit?');">Accept</button>
+                                                <button type="submit" name="action" value="reject" class="px-4 py-2 font-bold text-white bg-red-500 rounded-lg" onclick="return confirm('Are you sure you want to reject this credit?');">Reject</button></form>
+                                        </div>
+                                      
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                        {% endif %}
+                    <fieldset style="border: 2px solid #ccc; padding: 10px; border-radius: 8px; margin-top: 20px;">
+                        <legend style="font-weight: bold; padding: 0 10px;">Repayment Summary</legend>
+                        <div class="flex flex-wrap">
+                            <div class="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
+                                <div class="px-3 text-center basis-1/3 text-xs">
+                                    <span class="bg-green-200 py-2 px-3 rounded-lg mb-4 text-sm text-green-600">
+                                        <i class="fa fa-money-bill-wave"></i> Total Amount Paid
+                                    </span>
+                                    <p class="mt-4">
+                                        NGN{{ committee_info.total_repaid|intcomma|default:"0.00" }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
+                                <div class="px-3 text-center basis-1/3 text-xs">
+                                    <span class="bg-yellow-200 py-2 px-3 rounded-lg mb-4 text-sm text-yellow-600">
+                                        <i class="fa fa-money-bill-wave"></i> Amount Remaining
+                                    </span>
+                                    <p class="mt-4">
+                                        NGN{{ committee_info.total_remaining|intcomma|default:"0.00" }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
+                                <div class="px-3 text-center basis-1/3 text-xs">
+                                    <span class="bg-blue-200 py-2 px-3 rounded-lg mb-4 text-sm text-blue-600">
+                                        <i class="fa fa-calendar-alt"></i> Monthly Deduction
+                                    </span>
+                                    <p class="mt-4">
+                                        NGN{{ current_credit.monthly_deduction|intcomma|default:" -Not set" }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
+                                <div class="px-3 text-center basis-1/3 text-xs">
+                                    <span class="bg-red-200 py-2 px-3 rounded-lg mb-4 text-sm text-red-600">
+                                        <i class="fa fa-hourglass-half"></i> Months Remaining
+                                    </span>
+                                    <p class="mt-4">
+                                        {% if committee_info.months_remaining %}
+                                            {{ committee_info.months_remaining }}
+                                        {% else %}
+                                            {{ current_credit.repayment_period }} months
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
                     <fieldset style="border: 2px solid #ccc; padding: 10px; border-radius: 8px; margin-top: 20px;">
                         <legend style="font-weight: bold; padding: 0 10px;">Your Current Credit Status</legend>
                         <div class="flex flex-wrap">
+
+                           
                             
                             <div class="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
                                 <div class="px-3 text-center basis-1/3 text-xs">
@@ -200,7 +289,7 @@ Credit Portal | Benovelance Cooperative
                                 <div class="px-3 text-center basis-1/3 text-xs">
                                     <!-- Status Badge with Icon and Color -->
                                     <span class="py-2 px-3 rounded-lg mb-4 text-sm 
-                                        {% if current_credit.status == 'Approved' or current_credit.status == 'Disbursed' %}
+                                        {% if current_credit.status == 'Approved' or current_credit.status == 'Disbursed' or current_credit.status == 'Accepted' %}
                                             bg-green-200 text-green-600
                                         {% elif current_credit.status == 'Pending' %}
                                             bg-yellow-200 text-yellow-600
@@ -208,7 +297,7 @@ Credit Portal | Benovelance Cooperative
                                             bg-red-200 text-red-600
                                         {% endif %}">
                                         <i class="fa 
-                                            {% if current_credit.status == 'Approved' or current_credit.status == 'Disbursed' %}
+                                            {% if current_credit.status == 'Approved' or current_credit.status == 'Disbursed' or current_credit.status == 'Accepted' %}
                                                 fa-check-circle
                                             {% elif current_credit.status == 'Pending' %}
                                                 fa-hourglass-half
@@ -233,31 +322,84 @@ Credit Portal | Benovelance Cooperative
                                     <span class="py-2 px-3 rounded-lg mb-4 text-sm 
                                         {% if current_credit.status == 'Disbursed' %}
                                             bg-green-200 text-green-600
-                                        {% elif current_credit.status == 'Approved' %}
+                                        {% elif current_credit.status == 'Approved' or current_credit.status == 'Accepted' %}
                                             bg-yellow-200 text-yellow-600
                                         {% elif current_credit.status == 'Rejected' %}
                                             bg-red-200 text-red-600
+                                        {% elif current_credit.status == 'Pending' %}
+                                            bg-yellow-200 text-yellow-600
                                         {% endif %}">
                                         <i class="fa 
                                             {% if current_credit.status == 'Disbursed' %}
                                                 fa-check-circle
-                                            {% elif current_credit.status == 'Approved' %}
+                                            {% elif current_credit.status == 'Approved' or current_credit.status == 'Accepted' %}
                                                 fa-hourglass-half
                                             {% elif current_credit.status == 'Rejected' %}
                                                 fa-times-circle
+                                            {% elif current_credit.status == 'Pending' %}
+                                                fa-hourglass-start
                                             {% endif %}"></i> 
                                             Disbursed
-                                    </span> 
+                                       
+                                    </span>
                                     <br>
 
                                     <!-- Committee Action Details -->
                                     <p class="mt-4">
                                         <span><b>Status:</b> {{ current_credit.status }}</span> <br>
-                                        <span><b>Date:</b> {{ current_credit.newest_action_date|date:"F j, Y" }}</span> <br>
+                                        <span><b>Date:</b> {{ committee_info.transaction_record.transaction_date|date:"F j, Y" }}</span> <br>
+                                        <span><b>Receipt:</b>
+                                            {% if current_credit.status == 'Disbursed' %}
+                                               
+                                            
+                                             <a href="{{ committee_info.transaction_record.transaction_receipt.url }}" class="text-green-500 underline " download>
+                                                <i class="fa fa-download"></i> Download
+                                            </a>
+                                            {% endif %}
+                                        </span>
                                     </p>
                                 </div>
                             </div>
                             
+                        </div>
+                        <div class="flex flex-wrap">
+                            {% if current_credit.status == 'Disbursed' or current_credit.status == 'Repaid' %}
+                            <div class="w-full max-w-full px-3 mb-6 sm:flex-none xl:mb-0 xl:w-full">
+                                <div class="px-3 text-center basis-1/3 text-xs">
+                                    <table class="items-center w-full border mb-0 align-top border-gray-200 text-gray-900 overflow-x-auto overflow-y-auto" style="border:#ccc solid 1px">
+                                        <thead class="align-bottom">
+                                            <tr class="bg-gray-50 mt-1">
+                                                <th class="border px-3 py-2 text-left text-xs font-bold uppercase border-b border-gray-900">Repayment Date</th>
+                                                <th class="border px-3 py-2 text-left text-xs font-bold uppercase border-b border-gray-900">Amount</th>
+                                                <th class="border px-3 py-2 text-left text-xs font-bold uppercase border-b border-gray-900">Repayment Method</th>
+                                                <th class="border px-3 py-2 text-left text-xs font-bold uppercase border-b border-gray-900">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for record in committee_info.repayment_records %}
+                                            <tr class="border-b border-gray-300">
+                                                <td class="border p-2 align-middle whitespace-nowrap text-left">
+                                                    <span class="mb-0 leading-normal bg-blue-200 rounded-lg text-center py-1 px-2 text-xs font-bold">
+                                                        <i class="fa fa-calendar-alt"></i> {{ record.repayment_date|date:"F j, Y" }}
+                                                    </span>
+                                                </td>
+                                                <td class="border p-2 align-middle bg-transparent whitespace-nowrap text-left">
+                                                    <h6 class="mb-0 leading-normal text-xs text-gray-900">NGN{{ record.amount|intcomma }}</h6>
+                                                </td>
+                                                
+                                                <td class="border p-2 align-middle bg-transparent whitespace-nowrap text-left">
+                                                    <h6 class="mb-0 leading-normal text-xs text-gray-900">{{ record.get_repayment_method_display }}</h6>
+                                                </td>
+                                                <td class="border p-2 align-middle bg-transparent whitespace-nowrap text-left">
+                                                    <h6 class="mb-0 leading-normal text-xs text-gray-900">{{ record.get_status_display }}</h6>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            {% endif %}
                         </div>
                     </fieldset>
                     {% else %}
@@ -280,31 +422,42 @@ Credit Portal | Benovelance Cooperative
                         <div class="mt-4 text-sm text-gray-700">
                             <strong>Allowed Credit Application Days:</strong> {{ allowed_days }}
                         </div>
-                        {% if is_open_today %}
-                        <fieldset style="border: 2px solid #ccc; padding: 10px; border-radius: 8px; margin-top: 20px;">
-                            <legend style="font-weight: bold; padding: 0 10px;">Select Credit Type</legend>
-                            <div class="flex flex-wrap">
-                                {% for credit_type, enabled in enabled_credits.items %}
-                                {% if enabled %}
-                                <div class="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
-                                    <div class="px-3 text-right basis-1/3">
-                                        <a href="{% url 'credit:apply_credit' credit_type %}" class="inline-block w-full px-6 py-3 my-4 font-bold text-center text-white uppercase align-middle transition-all ease-in border-0 rounded-lg select-none shadow-soft-md bg-150 bg-x-25 leading-pro text-xs bg-green-500">
-                                            {{ credit_type }}
-                                        </a>
+                        {% if request.user.get_member_bank_details %}
+                        
+                        
+                            {% if is_open_today %}
+                            <fieldset style="border: 2px solid #ccc; padding: 10px; border-radius: 8px; margin-top: 20px;">
+                                <legend style="font-weight: bold; padding: 0 10px;">Select Credit Type</legend>
+                                <div class="flex flex-wrap">
+                                    {% for credit_type, enabled in enabled_credits.items %}
+                                    {% if enabled %}
+                                    <div class="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
+                                        <div class="px-3 text-right basis-1/3">
+                                            <a href="{% url 'credit:apply_credit' credit_type %}" class="inline-block w-full px-6 py-3 my-4 font-bold text-center text-white uppercase align-middle transition-all ease-in border-0 rounded-lg select-none shadow-soft-md bg-150 bg-x-25 leading-pro text-xs bg-green-500">
+                                                {{ credit_type }}
+                                            </a>
+                                        </div>
                                     </div>
+                                    {% endif %}
+                                    {% empty %}
+                                    <p class="text-red-600 text-center font-bold mt-4">
+                                        All credit application options are currently closed. Please check back later.
+                                    </p>
+                                    {% endfor %}
                                 </div>
-                                {% endif %}
-                                {% empty %}
-                                <p class="text-red-600 text-center font-bold mt-4">
-                                    All credit application options are currently closed. Please check back later.
-                                </p>
-                                {% endfor %}
-                            </div>
-                        </fieldset>
+                            </fieldset>
+                            {% else %}
+                            <p class="text-red-600 text-center font-bold mt-4">
+                                Credit applications are currently closed. Please check back on allowed days.
+                            </p>
+                            {% endif %}
                         {% else %}
-                        <p class="text-red-600 text-center font-bold mt-4">
-                            Credit applications are currently closed. Please check back on allowed days.
-                        </p>
+                            <p class="text-red-600 font-bold text-sm mt-2">
+                                To apply for credit, please ensure your bank details are up to date.
+                            </p>
+                            <a href="{% url 'withdrawal:add_account' %}" class="inline-block w-full px-6 py-3 my-4 font-bold text-center text-white uppercase align-middle transition-all ease-in border-0 rounded-lg select-none shadow-soft-md bg-150 bg-x-25 leading-pro text-xs bg-green-500">
+                                Add Bank Details
+                            </a>
                         {% endif %}
                     </div>
                     {% endif %}

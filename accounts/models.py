@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.crypto import get_random_string
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+from django.urls import reverse
 
 def validate_nitda_email(value):
     """Ensure the email belongs to the nitda.gov.ng domain."""
@@ -83,12 +84,20 @@ class CustomUser(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
 
-    objects = CustomUserManager() # Add this line
-
+    objects = CustomUserManager() # type: ignore # Add this line
+    def get_member_bank_details(self):
+        """Retrieve bank details for the user."""
+        if self.account_details: # type: ignore
+            return self.account_details # type: ignore
+        return None
+    
+    def get_absolute_url(self):
+        return reverse('employee_detail', kwargs={'employee_id': self.pk})
+    
     def save(self, *args, **kwargs):
         """Handle passport photo update by deleting the old one when a new one is uploaded."""
         try:
-            existing_user = CustomUser.objects.get(id=self.id)
+            existing_user = CustomUser.objects.get(id=self.id) # type: ignore
         except CustomUser.DoesNotExist:
             existing_user = None
 

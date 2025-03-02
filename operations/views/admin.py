@@ -24,6 +24,8 @@ from .contribution import calculate_contribution_durations
 from operations.utils import get_system_financial_summary  # Importing your utility function
 from notification.services import NotificationService
 from notification.models import Notification
+from credit.utils.utils import get_system_credit_summary
+
 # Admin check function
 def is_admin(user):
     return user.groups.filter(name="Admin").exists()
@@ -55,6 +57,7 @@ def admin_dashboard(request):
 
     # Get system-wide financial summary
     financial_summary = get_system_financial_summary()
+    credit_summary = get_system_credit_summary()
 
     # Fetch latest 5 contributions
     latest_contributions = ContributionRecord.objects.order_by('-created_at')[:5]
@@ -64,9 +67,7 @@ def admin_dashboard(request):
 
     # Employee contributions data
     employee_contributions = []
-    labels, data = [], []  # For chart data
-        # Send in-app notification
- 
+
 
     for employee in employees:
         total_contributed = ContributionRecord.objects.filter(employee=employee).aggregate(Sum('amount'))['amount__sum'] or Decimal(0.00)
@@ -76,9 +77,6 @@ def admin_dashboard(request):
             'contributions': ContributionRecord.objects.filter(employee=employee)
         })
 
-        if total_contributed > 0:
-            labels.append(employee.get_full_name())
-            data.append(float(total_contributed))  # Convert Decimal to float for charting
 
     # Context for template rendering
     context = {
@@ -96,6 +94,7 @@ def admin_dashboard(request):
         'total_remained': financial_summary["total_remained_balance"],
         'saving_balance': financial_summary["total_system_savings_balance"],
         'investment_balance': financial_summary["total_system_investment_balance"],
+        'credit_summary':credit_summary,
     }
 
     return render(request, 'operations/admin_dashboard.html', context)
@@ -111,9 +110,9 @@ def record_all_contributions(request):
     today = timezone.now().date()
     
     # Ensure today is 25th or later
-    if today.day < 7:
+    if today.day < int(settings.SALARY_PAYMENT_DATE):
         messages.warning(request, "You can only record contributions on or after the 25th of the month.")
-        return redirect('admin_dashboard')
+        return redirect(request.path)
 
     # Check if contributions for the current month already exist
     current_month = today.month
@@ -125,7 +124,7 @@ def record_all_contributions(request):
 
     if contributions_exist:
         messages.warning(request, "All contributions for this month have already been recorded.")
-        return redirect('admin_dashboard')
+        return redirect(request.path)
 
     # If conditions are met, record contributions
     records_created = ContributionRecord.bulk_record_contributions()
@@ -135,7 +134,7 @@ def record_all_contributions(request):
     else:
         messages.warning(request, "No employee contributions were recorded.")
 
-    return redirect('admin_dashboard')
+    return redirect(request.path)
 
 @login_required
 @user_passes_test(is_admin)
@@ -151,7 +150,7 @@ def record_individual_contribution(request, employee_id):
     else:
         ContributionRecord.objects.create(
             employee=employee,
-            amount=employee.contribution_setting.amount,
+            amount=employee.contribution_setting.amount, # type: ignore
             month=selected_month,
             year=selected_year,
             status='Paid'
@@ -182,7 +181,7 @@ def record_all_missing_contributions(request):
     for employee in missing_employees:
         ContributionRecord.objects.create(
             employee=employee,
-            amount=employee.contribution_setting.amount,
+            amount=employee.contribution_setting.amount, # type: ignore
             month=selected_month,
             year=selected_year,
             status='pending'
@@ -245,6 +244,10 @@ def manage_contributions(request):
         has_contribution=False  # Employees who have settings but no record
     )
 
+    # Check if today is the salary payment date
+    salary_payment_date = settings.SALARY_PAYMENT_DATE
+    is_salary_payment_day = date.today().day >= int(salary_payment_date)
+
     context = {
         "contributions": contributions,
         "missing_contributions": missing_contributions,
@@ -253,6 +256,8 @@ def manage_contributions(request):
         "available_months": available_months,
         "available_years": available_years,
         "today": date.today(),
+        'is_salary_payment_day': is_salary_payment_day,
+        'salary_payment_date': salary_payment_date,
     }
     
     return render(request, "operations/contributions/manage_contributions.html", context)
@@ -351,7 +356,7 @@ def delete_contribution_history(request, record_id):
     try:
         # Fetch the record
         record = ContributionSettingHistory.objects.get(id=record_id)
-        employee_id = record.contribution_setting.employee.id
+        employee_id = record.contribution_setting.employee.id # type: ignore
         record.delete()
         messages.success(request, 'Contribution history record deleted successfully.')
     except ContributionSettingHistory.DoesNotExist:
@@ -400,16 +405,20 @@ from django.http import JsonResponse
 from django.utils.timezone import now
 from django.db.models import Sum
 from datetime import datetime, timedelta
+from credit.models import Credit, Repayment
+from django.conf import settings
 
 @login_required
 @user_passes_test(is_admin)
 def get_monthly_contributions(request):
     """Fetch total contributions and total withdrawals for the last 9 months."""
     today = now().date()
-    last_9_months = [(today - timedelta(days=30 * i)).strftime('%b %Y') for i in range(8, -1, -1)]
+    last_9_months = [(today - timedelta(days=30 * i)).strftime('%b') for i in range(8, -1, -1)]
 
     contributions = []
     withdrawals = []
+    credits = []
+    repayments = []
     
     for i in range(8, -1, -1):
         month_date = today - timedelta(days=30 * i)
@@ -426,10 +435,22 @@ def get_monthly_contributions(request):
             payment_date__month=month, payment_date__year=year,  status=Withdrawals.Status.PAID
         ).aggregate(total=Sum('total_amount_withdrawn'))['total'] or Decimal('0.00')
 
+        # Sum disbursed credits for each month
+        disbursed_credits = Credit.objects.filter(
+            Q(status='Repaid') | Q(status='Disbursed'), date_applied__month=month, date_applied__year=year
+        ).aggregate(total=Sum('amount_requested'))['total'] or Decimal(0.00)
+        
+        repayment_credits = Repayment.objects.filter(
+            repayment_date__month=month, repayment_date__year=year
+        ).aggregate(total=Sum('amount'))['total'] or Decimal(0.00)
+
+        repayments.append(float(repayment_credits))  
+        credits.append(float(disbursed_credits))  # Convert Decimal to float
         contributions.append(float(total_contributions))  # Convert Decimal to float
         withdrawals.append(float(total_withdrawals))  # Convert Decimal to float
 
-    return JsonResponse({'months': last_9_months, 'contributions': contributions, 'withdrawals': withdrawals})
+    return JsonResponse({'months': last_9_months, 'contributions': contributions, 'withdrawals': withdrawals, 'credits': credits, 'repayments': repayments})
+
 
 @login_required
 @user_passes_test(is_admin)

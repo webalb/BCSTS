@@ -27,7 +27,13 @@ urlpatterns = [
     
     path('approved-credit-request/', disbursement.approved_credit_requests, name='approved_credit_request'),
 
-    path('disburse-credit/<str:tracking_id>/', disbursement.disburse_credit, name='disburse_credit')
+    path('disburse-credit/<str:tracking_id>/', disbursement.disburse_credit, name='disburse_credit'),
+    path('disbursed-credits/', disbursement.disbursed_credits, name='disbursed_credits'),
+    path('clear-credit/<str:tracking_id>/', disbursement.clear_credit, name='clear_credit'),
+
+    path('record-credit-repayments/', settings.record_monthly_repayment, name='record_monthly_repayment'),
+    path('accept-or-reject/<str:tracking_id>/', disbursement.accept_or_reject, name='accept_or_reject'),
+
 ]
 
 

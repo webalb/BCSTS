@@ -18,12 +18,45 @@ Manage Credit Settings | Benevolence Cooperative
     <!-- Navbar -->
     {% include 'include/dashboard_navbar.html' %}
     <!-- end Navbar -->
+    <div class="w-full px-6 mx-auto">
+        <div class="flex flex-wrap -mx-3">
+            <div class="w-full max-w-full px-3 mt-6 md:w-7/12 md:flex-none">
+                <div class="relative flex flex-col min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
+                    <div class="p-6 px-4 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
+                        {% if is_repayment_recorded %}
+                            <h6 class="mb-0 uppercase font-bold text-red-600">Repayment for this month has already been recorded.</h6>
+                           
+                        {% else %}
+                            <h6 class="mb-0 uppercase font-bold">Record Repayment for This Month</h6>
+                            
+                        {% endif %}
+                    </div>
+                    <div class="flex-auto p-4 pt-6">
+                        {% if is_repayment_recorded %}
+                            <a href="#" 
+                               class="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg opacity-60 cursor-not-allowed"
+                               onclick="return false;" disabled style="pointer-events: none; opacity: 0.6;">
+                                Record Repayment
+                            </a>
+                        {% else %}
+                            <a href="{% url 'credit:record_monthly_repayment' %}" 
+                               class="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg"
+                               onclick="return confirm('Are you sure you want to record credit repayments for this month?');">
+                                Record Repayment
+                            </a>
+                        {% endif %}
+                     
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="w-full py-6 px-6 mx-auto">
         <div class="flex flex-wrap -mx-3">
             <div class="w-full max-w-full px-3 mt-6 md:w-7/12 md:flex-none">
                 <div class="relative flex flex-col min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
                     <div class="p-6 px-4 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
-                        <h6 class="mb-0">Credit Settings</h6>
+                        <h6 class="mb-0 uppercase font-bold">Credit Settings</h6>
                     </div>
                     <div class="flex-auto p-4 pt-6">
                         <ul class="flex flex-col pl-0 mb-0 rounded-lg">

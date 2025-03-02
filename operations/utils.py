@@ -3,6 +3,7 @@ from decimal import Decimal
 from operations.models import ContributionRecord
 from withdrawal.models import Withdrawals
 from credit.models import Credit
+from django.db.models import Q
 
 def get_employee_financial_summary(employee):
     """
@@ -16,9 +17,11 @@ def get_employee_financial_summary(employee):
         employee=employee, status='paid'
     ).aggregate(total=Sum('amount'))['total'] or Decimal(0.00)
 
-    disbursed_credits = Credit.objects.filter(applicant=employee, status='Disbursed').aggregate(total=Sum('amount_requested'))['total'] or Decimal(0.00)
-    repaid_credits = Credit.objects.filter(applicant=employee, status='Repaid').aggregate(total=Sum('amount_repaid'))['total'] or Decimal(0.00)
-
+    disbursed_credits = Credit.objects.filter(Q(status='Repaid') | Q(status='Disbursed'), applicant=employee).aggregate(total=Sum('amount_requested'))['total'] or Decimal(0.00)
+    credits = Credit.objects.filter(applicant=employee, status='Repaid')
+    repaid_credits = sum(credit.total_repaid for credit in credits)
+    # Calculate the percentage of repaid credits
+    repaid_percentage = round(((repaid_credits / disbursed_credits) * Decimal(100.00)) if disbursed_credits > 0 else Decimal(0.00), 2)
     # Ensure the method returns a Decimal, not None
     total_paid_withdrawals = Withdrawals.get_employee_total_paid_withdrawals(employee) or Decimal(0.00)
 
@@ -33,8 +36,9 @@ def get_employee_financial_summary(employee):
         "investment_balance": round(investment_balance, 2),
         "total_remained_balance": max(total_remained_balance, Decimal(0.00)),  # Ensure non-negative balance
         "total_withdrawn": total_paid_withdrawals,
-        'disbursed_credits': disbursed_credits,
+        'took_credits': disbursed_credits,
         'repaid_credits': repaid_credits,
+        "repaid_percentage": repaid_percentage
     }
 
 def get_system_financial_summary():
@@ -48,8 +52,13 @@ def get_system_financial_summary():
     total_system_contributions = ContributionRecord.objects.aggregate(Sum('amount'))['amount__sum'] or Decimal(0.00)
     total_withdrawn = Withdrawals.get_system_total_paid_withdrawals()
     
-    disbursed_credits = Credit.objects.filter(status='Disbursed').aggregate(total=Sum('amount_requested'))['total'] or Decimal(0.00)
-    repaid_credits = Credit.objects.filter(status='Repaid').aggregate(total=Sum('amount_repaid'))['total'] or Decimal(0.00)
+    disbursed_credits = Credit.objects.filter(
+        Q(status='Repaid') | Q(status='Disbursed')
+    ).aggregate(total=Sum('amount_requested'))['total'] or Decimal(0.00)
+    
+    credits = Credit.objects.filter(status='Repaid')
+    repaid_credits = sum(credit.total_repaid for credit in credits)
+    repaid_percentage = (repaid_credits / disbursed_credits * Decimal(100.00)) if disbursed_credits > 0 else Decimal(0.00)
 
     # Calculate balances using Decimal to maintain precision
     total_system_savings_balance = (Decimal(0.60) * total_system_contributions) - total_withdrawn
@@ -63,7 +72,8 @@ def get_system_financial_summary():
         "total_system_investment_balance": round(max(total_system_investment_balance, Decimal(0.00)), 2),
         "total_remained_balance": max(total_remained_balance, Decimal(0.00)),  # Ensure it doesn't go negative
         "total_withdrawn": max(total_withdrawn, Decimal(0.00)),
-        "disbursed_credits": disbursed_credits,
+        "took_credits": disbursed_credits,
         "repaid_credits": repaid_credits,
+        "repaid_percentage": repaid_percentage,
 
     }

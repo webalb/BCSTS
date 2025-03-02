@@ -90,7 +90,6 @@ Credit Portal | Benovelance Cooperative
                                 </p>
                                 {% endif %}
                             </div>
-                            <!-- Credit Type-Specific Fields (Hidden for Qard Hasan) -->
                             <fieldset
                                 style="border: 2px solid #ccc; padding: 10px; border-radius: 8px; margin-top: 20px;">
                                 <legend style="font-weight: bold; padding: 0 10px;">{{ credit_type }} Details</legend>
@@ -124,17 +123,17 @@ Credit Portal | Benovelance Cooperative
                                     </p>
                                     {% endif %}
                                 </div>
-                                <label class="mb-2 ml-1 font-bold text-xs text-gray-900">Asset Value</label>
+                                <label class="mb-2 ml-1 font-bold text-xs text-gray-900">Asset Price</label>
                                 <div class="mb-4">
                                     <input type="number"
                                         class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-gray-300 bg-white py-2 px-3 text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none"
-                                        placeholder="Enter Asset Value in Naira" name="asset_value"
+                                        placeholder="Enter Asset Price in Naira" name="asset_price"
                                         min="{{ credit_settings.min_credit_amount }}"
-                                        value="{{ request.POST.asset_value }}">
+                                        value="{{ request.POST.asset_price }}">
                                     <p id="asset_warning" class="mb-2 ml-1 font-bold text-xs text-red-600 hidden"></p>
-                                    {% if form.asset_value.errors %}
+                                    {% if form.asset_price.errors %}
                                     <p class="mb-2 ml-1 font-bold text-xs text-red-600">
-                                        {{ form.asset_value.errors.0 }}
+                                        {{ form.asset_price.errors.0 }}
                                     </p>
                                     {% endif %}
                                 </div>
@@ -144,7 +143,7 @@ Credit Portal | Benovelance Cooperative
                                     <input type="file"
                                         class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-gray-300 bg-white py-2 px-3 text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none"
                                         placeholder="Upload vendor invoice" name="vendor_invoice"
-                                        value="{{ request.POST.vendor_invoice }}" required>
+                                        value="{{ request.FILE.vendor_invoice }}" required>
                                     {% if form.vendor_invoice.errors %}
                                     <p class="mb-2 ml-1 font-bold text-xs text-red-600">
                                         {{ form.vendor_invoice.errors.0 }}</p>

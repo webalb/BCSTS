@@ -19,8 +19,8 @@ class CreditApplicationForm(forms.ModelForm):
 
     # Credit type-specific fields (optional, will be validated in the view)
     asset_name = forms.CharField(required=False)
-    asset_value = forms.DecimalField(required=False)
-    vendor_invoice = forms.ImageField(required=False)
+    asset_price = forms.DecimalField(required=False)
+    vendor_invoice = forms.FileField(required=False, widget=forms.ClearableFileInput(attrs={'accept': 'application/pdf'}))
     partner_contribution = forms.DecimalField(required=False)
     profit_sharing_ratio = forms.DecimalField(required=False)
     lease_period = forms.IntegerField(required=False)
