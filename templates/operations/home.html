@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Welcome | Benovelance Cooperative
+{% endblock title %}
+{% block content %}
+<!-- sidenav  -->
+  <!-- Navbar Transparent -->
+  {% include 'include/login_navbar.html' %}
+  <!-- End Navbar -->
+ 
+
+  <main class="mt-0 transition-all duration-200 ease-soft-in-out">
+    <section class="min-h-screen mb-4">
+      <div class="relative flex items-start pt-12 pb-56 m-4 overflow-hidden bg-center bg-green-300 min-h-50-screen rounded-xl" style="background-image: url({% static '/assets/img/favicon.png' %}); background-size: cover;">
+        <span class="absolute top-0 left-0 w-full h-full bg-center bg-cover bg-gradient-to-tl from-gray-900 to-slate-800 opacity-60"></span>
+        <div class="container z-10">
+          <div class="flex flex-wrap justify-center -mx-3">
+            <div class="w-full max-w-full px-3 mx-auto mt-0 text-center lg:flex-0 shrink-0 lg:w-7/12">
+              <h1 class="mt-12 mb-2 text-white">Welcome to Benovelance Cooperative Society</h1>
+              <p class="text-white">A Sharia-Compliant Cooperative Committed to Ethical Finance and Community Growth</p>
+            </div>
+          </div>
+
+          <div class="flex justify-center mt-8">
+            <a href="{% url 'login' %}" style="background-color: #fff;"
+            class="leading-pro hover:scale-102 hover:shadow-soft-xs ease-soft-in text-sm tracking-tight-soft shadow-soft-md bg-white rounded-2xl mb-0 mr-1 inline-block cursor-pointer border-0 bg-transparent px-8 py-4 text-center align-middle font-bold uppercase text-gray-800 transition-all">Login</a>
+        </div>
+
+        </div>
+      </div>
+    
+
+    </section>
+    <!-- -------- START FOOTER 3 w/ COMPANY DESCRIPTION WITH LINKS & SOCIAL ICONS & COPYRIGHT ------- -->
+    <footer class="py-12">
+      <div class="container">
+        
+        <div class="flex flex-wrap -mx-3">
+          <div class="w-8/12 max-w-full px-3 mx-auto mt-1 text-center flex-0">
+            <p class="mb-0 text-slate-400">
+              Copyright ©
+              <script>
+                document.write(new Date().getFullYear());
+              </script>
+              Benovelance Cooperative Society. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
+{% endblock %}

@@ -3,6 +3,7 @@ from operations.views import views, admin
 from operations.views import bulk_upload_contributions, confirm_bulk_upload
 
 urlpatterns = [
+    path('', views.home, name='home'),
     path('dashboard/', views.dashboard, name="dashboard"), 
     path('admin-dashboard/', admin.admin_dashboard, name='admin_dashboard'),
     path('redirect-user/', admin.redirect_user, name='redirect_user'),  # Route for redirection

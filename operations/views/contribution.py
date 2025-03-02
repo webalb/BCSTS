@@ -19,6 +19,11 @@ from withdrawal.models import EmployeeAccountDetails
 
 from operations.utils import get_employee_financial_summary  # Utility function
 
+def home(request):
+    """Home view displaying a welcome message and navigation options."""
+
+    return render(request, 'operations/home.html')
+
 def is_employee(user):
     return user.groups.filter(name="Employee").exists()
 
