@@ -1,7 +1,6 @@
 <script>
     // Establish WebSocket connection
-    const userSocket = new WebSocket(`ws://${window.location.host}/ws/dashboard/`);
-
+    const userSocket = new WebSocket(`wss://${window.location.host}/ws/dashboard/`);
     userSocket.onmessage = function (e) {
         const data = JSON.parse(e.data);
 
@@ -9,6 +8,7 @@
             updateNotifications(data.notifications);
         }
     };
+    
 
     function updateNotifications(notifications) {
         const notificationList = document.getElementById("notification-list");
