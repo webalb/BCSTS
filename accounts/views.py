@@ -34,7 +34,7 @@ def register(request):
                 return render(request, "accounts/register.html", {"form": form})
 
             user = form.save(commit=False)
-            user.is_active = False  # Require email verification before activation
+            user.is_active = True 
             user.save()
 
             # Assign default role (employee group)
@@ -49,21 +49,22 @@ def register(request):
             # Create contribution setting
             ContributionSetting.objects.create(employee=user, amount=contribution_amount)
 
-            # Send email verification
-            current_site = get_current_site(request)
-            subject = "Verify your Email - Benevolence Cooperative"
-            message = render_to_string(
-                "accounts/email_verification.html",
-                {
-                    "user": user,
-                    "domain": current_site.domain,
-                    "uid": urlsafe_base64_encode(force_bytes(user.pk)),
-                    "token": user.verification_token,
-                },
-            )
-            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
+            # # Send email verification
+            # current_site = get_current_site(request)
+            # subject = "Verify your Email - Benevolence Cooperative"
+            # message = render_to_string(
+            #     "accounts/email_verification.html",
+            #     {
+            #         "user": user,
+            #         "domain": current_site.domain,
+            #         "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+            #         "token": user.verification_token,
+            #     },
+            # )
+            # send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
+            return redirect("login")
 
-            return HttpResponse("Check your email for a verification link.")
+            # return HttpResponse("Check your email for a verification link.")
     else:
         form = RegistrationForm()
 

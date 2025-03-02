@@ -26,7 +26,7 @@
                             {% endif %}
                         </div>
                         <div class="flex-auto p-6">
-                            <form role="form text-left" method="post" enctype="multipart/form-data">
+                            <form role="form text-left" method="post" enctype="multipart/form-data" action="{% url 'create_employee' %}">
                                 {% csrf_token %}
                                 <div class="w-full">
                                     <h4>Personal Information</h4>
