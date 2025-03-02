@@ -247,7 +247,7 @@ def create_employee(request):
             Regards,  
             Benevolence Cooperative Management
             """
-            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [employee.email])
+            # send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [employee.email])
 
             messages.success(request, f"Employee created successfully with an initial contribution of ₦{contribution_amount:,.2f}. An email notification has been sent!")
             return redirect("employee_list")
