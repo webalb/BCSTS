@@ -111,8 +111,8 @@ def record_all_contributions(request):
     
     # Ensure today is 25th or later
     if today.day < int(settings.SALARY_PAYMENT_DATE):
-        messages.warning(request, "You can only record contributions on or after the 25th of the month.")
-        return redirect(request.path)
+        messages.warning(request, f"You can only record contributions on or after the {settings.SALARY_PAYMENT_DATE}th of the month.")
+        return redirect(reverse("manage_contributions"))
 
     # Check if contributions for the current month already exist
     current_month = today.month
@@ -124,7 +124,7 @@ def record_all_contributions(request):
 
     if contributions_exist:
         messages.warning(request, "All contributions for this month have already been recorded.")
-        return redirect(request.path)
+        return redirect(reverse("manage_contributions"))
 
     # If conditions are met, record contributions
     records_created = ContributionRecord.bulk_record_contributions()
@@ -134,7 +134,7 @@ def record_all_contributions(request):
     else:
         messages.warning(request, "No employee contributions were recorded.")
 
-    return redirect(request.path)
+    return redirect(reverse("manage_contributions"))
 
 @login_required
 @user_passes_test(is_admin)
@@ -244,6 +244,9 @@ def manage_contributions(request):
         has_contribution=False  # Employees who have settings but no record
     )
 
+    # Check if contributions have been recorded for the selected month and year
+    contributions_recorded = ContributionRecord.is_contribution_recorded_for_month(selected_month, selected_year)
+
     # Check if today is the salary payment date
     salary_payment_date = settings.SALARY_PAYMENT_DATE
     is_salary_payment_day = date.today().day >= int(salary_payment_date)
@@ -258,6 +261,7 @@ def manage_contributions(request):
         "today": date.today(),
         'is_salary_payment_day': is_salary_payment_day,
         'salary_payment_date': salary_payment_date,
+        "contributions_recorded": contributions_recorded,
     }
     
     return render(request, "operations/contributions/manage_contributions.html", context)
