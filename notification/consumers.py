@@ -1,7 +1,6 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
-from .models import Notification
 
 class DashboardConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -14,7 +13,7 @@ class DashboardConsumer(AsyncWebsocketConsumer):
             await self.accept()
 
             # Send unread notifications on connection
-            unread_notifications = await self.get_unread_notifications()
+            unread_notifications = await self.get_unread_notifications(self.user.id)
             await self.send(text_data=json.dumps({
                 "event_type": "notification",
                 "notifications": unread_notifications
@@ -35,7 +34,7 @@ class DashboardConsumer(AsyncWebsocketConsumer):
         if event_type == "mark_as_read":
             notification_id = data.get("notification_id")
             if notification_id:
-                await self.mark_notification_as_read(notification_id)
+                await self.mark_notification_as_read(notification_id, self.user.id)
 
     async def send_notification(self, event):
         """Sends real-time notifications to users"""
@@ -45,8 +44,11 @@ class DashboardConsumer(AsyncWebsocketConsumer):
         }))
 
     @sync_to_async
-    def get_unread_notifications(self):
+    def get_unread_notifications(self, user_id):
         """Fetch unread notifications for the user"""
+        from .models import Notification #import here
+        from accounts.models import CustomUser #import here
+        user = CustomUser.objects.get(id=user_id)
         return [
             {
                 "id": n.id,
@@ -56,10 +58,13 @@ class DashboardConsumer(AsyncWebsocketConsumer):
                 "created_at": str(n.created_at),
                 "is_read": n.is_read
             }
-            for n in Notification.objects.filter(user=self.user, is_read=False).order_by("-created_at")
+            for n in Notification.objects.filter(user=user, is_read=False).order_by("-created_at")
         ]
 
     @sync_to_async
-    def mark_notification_as_read(self, notification_id):
+    def mark_notification_as_read(self, notification_id, user_id):
         """Marks a notification as read"""
-        Notification.objects.filter(id=notification_id, user=self.user).update(is_read=True)
+        from .models import Notification #import here
+        from accounts.models import CustomUser #import here
+        user = CustomUser.objects.get(id=user_id)
+        Notification.objects.filter(id=notification_id, user=user).update(is_read=True)

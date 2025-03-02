@@ -49,6 +49,13 @@ def admin_dashboard(request):
     employees = User.objects.exclude(Q(is_superuser=True) | Q(groups__name="admin"))
     total_employees = employees.count()
 
+    # Send a test notification to the current user
+    NotificationService.send_notification(
+        user=request.user,
+        heading="Test Notification",
+        message="This is a test notification for admin dashboard.",
+    )
+
     today = timezone.now().date()
     current_month, current_year = today.month, today.year
 

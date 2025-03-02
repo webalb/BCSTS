@@ -89,7 +89,7 @@ class ContributionRecord(models.Model):
         return f"{self.employee.nitda_id} - {self.month}/{self.year}: {self.status}"
     
     @classmethod
-    def is_contribution_recorded_for_month(self, current_month, current_year):
+    def is_contribution_recorded_for_month(cls, current_month, current_year):
         """Check if the contribution for this month is already recorded."""
         return ContributionRecord.objects.filter(month=current_month, year=current_year).exists()
 
