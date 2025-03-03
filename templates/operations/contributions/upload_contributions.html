@@ -22,7 +22,7 @@ Upload Contributions | Benevolence Cooperative
         <div class="min-w-0 p-4">
             <h2 class="text-xl font-bold">Upload Contributions</h2>
         </div>
-        <div class="relative flex flex-col flex-auto min-w-0 p-4 mb-4 overflow-hidden min-h-10 break-words border-0 rounded-2xl bg-white/80 bg-clip-border backdrop-blur-2xl backdrop-saturate-200">
+        <div class="relative flex flex-col flex-auto min-w-0 p-4 mb-4 overflow-hidden min-h-10 break-words border-0 rounded-2xl bg-gray-100 bg-clip-border backdrop-blur-2xl backdrop-saturate-200">
             <div class="flex flex-wrap -mx-3">
                 <div class="flex-none w-auto max-w-full px-3 my-auto">
                     <div class="h-full">
@@ -65,10 +65,10 @@ Upload Contributions | Benevolence Cooperative
         <div class="bg-white p-4 rounded-lg shadow-md">
             <h3 class="text-lg font-bold mb-2">Preview Data</h3>
             <!-- Missing Contributions -->
-            <button id="confirm-btn" disabled onclick="confirmUpload()" class="px-3 py-1 bg-gray-500 text-white rounded hover:bg-green-600">Confirm upload</button>
+            <button id="confirm-btn" disabled onclick="confirmUpload()" class="px-3 py-1 bg-gray-1000 text-white rounded hover:bg-green-600">Confirm upload</button>
             <div class="" id="preview-table-container">
                 <table id="contributionsTable" class="w-full text-sm text-left border border-gray-200 overflow-x-auto, overflow-y-auto">
-                    <thead class="bg-gray-50">
+                    <thead class="bg-gray-100">
                         <tr>
                             <th class="p-2">Employee Email</th>
                             <th class="p-2">Amount</th>
@@ -127,7 +127,7 @@ function uploadFile() {
     $("#preview-table-container").hide();
 
     // Disable upload button & change text
-    $("#upload-btn").prop("disabled", true).addClass("bg-gray-500").removeClass("bg-green-500").text("Uploading...");
+    $("#upload-btn").prop("disabled", true).addClass("bg-gray-1000").removeClass("bg-green-500").text("Uploading...");
 
     $.ajax({
         url: "{% url 'bulk_upload_contributions' %}",
@@ -178,7 +178,7 @@ function uploadFile() {
         complete: function() {
             // Re-enable the upload button
             $("#upload-btn").text("Click confirm below to save");
-            $("#confirm-btn").prop("disabled", false).removeClass("bg-gray-500").addClass("bg-green-500");
+            $("#confirm-btn").prop("disabled", false).removeClass("bg-gray-1000").addClass("bg-green-500");
         }
     });
 }
@@ -195,8 +195,8 @@ function confirmUpload() {
             // Clear preview table
             $("#preview-table").empty();
             $("#preview-table-container").hide();
-            $("#confirm-btn").prop("disabled", true).removeClass("bg-green-500").addClass("bg-gray-500");
-            $("#upload-btn").prop("disabled", false).removeClass("bg-gray-500").addClass("bg-green-500").text("Upload another record");
+            $("#confirm-btn").prop("disabled", true).removeClass("bg-green-500").addClass("bg-gray-1000");
+            $("#upload-btn").prop("disabled", false).removeClass("bg-gray-1000").addClass("bg-green-500").text("Upload another record");
         },
         error: function(response) {
             $("#error-message").text(response.responseJSON.error).show();

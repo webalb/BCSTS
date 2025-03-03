@@ -15,7 +15,7 @@ Employee Details | Benovelance Cooperative
     <!-- end Navbar -->
     <!-- cards -->
     <div class="w-full mx-auto ">
-        <div class="relative flex flex-col flex-auto min-w-0 p-4 mx-6 overflow-hidden min-h-10 break-words border-0 shadow-blur rounded-2xl bg-white/80 bg-clip-border backdrop-blur-2xl backdrop-saturate-200">
+        <div class="relative flex flex-col flex-auto min-w-0 p-4 mx-6 overflow-hidden min-h-10 break-words border-0 shadow-blur rounded-2xl bg-gray-100 bg-clip-border backdrop-blur-2xl backdrop-saturate-200">
             <div class="flex flex-wrap -mx-3">
                 <div class="flex-none w-auto max-w-full px-3">
                     <div class="text-base ease-soft-in-out h-18.5 w-18.5 relative inline-flex items-center justify-center rounded-xl text-white transition-all duration-200">
@@ -83,17 +83,17 @@ Employee Details | Benovelance Cooperative
                     <div class="flex-auto p-4">
                         <h6 class="font-bold leading-tight uppercase text-xs text-slate-500 mt-4 mb-2">Personal Details</h6>
                         <ul class="flex flex-col pl-0 mb-0 rounded-lg">
-                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-t-lg text-sm"><strong class="text-slate-700">Full Name:</strong> &nbsp; {{ employee.get_full_name }}</li>
-                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-slate-700">Mobile:</strong> &nbsp; {{ employee.phone_number }}</li>
-                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-slate-700">Email:</strong> &nbsp; {{ employee.email }}</li>
-                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-slate-700">Staff ID:</strong> &nbsp; {{ employee.nitda_id }}</li>
-                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-slate-700">Gender:</strong> &nbsp; {{ employee.get_gender_display }}</li>
+                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-t-lg text-sm"><strong class="text-gray-800">Full Name:</strong> &nbsp; {{ employee.get_full_name }}</li>
+                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-gray-800">Mobile:</strong> &nbsp; {{ employee.phone_number }}</li>
+                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-gray-800">Email:</strong> &nbsp; {{ employee.email }}</li>
+                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-gray-800">Staff ID:</strong> &nbsp; {{ employee.nitda_id }}</li>
+                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-gray-800">Gender:</strong> &nbsp; {{ employee.get_gender_display }}</li>
                         </ul>
                         <h6 class="font-bold leading-tight uppercase text-xs text-slate-500 mt-4 mb-2">Next of Kin Details</h6>
                         <ul class="flex flex-col pl-0 mb-0 rounded-lg">
-                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-t-lg text-sm"><strong class="text-slate-700">Full Name:</strong> &nbsp; {{ employee.next_of_kin_name }}</li>
-                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-slate-700">Mobile:</strong> &nbsp; {{ employee.next_of_kin_phone }}</li>
-                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-slate-700">Relationship:</strong> &nbsp; {{ employee.next_of_kin_relationship }}</li>
+                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-t-lg text-sm"><strong class="text-gray-800">Full Name:</strong> &nbsp; {{ employee.next_of_kin_name }}</li>
+                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-gray-800">Mobile:</strong> &nbsp; {{ employee.next_of_kin_phone }}</li>
+                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-gray-800">Relationship:</strong> &nbsp; {{ employee.next_of_kin_relationship }}</li>
                         </ul>
                     </div>
                 </div>
@@ -106,26 +106,26 @@ Employee Details | Benovelance Cooperative
                     <div class="flex-auto p-4">
                         <h6 class="font-bold leading-tight uppercase text-xs text-slate-500">Accounts</h6>
                         <ul class="flex flex-col pl-0 mb-0 rounded-lg">
-                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-t-lg text-sm"><strong class="text-slate-700">Total Balance:</strong> &nbsp; ₦{{ total_remained_balance|floatformat:2|intcomma }}</li>
+                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-t-lg text-sm"><strong class="text-gray-800">Total Balance:</strong> &nbsp; ₦{{ total_remained_balance|floatformat:2|intcomma }}</li>
                             <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 text-sm">
-                                <strong class="text-slate-700">Savings (60%):</strong> &nbsp; ₦{{ savings_balance|floatformat:2|intcomma }}
+                                <strong class="text-gray-800">Savings (60%):</strong> &nbsp; ₦{{ savings_balance|floatformat:2|intcomma }}
                             </li>
                             <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-b-lg text-sm">
-                                <strong class="text-slate-700">Investment (40%):</strong> &nbsp; ₦{{ investment_balance|floatformat:2|intcomma }} {# New Line #}
+                                <strong class="text-gray-800">Investment (40%):</strong> &nbsp; ₦{{ investment_balance|floatformat:2|intcomma }} {# New Line #}
                             </li>
                             <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-b-lg text-sm">
-                                <strong class="text-slate-700">Monthly Contribution:</strong> &nbsp; ₦{{ employee.contribution_setting.amount|floatformat:2|intcomma }} {# New Line #}
+                                <strong class="text-gray-800">Monthly Contribution:</strong> &nbsp; ₦{{ employee.contribution_setting.amount|floatformat:2|intcomma }} {# New Line #}
                             </li>
                         </ul>
                         <h6 class="mt-6 font-bold leading-tight uppercase text-xs text-slate-500">Financial Summary</h6>
                         <ul class="flex flex-col pl-0 mb-0 rounded-lg">
                             <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-b-lg text-sm">
-                                <strong class="text-slate-700">Total Withdrawed:</strong> &nbsp; ₦{{ total_withdrawn|floatformat:2|intcomma }} {# New Line #}
+                                <strong class="text-gray-800">Total Withdrawed:</strong> &nbsp; ₦{{ total_withdrawn|floatformat:2|intcomma }} {# New Line #}
                             </li>
                             <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-b-lg text-sm">
-                                <strong class="text-slate-700">Austanding Credit:</strong> &nbsp; ₦{{ total_withdrawn|floatformat:2|intcomma }}                            </li>
+                                <strong class="text-gray-800">Austanding Credit:</strong> &nbsp; ₦{{ total_withdrawn|floatformat:2|intcomma }}                            </li>
                             <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-b-lg text-sm">
-                                <strong class="text-slate-700">Total Money Contributed:</strong> &nbsp; ₦{{ total_contributions|floatformat:2|intcomma }} {# New Line #}
+                                <strong class="text-gray-800">Total Money Contributed:</strong> &nbsp; ₦{{ total_contributions|floatformat:2|intcomma }} {# New Line #}
                             </li>
                         </ul>
                     </div>

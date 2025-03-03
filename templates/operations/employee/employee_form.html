@@ -45,7 +45,7 @@
                                     {% endif %}
                                     {% if field.name == 'next_of_kin_relationship' or field.name == 'position' or field.name == 'contribution_amount' %}
                                     <div class="w-full md:w-12/12 px-3 mb-4">
-                                        <label for="{{ field.id_for_label }}" class="mb-2 ml-1 font-bold text-xs text-slate-700">{{ field.label_tag }}</label>
+                                        <label for="{{ field.id_for_label }}" class="mb-2 ml-1 font-bold text-xs text-gray-800">{{ field.label_tag }}</label>
                                         <span class="text-xs text-red-500">{{ field.errors }}</span>
                                         {{ field }}
                                         {% if field.help_text %}
@@ -56,7 +56,7 @@
                                     {% elif field.name == 'passport_photo' %}
                                     <div class="w-full md:w-12/12 px-3 mb-4">
                                         <!-- Label -->
-                                        <label for="{{ field.id_for_label }}" class="mb-2 ml-1 font-bold text-xs text-slate-700 block">{{ field.label_tag }}</label>
+                                        <label for="{{ field.id_for_label }}" class="mb-2 ml-1 font-bold text-xs text-gray-800 block">{{ field.label_tag }}</label>
                                         <!-- Currently Uploaded Photo -->
                                         <span class="text-xs text-red-500">{{ field.errors }}</span>
                                         {% if field.value %}
@@ -76,7 +76,7 @@
                                     </div>
                                     {% else %}
                                     <div class="w-full md:w-6/12 px-3 mb-4"> 
-                                        <label for="{{ field.id_for_label }}" class="mb-2 ml-1 font-bold text-xs text-slate-700">{{ field.label_tag }}</label>
+                                        <label for="{{ field.id_for_label }}" class="mb-2 ml-1 font-bold text-xs text-gray-800">{{ field.label_tag }}</label>
                                         <span class="text-xs text-red-500">{{ field.errors }}</span>
                                         {{ field }}
                                         {% if field.help_text %}

@@ -29,7 +29,9 @@ Credit Portal | Benovelance Cooperative
                                 <div>
                                     <p class="mb-0 font-sans font-semibold leading-normal text-sm">Total Balance</p>
                                     <h4 class="mb-0 font-bold text-gray-900">
-                                        ₦{{ total_balance|intcomma }}
+                                        
+                                        <span class="balance">₦{{ total_balance|intcomma }}</span>
+                                        <span class="hidden-balance hidden-b"> *** </span>
                                     </h4>
                                     <p class="text-xs">Credit limit: <span class="leading-normal text-xs font-weight-bolder text-green-500">200%</span> of your Total Balance</p>
                                 </div>
@@ -52,7 +54,9 @@ Credit Portal | Benovelance Cooperative
                                 <div>
                                     <p class="mb-0 font-sans font-semibold leading-normal text-sm">Total Credit Taken</p>
                                     <h4 class="mb-0 font-bold text-gray-900">
-                                        ₦{{ took_credits|intcomma }}
+                                        
+                                        <span class="balance">₦{{ took_credits|intcomma }}</span>
+                                        <span class="hidden-balance hidden-b"> *** </span>
                                     </h4>
                                     <p class="text-xs">Repaid Percentage: <span class="font-semibold text-green-600"> {{ repaid_percentage }}% </span></p>
                                 </div>
@@ -85,7 +89,7 @@ Credit Portal | Benovelance Cooperative
                     <div class="h-[600px] overflow-y-auto p-4">
                         <table class="items-center w-full border mb-0 align-top border-gray-200 text-gray-900 overflow-x-auto overflow-y-auto" style="border:#ccc solid 1px">
                             <thead class="align-bottom">
-                                <tr class="bg-gray-50 mt-1">
+                                <tr class="bg-gray-100 mt-1">
                                     <th class="border px-3 py-2 text-left text-xs font-bold uppercase border-b border-gray-900">Tracking ID</th>
                                     <th class="border px-3 py-2 text-left text-xs font-bold uppercase border-b border-gray-900">Applicant</th>
                                     <th class="border px-3 py-2 text-left text-xs font-bold uppercase border-b border-gray-900">Credit Type</th>
@@ -368,7 +372,7 @@ Credit Portal | Benovelance Cooperative
                                 <div class="px-3 text-center basis-1/3 text-xs">
                                     <table class="items-center w-full border mb-0 align-top border-gray-200 text-gray-900 overflow-x-auto overflow-y-auto" style="border:#ccc solid 1px">
                                         <thead class="align-bottom">
-                                            <tr class="bg-gray-50 mt-1">
+                                            <tr class="bg-gray-100 mt-1">
                                                 <th class="border px-3 py-2 text-left text-xs font-bold uppercase border-b border-gray-900">Repayment Date</th>
                                                 <th class="border px-3 py-2 text-left text-xs font-bold uppercase border-b border-gray-900">Amount</th>
                                                 <th class="border px-3 py-2 text-left text-xs font-bold uppercase border-b border-gray-900">Repayment Method</th>

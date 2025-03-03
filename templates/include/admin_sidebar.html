@@ -3,7 +3,7 @@
     <div class="h-19.5">
         <i class="absolute top-0 right-0 p-4 opacity-50 cursor-pointer fas fa-times text-slate-400 xl:hidden" sidenav-close></i>
         <div class="flex flex-col items-center">
-            <a class="block px-1 py-2 m-0 text-sm whitespace-nowrap text-slate-700" href="{% url 'admin_dashboard' %}" target="_blank">
+            <a class="block px-1 py-2 m-0 text-sm whitespace-nowrap text-gray-800" href="{% url 'admin_dashboard' %}" target="_blank">
             <img src="{% static 'assets/img/favicon.png' %}" class="inline transition-all duration-200 ease-nav-brand" alt="main_logo" width="30" height="30" />
             </a>
             <span class="font-semibold text-green-600 transition-all duration-200 ease-nav-brand">BENEVOLENCE COOPERATIVE</span>
@@ -16,7 +16,7 @@
         <ul class="flex flex-col pl-0 mb-0">
             <li class="mt-0.5 w-full">
                 <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap rounded-lg bg-white px-4
-                {% if request.resolver_match.view_name == 'admin_dashboard' %}font-bold{% endif %} text-slate-700 transition-colors" href="{% url 'admin_dashboard' %}">
+                {% if request.resolver_match.view_name == 'admin_dashboard' %}font-bold{% endif %} text-gray-800 transition-colors" href="{% url 'admin_dashboard' %}">
                     <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg shadow-soft-2xl bg-center stroke-0 text-center xl:p-2.5
                      {% if request.resolver_match.view_name == 'admin_dashboard' %} bg-green-500 {%else %} bg-white {% endif %}">
                         <i class="fas fa-chart-line  {% if request.resolver_match.view_name == 'admin_dashboard' %} text-white{% else %} text-gray-900{% endif %}"></i>  </div>

@@ -11,7 +11,7 @@ total.forEach(function (item, i) {
   tab.classList.add("bg-white", "text-white", "shadow-soft-xxs");
   tab.style.animation = ".2s ease";
 
-  moving_div.classList.add("z-10", "absolute", "text-slate-700", "rounded-lg", "bg-inherit", "flex-auto", "text-center", "bg-none", "border-0", "block");
+  moving_div.classList.add("z-10", "absolute", "text-gray-800", "rounded-lg", "bg-inherit", "flex-auto", "text-center", "bg-none", "border-0", "block");
   moving_div.setAttribute("moving-tab", "");
   moving_div.setAttribute("nav-link", "");
   moving_div.appendChild(tab);
@@ -68,7 +68,7 @@ window.addEventListener("resize", function (event) {
     tab.classList.add("bg-white", "text-white", "shadow-soft-xxs");
     tab.style.animation = ".2s ease";
 
-    moving_div.classList.add("z-10", "absolute", "text-slate-700", "rounded-lg", "bg-inherit", "flex-auto", "text-center", "bg-none", "border-0", "block");
+    moving_div.classList.add("z-10", "absolute", "text-gray-800", "rounded-lg", "bg-inherit", "flex-auto", "text-center", "bg-none", "border-0", "block");
     moving_div.setAttribute("moving-tab", "");
     moving_div.setAttribute("nav-link", "");
     moving_div.appendChild(tab);

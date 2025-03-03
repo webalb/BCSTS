@@ -1,6 +1,6 @@
 <script>
     // Establish WebSocket connection
-    const userSocket = new WebSocket(`wss://${window.location.host}/ws/dashboard/`);
+    const userSocket = new WebSocket(`ws://${window.location.host}/ws/dashboard/`);
     userSocket.onmessage = function (e) {
         const data = JSON.parse(e.data);
 
@@ -31,7 +31,7 @@
             listItem.className = "relative mb-2";
 
             listItem.innerHTML = `
-                <a class="ease-soft py-1.2 clear-both block w-full whitespace-wrap px-4 transition-colors duration-300 hover:bg-gray-200 hover:text-slate-700" 
+                <a class="ease-soft py-1.2 clear-both block w-full whitespace-wrap px-4 transition-colors duration-300 hover:bg-gray-200 hover:text-gray-800" 
                 href="${notification.link || 'javascript:;'}" 
                 onclick="markAsRead(${notification.id})"   style="border-top: 1px solid #aaa ">
                     <div class="flex py-1">

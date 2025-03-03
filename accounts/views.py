@@ -23,6 +23,7 @@ from notification.services import NotificationService
 # for user registration
 def register(request):
     """Handles user registration."""
+
     if request.method == "POST":
         form = RegistrationForm(request.POST, request.FILES)
         if form.is_valid():
@@ -68,7 +69,7 @@ def register(request):
     else:
         form = RegistrationForm()
 
-    return render(request, "accounts/register.html", {"form": form})
+    return render(request, "accounts/register.html", {"form": form, 'action': "Create"})
 
 
 

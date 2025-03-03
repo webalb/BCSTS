@@ -21,9 +21,9 @@ Member Contributions | Benovelance Cooperative
 
     <div class="w-full px-6 mx-auto">
         <!-- card 1 -->
-        <div class="flex flex-col shadow-soft-xl flex-auto min-w-0 p-4  break-words border-0 rounded-2xl bg-white/80 bg-clip-border backdrop-blur-2xl backdrop-saturate-200">
+        <div class="flex flex-col shadow-soft-xl flex-auto min-w-0 p-4  break-words border-0 rounded-2xl bg-gray-100 bg-clip-border backdrop-blur-2xl backdrop-saturate-200">
             <div class="flex flex-wrap -mx-3">
-                <div class="flex-none w-auto max-w-full px-3 my-auto">
+                <div class="flex-none w-auto max-w-full px-3 my-auto bg-white">
                     <div class="h-full">
                         <h5 class="mb-1">{{ employee.nitda_id }}`s Contributions at BCS</h5>
                         <p class="mb-0 font-semibold leading-normal text-sm">from {{ employee.date_joined|date:"F Y" }} to date</p>
@@ -50,7 +50,7 @@ Member Contributions | Benovelance Cooperative
                     <div class="border-black/12.5 mb-0 rounded-t-2xl border-b-0 border-solid bg-white p-6 pb-0">
                         <div class="flex flex-wrap mt-0 -mx-3">
                             <div class="flex-none w-12/12 max-w-full px-3 mt-0 lg:w-1/2 lg:flex-none">
-                                <h6 class="text-black-800">Complete Contributions in History</h6>
+                                <h6 class="text-gray-800">Complete Contributions in History</h6>
                                 <p>Contributed: ₦{{ total_contributed|intcomma}}</p>
                             </div>
                         </div>
@@ -60,12 +60,12 @@ Member Contributions | Benovelance Cooperative
                             <table id="contributionsTable" class="w-full mb-0 align-top border-gray-200 text-slate-500 ">
                                 <thead class="align-bottom">
                                     <tr>
-                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800 ">S/N</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800 ">Month</th>
-                                        <th class="px-6 py-3 pl-2 font-bold tracking-normal text-left uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800">Year</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle  text-sm border-b letter border-b-solid  whitespace-nowrap border-b-gray-200 text-black-800">Amount</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800 ">Status</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800">Date Recorded</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800 ">S/N</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800 ">Month</th>
+                                        <th class="px-6 py-3 pl-2 font-bold tracking-normal text-left uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Year</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle  text-sm border-b letter border-b-solid  whitespace-nowrap border-b-gray-200 text-gray-800">Amount</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800 ">Status</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Date Recorded</th>
                                     </tr>
                                 </thead>
                                 <tbody>

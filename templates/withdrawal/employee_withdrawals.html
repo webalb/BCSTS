@@ -29,7 +29,9 @@ Withdrawal management | Benovelance Cooperative
                                 <div>
                                     <p class="mb-0 font-sans font-semibold leading-normal text-sm">Savings Balance</p>
                                     <h4 class="mb-0 font-bold text-gray-900">
-                                        ₦{{ savings_balance|intcomma }}
+                                        
+                                        <span class="balance">₦{{ savings_balance|intcomma }}</span>
+                                        <span class="hidden-balance hidden-b"> *** </span>
                                     </h4>
                                     <p>
                                         <span class="leading-normal text-sm font-weight-bolder text-lime-500">60%</span> of your total balance</p>
@@ -53,7 +55,9 @@ Withdrawal management | Benovelance Cooperative
                                 <div>
                                     <p class="mb-0 font-sans font-semibold leading-normal text-sm">Total Withdrawn</p>
                                     <h4 class="mb-0 font-bold text-gray-900">
-                                        ₦{{ total_withdrawn|intcomma }}
+                                        
+                                        <span class="balance">₦{{ total_withdrawn|intcomma }}</span>
+                                        <span class="hidden-balance hidden-b"> *** </span>
                                     </h4>
                                     <p class="leading-normal text-sm font-weight-bolder">Total amount you withdreewed</p>
                                 </div>
@@ -75,7 +79,7 @@ Withdrawal management | Benovelance Cooperative
                     <div class="border-black/12.5 mb-0 rounded-t-2xl border-b-0 border-solid bg-white p-6 pb-0">
                         <div class="flex flex-wrap mt-0 -mx-3">
                             <div class="flex-none w-12/12 max-w-full px-3 mt-0 lg:w-1/2 lg:flex-none">
-                                <h6 class="text-black-800">Withdrawal on process</h6>
+                                <h6 class="text-gray-800">Withdrawal on process</h6>
                             </div>
                         </div>
                     </div>
@@ -84,15 +88,15 @@ Withdrawal management | Benovelance Cooperative
                             <table class="items-center w-full mb-0 align-top border-gray-200 text-slate-500">
                                 <thead class="align-bottom">
                                     <tr>
-                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800">Amount</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800">Charges</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800">Date Requested</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Amount</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Charges</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Date Requested</th>
                                         {% comment %} Show approval date only if status is approved {% endcomment %}
                                         {% if withdrawal_request.status == 'approved' %}
-                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800">Approval Date</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Approval Date</th>
                                         {% endif %}
-                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle text-sm border-b border-b-solid whitespace-nowrap border-b-gray-200 text-black-800">Status</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle text-sm border-b border-b-solid whitespace-nowrap border-b-gray-200 text-black-800">Action</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle text-sm border-b border-b-solid whitespace-nowrap border-b-gray-200 text-gray-800">Status</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle text-sm border-b border-b-solid whitespace-nowrap border-b-gray-200 text-gray-800">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -147,13 +151,13 @@ Withdrawal management | Benovelance Cooperative
                         <form role="form text-left" method="post" action="{% url 'withdrawal:withdrawal_request' %}">
                             {% csrf_token %}
                             <!-- Amount Input -->
-                            <label class="mb-2 ml-1 font-bold text-xs text-slate-700">Amount Requested</label>
+                            <label class="mb-2 ml-1 font-bold text-xs text-gray-800">Amount Requested</label>
                             <div class="mb-4">
                                 <input type="number" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-gray-300 bg-white py-2 px-3 text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none" placeholder="Enter Amount" id="amount_requested" name="amount_requested" required oninput="validateAmount()" min="1" />
                                 <p id="amount_warning" class="mb-2 ml-1 font-bold text-xs text-red-600 hidden">You cannot withdraw more than {{ savings_balance|intcomma }}</p>
                             </div>
                             <!-- Charges Display -->
-                            <label class="mb-2 ml-1 font-bold text-xs text-slate-700">
+                            <label class="mb-2 ml-1 font-bold text-xs text-gray-800">
                                 Charges to be applied:
                                 <span id="charges" class="text-red-600 font-semibold">0</span>
                             </label>
@@ -204,7 +208,7 @@ Withdrawal management | Benovelance Cooperative
                     <div class="border-black/12.5 mb-0 rounded-t-2xl border-b-0 border-solid bg-white p-6 pb-0">
                         <div class="flex flex-wrap mt-0 -mx-3">
                             <div class="flex-none w-12/12 max-w-full px-3 mt-0 lg:w-1/2 lg:flex-none">
-                                <h6 class="text-black-800">Withdrawal Transactions History</h6>
+                                <h6 class="text-gray-800">Withdrawal Transactions History</h6>
                             </div>
                         </div>
                     </div>
@@ -214,12 +218,12 @@ Withdrawal management | Benovelance Cooperative
                             <table id="withdrawalHistory" class="items-center w-full mb-0 align-top border-gray-200 text-slate-500" id="historyTable">
                                 <thead class="align-bottom">
                                     <tr>
-                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800">Amount</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800">Request Date</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800">Status</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800">Action Date</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800">Charges Applied</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800">Details</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Amount</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Request Date</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Status</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Action Date</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Charges Applied</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Details</th>
                                     </tr>
                                 </thead>
                                 <tbody>

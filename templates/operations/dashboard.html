@@ -26,7 +26,8 @@ Member Dashboard | Benovelance Cooperative
                                 <div>
                                     <p class="mb-0 font-sans font-semibold leading-normal text-sm">Savings</p>
                                     <h6 class="mb-0 font-bold">
-                                        ₦{{ savings_balance|intcomma }}
+                                       <span class="balance"> ₦{{ savings_balance|intcomma }} </span>
+                                       <span class="hidden-balance hidden-b"> *** </span>
                                         <br>
                                         <span class="leading-normal text-sm font-weight-bolder text-lime-500">60%</span>
                                     </h6>
@@ -50,7 +51,9 @@ Member Dashboard | Benovelance Cooperative
                                 <div>
                                     <p class="mb-0 font-sans font-semibold leading-normal text-sm">Investment</p>
                                     <h6 class="mb-0 font-bold">
-                                        ₦{{ investment_balance|intcomma }}
+                                        
+                                        <span class="balance"> ₦{{ investment_balance|intcomma }} </span>
+                                       <span class="hidden-balance hidden-b"> *** </span>
                                         <br>
                                         <span class="leading-normal text-sm font-weight-bolder text-lime-500">40%</span>
                                     </h6>
@@ -74,7 +77,9 @@ Member Dashboard | Benovelance Cooperative
                                 <div>
                                     <p class="mb-0 font-sans font-semibold leading-normal text-sm">Total Balance</p>
                                     <h6 class="mb-0 font-bold">
-                                        ₦{{ total_remained_balance|intcomma }}
+                                        
+                                        <span class="balance">₦{{ total_remained_balance|intcomma }}</span>
+                                       <span class="hidden-balance hidden-b"> *** </span>
                                         <br>
                                         <span class="text-xs">Remained
                                         <span class="leading-normal text-lime-500 text-sm font-weight-bolder">100%</span></span>
@@ -99,7 +104,9 @@ Member Dashboard | Benovelance Cooperative
                                 <div>
                                     <p class="mb-0 font-sans font-semibold leading-normal text-sm">Contributed</p>
                                     <h6 class="mb-0 font-bold">
-                                        ₦{{ total_contributions|intcomma }}
+                                        
+                                        <span class="balance">₦{{ total_contributions|intcomma }}</span>
+                                       <span class="hidden-balance hidden-b"> *** </span>
                                         <br>
                                         <span class="text-xs">Total Contributed
                                         <span class="leading-normal text-sm font-weight-bolder text-lime-500"></span></span>
@@ -123,15 +130,15 @@ Member Dashboard | Benovelance Cooperative
                     <div class="flex flex-col h-full">
                         <div class="flex-auto p-4 pt-6">
                             <ul class="flex flex-col pl-0 mb-0 rounded-lg">
-                                <li class="relative flex p-6 mb-2 border-0 rounded-t-inherit rounded-xl bg-gray-50">
+                                <li class="relative flex p-6 mb-2 border-0 rounded-t-inherit rounded-xl bg-gray-100">
                                     <div class="flex flex-col">
                                         <h5 class="mb-4 leading-normal text-sm underline">Your Profile Information</h5>
-                                        <span class="mb-2 leading-tight text-sm">Full Name: <span class="font-semibold text-slate-700 sm:ml-2">{{ employee.get_full_name }}</span></span>
-                                        <span class="mb-2 leading-tight text-sm">Email Address: <span class="font-semibold text-slate-700 sm:ml-2">{{ employee.email }}</span></span>
-                                        <span class="mb-2 leading-tight text-sm">Staff ID: <span class="font-semibold text-slate-700 sm:ml-2">{{ employee.nitda_id }}</span></span>
-                                        <span class="mb-2 leading-tight text-sm">Position: <span class="font-semibold text-slate-700 sm:ml-2">{{ employee.position }}</span></span>
+                                        <span class="mb-2 leading-tight text-sm">Full Name: <span class="font-semibold text-gray-800 sm:ml-2">{{ employee.get_full_name }}</span></span>
+                                        <span class="mb-2 leading-tight text-sm">Email Address: <span class="font-semibold text-gray-800 sm:ml-2">{{ employee.email }}</span></span>
+                                        <span class="mb-2 leading-tight text-sm">Staff ID: <span class="font-semibold text-gray-800 sm:ml-2">{{ employee.nitda_id }}</span></span>
+                                        <span class="mb-2 leading-tight text-sm">Position: <span class="font-semibold text-gray-800 sm:ml-2">{{ employee.position }}</span></span>
                                         {% if employee.loan_committee_member %}
-                                        <span class="mb-2 leading-tight text-sm">Credit Committee: <span class="font-semibold text-slate-700 sm:ml-2">
+                                        <span class="mb-2 leading-tight text-sm">Credit Committee: <span class="font-semibold text-gray-800 sm:ml-2">
                                            {{ employee.loan_committee_member.role }}
                                            </span>
                                          </span>
@@ -139,7 +146,7 @@ Member Dashboard | Benovelance Cooperative
                                     </div>
                                     <div class="ml-auto text-right">
                                         
-                                        <a class="inline-block px-4 py-3 mb-0 font-bold text-center uppercase align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer leading-pro text-xs ease-soft-in bg-150 hover:scale-102 active:opacity-85 bg-x-25 text-slate-700" href="{% url 'employee_specific_detail' employee.id %}"><i class="mr-2 fas fa-pencil-alt text-slate-700" aria-hidden="true"></i>Details</a>
+                                        <a class="inline-block px-4 py-3 mb-0 font-bold text-center uppercase align-middle transition-all bg-transparent border-0 rounded-lg shadow-none cursor-pointer leading-pro text-xs ease-soft-in bg-150 hover:scale-102 active:opacity-85 bg-x-25 text-gray-800" href="{% url 'employee_specific_detail' employee.id %}"><i class="mr-2 fas fa-pencil-alt text-gray-800" aria-hidden="true"></i>Details</a>
                                     </div>
                                 </li>
                                 </li>
@@ -150,13 +157,22 @@ Member Dashboard | Benovelance Cooperative
             </div>
             <div class="w-full max-w-full px-3 lg:w-5/12 lg:flex-none">
                 <div class="border-black/12.5 shadow-soft-xl relative flex h-full min-w-0 flex-col break-words rounded-2xl border-0 border-solid bg-white bg-clip-border p-4">
-                    <div class="relative h-full overflow-hidden bg-cover rounded-xl" style="background-image: url({% static 'assets/img/ivancik.jpg' %})">
+                    <div class="relative h-full overflow-hidden bg-cover rounded-xl">
                         <span class="absolute top-0 left-0 w-full h-full bg-center bg-cover bg-green-500 opacity-80"></span>
                         <div class="relative z-10 flex flex-col flex-auto h-full p-4">
                             <h5 class="pt-2 mb-4 font-bold text-white">Your Bank Details</h5>
-                            <p class="text-white"><b>Bank:</b> {{ account_details.bank_name|default:"XXXXX Bank" }}</p>
-                            <p class="text-white"><b>Account Number:</b> {{ account_details.account_number|default:"XXXXXXXXXX" }}</p>
-                            <p class="text-white"><b>Account Name:</b> {{ account_details.account_holder_name|default:"XXXXXX XXXXX XXXX"}}</p>
+                            <p class="text-white"><b>Bank:</b> 
+                                <span class="balance"> {{ account_details.bank_name|default:"*** Bank" }}</span>
+                                <span class="hidden-balance hidden-b"> *** </span>
+                            </p>
+                            <p class="text-white"><b>Account Number:</b>
+                                <span class="balance"> {{ account_details.account_number|default:"***" }}</span>
+                                <span class="hidden-balance hidden-b"> *** </span>
+                            </p>
+                            <p class="text-white"><b>Account Name:</b>
+                                <span class="balance"> {{ account_details.account_holder_name|default:"*** *** ***"}}</span>
+                                <span class="hidden-balance hidden-b"> *** </span>
+                            </p>
                             {% if not account_details %}
                             <a class="mt-auto mb-0 bg-dark font-semibold leading-normal text-white group text-sm" href="{% url 'withdrawal:add_account' %}">
                                 Please Add
@@ -176,7 +192,7 @@ Member Dashboard | Benovelance Cooperative
                     <div class="border-black/12.5 mb-0 rounded-t-2xl border-b-0 border-solid bg-white p-6 pb-0">
                         <div class="flex flex-wrap mt-0 -mx-3">
                             <div class="flex-none w-7/12 max-w-full px-3 mt-0 lg:w-1/2 lg:flex-none">
-                                <h6 class="text-black-800">Latest Contributions</h6>
+                                <h6 class="text-gray-800">Latest Contributions</h6>
                                 <p class="mb-0 leading-normal text-sm">
                                     <i class="fa fa-check text-cyan-500"></i> For the past
                                     <span class="ml-1 font-semibold">5 months</span>
@@ -191,11 +207,11 @@ Member Dashboard | Benovelance Cooperative
                             <table class="items-center w-full mb-0 align-top border-gray-200 text-slate-500">
                                 <thead class="align-bottom">
                                     <tr>
-                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800 ">Month</th>
-                                        <th class="px-6 py-3 pl-2 font-bold tracking-normal text-left uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800">Year</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle  text-sm border-b letter border-b-solid  whitespace-nowrap border-b-gray-200 text-black-800">Amount</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800 ">Status</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-black-800">Date Recorded</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800 ">Month</th>
+                                        <th class="px-6 py-3 pl-2 font-bold tracking-normal text-left uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Year</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle  text-sm border-b letter border-b-solid  whitespace-nowrap border-b-gray-200 text-gray-800">Amount</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800 ">Status</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Date Recorded</th>
                                     </tr>
                                 </thead>
                                 <tbody>

@@ -40,9 +40,16 @@
                     </a>
                 </li>
                 <li class="flex items-center">
-                    <span style="font-size: 1.5rem" class="block text-gray-900 px-2 py-2 font-bold transition-all ease-nav-brand text-sm text-slate-500 dark:text-white">
+                    <span style="font-size: 1.1rem" class="block text-gray-400 px-2 py-2 font-bold transition-all ease-nav-brand text-sm text-slate-500 dark:text-white">
                     |</span>
                 </li>
+                <li class="flex items-center pl-2">
+                    <button id="toggleButton" class="p-0 transition-all text-sm ease-nav-brand text-slate-500 mr-4" title="Toggle balance visibility">
+                        <i class="fa fa-eye text-gray-900" style="font-size: 1rem" id="show-balance"></i>
+                        <i class="fa fa-eye-slash hidden text-gray-900" style="font-size: 1rem" id="hide-balance"></i>
+                    </button>
+                </li>
+
                 <li class="flex items-center pl-2">
                     <button id="dark-mode-toggle" onclick="toggleDarkMode()" class="p-0 transition-all text-sm ease-nav-brand text-slate-500 mr-4">
                         <i class="fa fa-moon text-gray-900"  style="font-size: 1rem" id="moon"></i>
@@ -68,5 +75,62 @@
         </div>
     </div>
 </nav>
-<!-- end Navbar -->
+
+
+<script>
+    const toggleButton = document.getElementById('toggleButton');
+    const showBalanceIcon = document.getElementById('show-balance');
+    const hideBalanceIcon = document.getElementById('hide-balance');
+
+    function toggleBalances() {
+        const balances = document.querySelectorAll('.balance');
+        const hiddenBalances = document.querySelectorAll('.hidden-b');
+
+        const isHidden = localStorage.getItem('balancesHidden') === 'true';
+
+        balances.forEach(balance => {
+            balance.classList.toggle('hidden-balance', isHidden);
+        });
+
+        hiddenBalances.forEach(hiddenBalance => {
+            hiddenBalance.classList.toggle('hidden-balance', !isHidden);
+        });
+
+        localStorage.setItem('balancesHidden', String(!isHidden));
+
+        // Toggle eye icons
+        showBalanceIcon.classList.toggle('hidden', !isHidden);
+        hideBalanceIcon.classList.toggle('hidden', isHidden);
+    }
+
+    toggleButton.addEventListener('click', toggleBalances);
+
+    // Check local storage on page load
+    function initializeBalances() {
+        const isHidden = localStorage.getItem('balancesHidden') === 'true';
+
+        const balances = document.querySelectorAll('.balance');
+        const hiddenBalances = document.querySelectorAll('.hidden-b');
+
+        balances.forEach(balance => {
+            balance.classList.toggle('hidden-balance', !isHidden);
+        });
+
+        hiddenBalances.forEach(hiddenBalance => {
+            hiddenBalance.classList.toggle('hidden-balance', isHidden);
+        });
+
+        // Toggle eye icons on load
+        showBalanceIcon.classList.toggle('hidden', !isHidden);
+        hideBalanceIcon.classList.toggle('hidden', isHidden);
+    }
+    document.addEventListener('DOMContentLoaded', (event) => {
+        initializeBalances();
+    });
+    
+
+    
+</script>
+
+
 {% include "include/notification_ws.html" %}

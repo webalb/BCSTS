@@ -23,7 +23,7 @@ Withdrawal Charge setting | Benovelance Cooperative
                     <h6 class="mb-0 text-lg font-semibold text-gray-700">Manage Withdrawal Charges</h6>
                 </div>
                 <div class="p-6">
-                    <label class="mb-2 ml-1 font-bold text-xs text-slate-700">Set New Charge Percentage (%)</label>
+                    <label class="mb-2 ml-1 font-bold text-xs text-gray-800">Set New Charge Percentage (%)</label>
                     <div class="flex items-center">
                         <form method="post" action="{% url 'withdrawal:update_charge' %}" class="flex items-center">
                         {% csrf_token %}
@@ -32,7 +32,7 @@ Withdrawal Charge setting | Benovelance Cooperative
                         <button id="update_charge_btn" class="ml-2 px-4 py-2 text-white bg-blue-500 text-sm uppercase rounded-lg hover:bg-blue-600">
                             Update
                         </button>
-                        <a class="ml-2 px-4 py-2 text-white bg-gray-500 rounded-lg hover:bg-gray-600 text-sm uppercase" href="{% url 'withdrawal:admin_withdrawal_management' %}">Back</a>
+                        <a class="ml-2 px-4 py-2 text-white bg-gray-1000 rounded-lg hover:bg-gray-600 text-sm uppercase" href="{% url 'withdrawal:admin_withdrawal_management' %}">Back</a>
                         </form>
                     </div>
                     
