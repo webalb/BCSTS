@@ -32,7 +32,6 @@ urlpatterns = [
     path('contribution-history/<str:employee_id>/', admin.admin_contribution_history, name='admin_contribution_history'),    
     path('delete-contribution-history/<str:record_id>/', admin.delete_contribution_history, name='delete_contribution_history'),
 
-
     path('upload-contributions/', bulk_upload_contributions, name='bulk_upload_contributions'),
     path('confirm-bulk-upload/', confirm_bulk_upload, name='confirm_bulk_upload'),
 
