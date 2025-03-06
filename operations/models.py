@@ -103,7 +103,6 @@ class ContributionRecord(models.Model):
         ('paid', 'Paid'),
     ]
     id = models.CharField(primary_key=True, max_length=7, unique=True)
-
     employee = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="contribution_records")
     amount = models.DecimalField(max_digits=10, decimal_places=2)  # Deducted amount
     month = models.IntegerField()
