@@ -3,7 +3,7 @@
 {% load humanize %}
 {% load custom_filters %}
 {% block title %}
-Credit Portal | Benovelance Cooperative
+Credit Portal | Benevolance Cooperative
 {% endblock title %}
 {% block header %}
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
@@ -14,7 +14,7 @@ Credit Portal | Benovelance Cooperative
 <!-- end sidenav -->
 <main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200">
     <!-- Navbar -->
-    {% include 'include/dashboard_navbar.html' %}
+    {% include 'include/dashboard_navbar.html' with breadcrumb='Credit' page_title='Credit Portal' %}
     <!-- end Navbar -->
     <!-- cards -->
     <div class="w-full px-6 py-6 mx-auto">
@@ -437,7 +437,7 @@ Credit Portal | Benovelance Cooperative
                                     {% if enabled %}
                                     <div class="w-full max-w-full px-3 mb-6 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/4">
                                         <div class="px-3 text-right basis-1/3">
-                                            <a href="{% url 'credit:apply_credit' credit_type %}" class="inline-block w-full px-6 py-3 my-4 font-bold text-center text-white uppercase align-middle transition-all ease-in border-0 rounded-lg select-none shadow-soft-md bg-150 bg-x-25 leading-pro text-xs bg-green-500">
+                                            <a href="{% url 'credit:apply_credit' credit_type %}" class="apply-credit-button inline-block w-full px-6 py-3 my-4 font-bold text-center text-white uppercase align-middle transition-all ease-in border-0 rounded-lg select-none shadow-soft-md bg-150 bg-x-25 leading-pro text-xs bg-green-500">
                                                 {{ credit_type }}
                                             </a>
                                         </div>
@@ -484,6 +484,34 @@ $(document).ready(function() {
         "responsive": true,
         "scrollX": true,
         "autoWidth": false,
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const agreeTermsCheckbox = document.getElementById('agree_terms');
+    const applyCreditButtons = document.querySelectorAll('.apply-credit-button');
+
+    function updateButtonState() {
+        applyCreditButtons.forEach(button => {
+            if (agreeTermsCheckbox.checked) {
+                button.classList.remove('disabled'); // Remove disabled class
+            } else {
+                button.classList.add('disabled'); // Add disabled class
+            }
+        });
+    }
+
+    agreeTermsCheckbox.addEventListener('change', updateButtonState);
+
+    // Initial state setup
+    updateButtonState();
+
+    applyCreditButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+            if (this.classList.contains('disabled')) {
+                event.preventDefault(); // Prevent navigation
+            }
+        });
     });
 });
 </script>

@@ -3,7 +3,7 @@
 {% load humanize %}
 {% load custom_filters %}
 {% block title %}
-Withdrawal management | Benovelance Cooperative
+Withdrawal management | Benevolance Cooperative
 {% endblock title %}
 {% block header %}
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
@@ -14,7 +14,7 @@ Withdrawal management | Benovelance Cooperative
 <!-- end sidenav -->
 <main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200">
     <!-- Navbar -->
-    {% include 'include/dashboard_navbar.html' %}
+    {% include 'include/dashboard_navbar.html' with breadcrumb='Withdrawal' page_title='Manage Withdrawal' %}
     <!-- end Navbar -->
     <!-- cards -->
     <div class="w-full px-6 py-6 mx-auto">
@@ -53,7 +53,7 @@ Withdrawal management | Benovelance Cooperative
                         <div class="flex flex-row -mx-3">
                             <div class="flex-none w-2/3 max-w-full pl-3">
                                 <div>
-                                    <p class="mb-0 font-sans font-semibold leading-normal text-sm">Total Withdrawn</p>
+                                    <p class="mb-0 font-sans font-semibold leading-normal text-sm">Total Withdrawal</p>
                                     <h4 class="mb-0 font-bold text-gray-900">
                                         
                                         <span class="balance">₦{{ total_withdrawn|intcomma }}</span>
@@ -138,67 +138,89 @@ Withdrawal management | Benovelance Cooperative
             </div>
         </div>
         {% else %}
-        <!-- cards row 2 -->
-        <div class="flex flex-wrap -mx-3">
-            <!-- Request Withdrawal Form -->
-            <div class="w-full max-w-full px-3 mt-6 md:w-5/12 md:flex-none">
-                <div class="relative flex flex-col min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
-                    <div class="p-6 px-4 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
-                        <h6 class="mb-0 text-lg font-semibold text-gray-700">Request Withdrawal</h6>
-                    </div>
-                    <div class="flex-auto p-4 pt-6">
-                        <!-- Withdrawal Form -->
-                        <form role="form text-left" method="post" action="{% url 'withdrawal:withdrawal_request' %}">
-                            {% csrf_token %}
-                            <!-- Amount Input -->
-                            <label class="mb-2 ml-1 font-bold text-xs text-gray-800">Amount Requested</label>
-                            <div class="mb-4">
-                                <input type="number" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-gray-300 bg-white py-2 px-3 text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none" placeholder="Enter Amount" id="amount_requested" name="amount_requested" required oninput="validateAmount()" min="1" />
-                                <p id="amount_warning" class="mb-2 ml-1 font-bold text-xs text-red-600 hidden">You cannot withdraw more than {{ savings_balance|intcomma }}</p>
-                            </div>
-                            <!-- Charges Display -->
-                            <label class="mb-2 ml-1 font-bold text-xs text-gray-800">
-                                Charges to be applied:
-                                <span id="charges" class="text-red-600 font-semibold">0</span>
-                            </label>
-                            <!-- Agreement Checkbox -->
-                            <div class="flex items-center mt-4">
-                                <input type="checkbox" id="agree_terms" class="mr-2" onclick="toggleSubmit()" required />
-                                <label for="agree_terms" class="text-xs text-gray-700">I agree to the <span class="text-red-500 font-bold">{{ charge.charge_percentage }}% administrative charges</span>.</label>
-                            </div>
-                            <!-- Submit Button (Initially Disabled) -->
-                            <div class="text-center">
-                                <button type="submit" id="submit_btn" class="inline-block w-full px-6 py-3 mt-6 font-bold text-white uppercase transition-all bg-green-500 rounded-lg hover:scale-105 hover:shadow-lg active:opacity-85 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                                    Request Withdrawal
-                                </button>
-                            </div>
-                        </form>
+            {% if request.user.get_member_bank_details %}
+            <!-- cards row 2 -->
+            <div class="flex flex-wrap -mx-3">
+                <!-- Request Withdrawal Form -->
+                <div class="w-full max-w-full px-3 mt-6 md:w-5/12 md:flex-none">
+                    <div class="relative flex flex-col min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
+                        <div class="p-6 px-4 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
+                            <h6 class="mb-0 text-lg font-semibold text-gray-700">Request Withdrawal</h6>
+                            
+                        </div>
+                        <div class="flex-auto p-4 pt-6">
+                            <!-- Withdrawal Form -->
+                            <form role="form text-left" method="post" action="{% url 'withdrawal:withdrawal_request' %}">
+                                {% csrf_token %}
+                                <!-- Amount Input -->
+                                <label class="mb-2 ml-1 font-bold text-xs text-gray-800">Amount Requested</label>
+                                <div class="mb-4">
+                                    <input type="number" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-gray-300 bg-white py-2 px-3 text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none" placeholder="Enter Amount" id="amount_requested" name="amount_requested" required oninput="validateAmount()" min="1" />
+                                    <p id="amount_warning" class="mb-2 ml-1 font-bold text-xs text-red-600 hidden">You cannot withdraw more than {{ savings_balance|intcomma }}</p>
+                                </div>
+                                <!-- Charges Display -->
+                                <label class="mb-2 ml-1 font-bold text-xs text-gray-800">
+                                    Charges to be applied:
+                                    <span id="charges" class="text-red-600 font-semibold">0</span>
+                                </label>
+                                <!-- Agreement Checkbox -->
+                                <div class="flex items-center mt-4">
+                                    <input type="checkbox" id="agree_terms" class="mr-2" onclick="toggleSubmit()" required />
+                                    <label for="agree_terms" class="text-xs text-gray-700">I agree to the <span class="text-red-500 font-bold">{{ charge.charge_percentage }}% administrative charges</span>.</label>
+                                </div>
+                                <!-- Submit Button (Initially Disabled) -->
+                                <div class="text-center">
+                                    <button type="submit" id="submit_btn" class="inline-block w-full px-6 py-3 mt-6 font-bold text-white uppercase transition-all bg-green-500 rounded-lg hover:scale-105 hover:shadow-lg active:opacity-85 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                        Request Withdrawal
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <!-- Withdrawal Information -->
-            <div class="w-full max-w-full px-3 mt-6 md:w-7/12 md:flex-none">
-                <div class="relative flex flex-col min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
-                    <div class="p-6 px-4 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
-                        <h6 class="mb-0 text-lg font-semibold text-gray-700">Withdrawal Process</h6>
-                    </div>
-                    <div class="p-6">
-                        <p class="text-gray-600 text-sm">
-                            Your request will go through an <span class="font-bold text-blue-600">administrative review</span>, including security verification. This is to ensure that even if your account is compromised, unauthorized withdrawals cannot be made.
-                        </p>
-                        <div class="mt-4 pl-2">
-                            <h6 class="text-gray-700 font-semibold">Important Notes:</h6>
-                            <ul style="list-style: disc !important;" class="list-disc list-inside text-gray-600 text-sm mt-2">
-                                <li>You may receive a confirmation call from management.</li>
-                                <li>Security checks will be conducted before approval.</li>
-                                <li>If approved, funds will be deducted from your savings balance.</li>
-                                <li> A <span class="text-red-600 font-bold">{{charge.charge_percentage}}% administrative charge</span> will be applied.</li>
-                            </ul>
+                <!-- Withdrawal Information -->
+                <div class="w-full max-w-full px-3 mt-6 md:w-7/12 md:flex-none">
+                    <div class="relative flex flex-col min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
+                        <div class="p-6 px-4 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
+                            <h6 class="mb-0 text-lg font-semibold text-gray-700">Withdrawal Process</h6>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-gray-600 text-sm">
+                                Your request will go through an <span class="font-bold text-blue-600">administrative review</span>, including security verification. This is to ensure that even if your account is compromised, unauthorized withdrawals cannot be made. 
+                                If approved, funds will be deducted from your savings balance. And a <span class="text-red-600 font-bold">{{charge.charge_percentage}}% administrative charge</span> will be applied.
+                            </p>
+                            <h6 class="mb-0 text-sm font-semibold text-gray-700">Payment will be made to the following account:</h6>
+
+                            <p class="text-gray-600 text-sm mt-2">
+                                <strong>Account Name:</strong> {{ request.user.get_member_bank_details.account_holder_name }}
+                                |
+                                <strong>Bank Name:</strong> {{ request.user.get_member_bank_details.bank_name }}|
+                                <strong>Account Number:</strong> {{ request.user.get_member_bank_details.account_number }}
+                            </p>
+                            
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+            {% else %}
+                <div class="w-full max-w-full px-3 mt-6 md:w-7/12 md:flex-none">
+                    <div class="relative flex flex-col min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
+                        <div class="p-6 px-4 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
+                            <h6 class="mb-0 text-lg font-semibold text-gray-700">Bank Details Required</h6>
+                        </div>
+                        <div class="p-6">
+                            <p class="text-gray-600 text-sm">
+                                You need to set your bank details before you can request a withdrawal.
+                            </p>
+                            <div class="text-center mt-4">
+                                <a href="{% url 'withdrawal:add_account' %}" class="inline-block px-6 py-3 font-bold text-white uppercase transition-all bg-blue-500 rounded-lg hover:scale-105 hover:shadow-lg active:opacity-85">
+                                    Add Bank Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
         {% endif %}
         <!-- cards row 3 -->
         <div class="flex flex-wrap my-6 -mx-3">
@@ -261,7 +283,7 @@ Withdrawal management | Benovelance Cooperative
                                             <strong>Payment Ref:</strong> {{ record.payment_reference }}<br>
                                             <strong>Payment Date:</strong> {{ record.payment_date }}<br>
                                             
-                                            <strong>Total Withdrawn:</strong> ₦{{ record.total_amount_withdrawn|default:"0.00" }}
+                                            <strong>Total Withdrawal:</strong> ₦{{ record.total_amount_withdrawn|default:"0.00" }}
                                             {% else %}
                                             N/A
                                             {% endif %}

@@ -3,7 +3,7 @@
 {% load humanize %}
 {% load custom_filters %}
 {% block title %}
-Employee Details | Benovelance Cooperative
+Contributor Profile | Benevolance Cooperative
 {% endblock title %}
 {% block content %}
 <!-- sidenav  -->
@@ -11,7 +11,7 @@ Employee Details | Benovelance Cooperative
 <!-- end sidenav -->
 <main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200">
     <!-- Navbar -->
-    {% include 'include/dashboard_navbar.html' %}
+    {% include 'include/dashboard_navbar.html' with breadcrumb='Profile' page_title='Contributor Profile' %}
     <!-- end Navbar -->
     <!-- cards -->
     <div class="w-full mx-auto ">
@@ -38,7 +38,7 @@ Employee Details | Benovelance Cooperative
                             <!-- Buttons Inside UL -->
                             <li class="z-30 flex-auto text-center">
                                 <!-- Back Button -->
-                    <a href="javascript:history.back()" class="inline-block px-4 py-2 mb-0 font-bold text-center uppercase align-middle transition-all bg-gray-200 border border-solid rounded-lg shadow-none cursor-pointer leading-pro ease-soft-in text-xs hover:scale-102 active:shadow-soft-xs tracking-tight-soft border-gray-500 text-gray-700 hover:border-gray-600 hover:bg-gray-300 hover:text-gray-900">
+                    <a href="javascript:history.back()" class="inline-block px-4 py-2 mb-0 font-bold text-center text-white-p uppercase align-middle transition-all bg-gray-600 border border-solid rounded-lg shadow-none cursor-pointer leading-pro ease-soft-in text-sm hover:scale-102 active:shadow-soft-xs tracking-tight-soft border-gray-500 text-gray-700 hover:border-gray-600 hover:bg-gray-300 hover:text-gray-900">
                         ← Back
                     </a>
                             </li>
@@ -51,75 +51,122 @@ Employee Details | Benovelance Cooperative
     </div>
     <div class="w-full p-6 mx-auto">
         <div class="flex flex-wrap -mx-3">
-            <div class="w-full max-w-full px-3 xl:w-4/12">
+            <div class="w-full max-w-full px-3 mt-0 mb-6 md:mb-0 md:w-6/12 lg:flex-none">
                 <div class="relative flex flex-col h-full min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
                     <div class="p-4 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
                         <div class="flex flex-wrap -mx-3">
                             <div class="flex items-center w-full max-w-full px-3 shrink-0 md:w-8/12 md:flex-none">
                                 <h6 class="mb-0">Profile Information</h6>
                             </div>
-                                                    </div>
+                        </div>
                     </div>
                     <div class="flex-auto p-4">
-                        <h6 class="font-bold leading-tight uppercase text-xs text-slate-500 mt-4 mb-2">Personal Details</h6>
-                        <ul class="flex flex-col pl-0 mb-0 rounded-lg">
-                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-t-lg text-sm"><strong class="text-gray-800">Full Name:</strong> &nbsp; {{ employee.get_full_name }}</li>
-                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-gray-800">Mobile:</strong> &nbsp; {{ employee.phone_number }}</li>
-                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-gray-800">Email:</strong> &nbsp; {{ employee.email }}</li>
-                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-gray-800">Staff ID:</strong> &nbsp; {{ employee.nitda_id }}</li>
-                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-gray-800">Gender:</strong> &nbsp; {{ employee.get_gender_display }}</li>
-                        </ul>
-                        <h6 class="font-bold leading-tight uppercase text-xs text-slate-500 mt-4 mb-2">Next of Kin Details</h6>
-                        <ul class="flex flex-col pl-0 mb-0 rounded-lg">
-                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-t-lg text-sm"><strong class="text-gray-800">Full Name:</strong> &nbsp; {{ employee.next_of_kin_name }}</li>
-                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-gray-800">Mobile:</strong> &nbsp; {{ employee.next_of_kin_phone }}</li>
-                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-gray-800">Relationship:</strong> &nbsp; {{ employee.next_of_kin_relationship }}</li>
-                        </ul>
+                        <fieldset class="border border-gray-300 rounded-lg p-4 mb-6">
+                            <legend class="text-slate-500 font-bold">Personal Details</legend>
+                            <table class="min-w-full bg-white rounded-lg">
+                                <tbody>
+                                    <tr>
+                                        <td class=" py-2 border-b border-gray-200 text-sm"><strong class="text-gray-800">Full Name:</strong></td>
+                                        <td class=" py-2 border-b border-gray-200 text-sm">{{ employee.get_full_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class=" py-2 border-b border-gray-200 text-sm"><strong class="text-gray-800">Mobile:</strong></td>
+                                        <td class=" py-2 border-b border-gray-200 text-sm">{{ employee.phone_number }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class=" py-2 border-b border-gray-200 text-sm"><strong class="text-gray-800">Email:</strong></td>
+                                        <td class=" py-2 border-b border-gray-200 text-sm">{{ employee.email }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class=" py-2 border-b border-gray-200 text-sm"><strong class="text-gray-800">Staff ID:</strong></td>
+                                        <td class=" py-2 border-b border-gray-200 text-sm" style="word-break: break-all;">{{ employee.nitda_id }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class=" py-2 border-b border-gray-200 text-sm"><strong class="text-gray-800">Gender:</strong></td>
+                                        <td class=" py-2 border-b border-gray-200 text-sm">{{ employee.get_gender_display }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </fieldset>
+                        <fieldset class="border border-gray-300 rounded-lg p-4 mt-6">
+                            <legend class="text-slate-500 font-bold">Next of Kin Details</legend>
+                            <table class="min-w-full bg-white rounded-lg">
+                                <tbody>
+                                    <tr>
+                                        <td class="border-b border-gray-200 text-sm"><strong class="text-gray-800">Full Name:</strong></td>
+                                        <td class="py-2 border-b border-gray-200 text-sm">{{ employee.next_of_kin_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 border-b border-gray-200 text-sm"><strong class="text-gray-800">Mobile:</strong></td>
+                                        <td class="py-2 border-b border-gray-200 text-sm">{{ employee.next_of_kin_phone }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 border-b border-gray-200 text-sm"><strong class="text-gray-800">Relationship:</strong></td>
+                                        <td class="py-2 border-b border-gray-200 text-sm">{{ employee.next_of_kin_relationship }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </fieldset>
                     </div>
                 </div>
             </div>
-            <div class="w-full max-w-full px-3 lg-max:mt-6 xl:w-4/12">
+            <div class="w-full max-w-full px-3 mt-0 mb-6 md:mb-0 md:w-6/12 lg:flex-none">
                 <div class="relative flex flex-col h-full min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
                     <div class="p-4 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
                         <h6 class="mb-0">Financial Informations</h6>
                     </div>
                     <div class="flex-auto p-4">
-                        <h6 class="font-bold leading-tight uppercase text-xs text-slate-500">Accounts</h6>
-                        <ul class="flex flex-col pl-0 mb-0 rounded-lg">
-                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-t-lg text-sm"><strong class="text-gray-800">Total Balance:</strong> &nbsp; ₦{{ total_remained_balance|floatformat:2|intcomma }}</li>
-                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 text-sm">
-                                <strong class="text-gray-800">Savings (60%):</strong> &nbsp; ₦{{ savings_balance|floatformat:2|intcomma }}
-                            </li>
-                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-b-lg text-sm">
-                                <strong class="text-gray-800">Investment (40%):</strong> &nbsp; ₦{{ investment_balance|floatformat:2|intcomma }} {# New Line #}
-                            </li>
-                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-b-lg text-sm">
-                                <strong class="text-gray-800">Monthly Contribution:</strong> &nbsp; ₦{{ employee.contribution_setting.amount|floatformat:2|intcomma }} {# New Line #}
-                            </li>
-                        </ul>
-                        <h6 class="mt-6 font-bold leading-tight uppercase text-xs text-slate-500">Financial Summary</h6>
-                        <ul class="flex flex-col pl-0 mb-0 rounded-lg">
-                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-b-lg text-sm">
-                                <strong class="text-gray-800">Total Withdrawed:</strong> &nbsp; ₦{{ total_withdrawn|floatformat:2|intcomma }} {# New Line #}
-                            </li>
-                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-b-lg text-sm">
-                                <strong class="text-gray-800">Austanding Credit:</strong> &nbsp; ₦{{ total_withdrawn|floatformat:2|intcomma }}                            </li>
-                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-b-lg text-sm">
-                                <strong class="text-gray-800">Total Money Contributed:</strong> &nbsp; ₦{{ total_contributions|floatformat:2|intcomma }} {# New Line #}
-                            </li>
-                        </ul>
+                        <fieldset class="border border-gray-300 rounded-lg p-4 mb-6">
+                            <legend class="text-slate-500 font-bold">Accounts</legend>
+                            <table class="min-w-full bg-white rounded-lg">
+                                <tbody>
+                                    <tr>
+                                        <td class="py-2 border-b border-gray-200 text-sm"><strong class="text-gray-800">Total Balance:</strong></td>
+                                        <td class="py-2 border-b border-gray-200 text-sm">NGN{{ total_remained_balance|floatformat:2|intcomma }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 border-b border-gray-200 text-sm"><strong class="text-gray-800">Savings (60%):</strong></td>
+                                        <td class="py-2 border-b border-gray-200 text-sm">NGN{{ savings_balance|floatformat:2|intcomma }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 border-b border-gray-200 text-sm"><strong class="text-gray-800">Investment (40%):</strong></td>
+                                        <td class="py-2 border-b border-gray-200 text-sm">NGN{{ investment_balance|floatformat:2|intcomma }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 border-b border-gray-200 text-sm"><strong class="text-gray-800">Monthly Contribution:</strong></td>
+                                        <td class="py-2 border-b border-gray-200 text-sm">NGN{{ employee.contribution_setting.amount|floatformat:2|intcomma }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 border-b border-gray-200 text-sm"><strong class="text-gray-800">Total Money Contributed:</strong></td>
+                                        <td class="py-2 border-b border-gray-200 text-sm">NGN{{ total_contributions|floatformat:2|intcomma }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </fieldset>
+                        <fieldset class="border border-gray-300 rounded-lg p-4 mt-6">
+                            <legend class="text-slate-500 font-bold">Financial Summary</legend>
+                            <table class="min-w-full bg-white rounded-lg">
+                                <tbody>
+                                    <tr>
+                                        <td class="py-2 border-b border-gray-200 text-sm"><strong class="text-gray-800">Total Withdrawal:</strong></td>
+                                        <td class="py-2 border-b border-gray-200 text-sm">NGN{{ total_withdrawn|floatformat:2|intcomma }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 border-b border-gray-200 text-sm"><strong class="text-gray-800">Credit Collected:</strong></td>
+                                        <td class="py-2 border-b border-gray-200 text-sm">NGN{{ took_credits|floatformat:2|intcomma }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 border-b border-gray-200 text-sm"><strong class="text-gray-800">Credit Repaid:</strong></td>
+                                        <td class="py-2 border-b border-gray-200 text-sm">NGN{{ repaid_credits|floatformat:2|intcomma }}</td>
+                                    </tr>
+                                    
+                                </tbody>
+                            </table>
+                        </fieldset>
                     </div>
                 </div>
             </div>
-            <div class="w-full max-w-full px-3 lg-max:mt-6 xl:w-4/12">
-                <div class="relative flex flex-col h-full min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
-                    <div class="p-4 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
-                        <h6 class="mb-0">Conversations</h6>
-                    </div>
-                    <div class="flex-auto p-4">
-                    </div>
-                </div>
-            </div>
+
         </div>
     </div>
     {% include 'include/dashboard_footer.html' %}

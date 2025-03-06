@@ -2,7 +2,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% load humanize %}
-{% block title %}Employee Contribution Settings History | Benevolence Cooperative{% endblock title %}
+{% block title %}Contributor Contribution Settings History | Benevolence Cooperative{% endblock title %}
 
 {% block header %}
 <!-- DataTables CSS -->
@@ -15,11 +15,11 @@
 
 <main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200 text-gray-900">
     <!-- Navbar -->
-    {% include 'include/dashboard_navbar.html' %}
+    {% include 'include/dashboard_navbar.html' with breadcrumb='Contributor' page_title='Contribution Settings' %}
     
     <div class="w-full py-6 px-6 mx-auto">
         <div class="bg-white p-6 rounded-lg shadow-md">
-            <h2 class="text-xl font-bold text-gray-900 mb-4">Employee Contribution Setting History</h2>
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Contributor Contribution Setting History</h2>
             
             <div class="">
                 {% if records %}
@@ -28,7 +28,7 @@
                     <thead class="bg-gray-100">
                         <tr class="text-left">
                             <th class="border">S/N</th>
-                            <th class="border">Employee</th>
+                            <th class="border">Contributor</th>
                             <th class="border">Contribution Amount</th>
                             <th class="border">Start Date</th>
                             <th class="border">End Date</th>

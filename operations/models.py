@@ -1,14 +1,16 @@
-from django.db import models
 from accounts.models import CustomUser
 from django.db import models
 from django.utils.timezone import now
 from django.core.mail import send_mail
-from django.db.models import Q
-
+from django.db.models import Q, Sum
+import uuid
+from decimal import Decimal
 class ContributionSetting(models.Model):
     """ Stores employee's preferred contribution amount and its history. """
+    id = models.CharField(primary_key=True, max_length=7, unique=True)
+
     employee = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="contribution_setting")
-    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -17,7 +19,13 @@ class ContributionSetting(models.Model):
     def save(self, *args, **kwargs):
         is_new = self._state.adding  # Store if it's a new object
 
-        super().save(*args, **kwargs)  # Save the ContributionSetting FIRST
+        if not self.id:
+            while True:
+                new_id = uuid.uuid4().hex[:7]
+                if not ContributionSetting.objects.filter(id=new_id).exists():
+                    self.id = new_id
+                    break
+        super().save(*args, **kwargs)
 
         if is_new:  # Now it's safe to create the history entry
             ContributionSettingHistory.objects.create(
@@ -39,11 +47,22 @@ class ContributionSetting(models.Model):
 
 class ContributionSettingHistory(models.Model):
     """ Stores the history of contribution setting changes. """
+    id = models.CharField(primary_key=True, max_length=7, unique=True)
+
     contribution_setting = models.ForeignKey(ContributionSetting, on_delete=models.CASCADE, related_name='history')
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     changed_at = models.DateTimeField(auto_now_add=True)
     changed_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, related_name='contribution_setting_changes')  # Who made the change
     change_reason = models.CharField(max_length=255, blank=True, null=True) # A brief reason explaining the change
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            while True:
+                new_id = uuid.uuid4().hex[:7]
+                if not ContributionSettingHistory.objects.filter(id=new_id).exists():
+                    self.id = new_id
+                    break
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.contribution_setting.employee.nitda_id} - Amount: {self.amount} - Changed at: {self.changed_at}"  
@@ -55,6 +74,7 @@ class ContributionChangeRequest(models.Model):
         ('approved', 'Approved'),
         ('rejected', 'Rejected'),
     ]
+    id = models.CharField(primary_key=True, max_length=7, unique=True)
 
     employee = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="contribution_requests")
     requested_amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -62,6 +82,15 @@ class ContributionChangeRequest(models.Model):
     requested_at = models.DateTimeField(auto_now_add=True)
     reviewed_at = models.DateTimeField(null=True, blank=True)
     reviewed_by = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name="reviewed_contribution_requests")
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            while True:
+                new_id = uuid.uuid4().hex[:7]
+                if not ContributionChangeRequest.objects.filter(id=new_id).exists():
+                    self.id = new_id
+                    break
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.employee.nitda_id} - Requested: {self.requested_amount} - Status: {self.status}"
@@ -73,17 +102,27 @@ class ContributionRecord(models.Model):
         ('pending', 'Pending'),
         ('paid', 'Paid'),
     ]
+    id = models.CharField(primary_key=True, max_length=7, unique=True)
 
     employee = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="contribution_records")
     amount = models.DecimalField(max_digits=10, decimal_places=2)  # Deducted amount
     month = models.IntegerField()
     year = models.IntegerField()
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='paid')
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ('employee', 'month', 'year')
         ordering = ['-year', '-month']
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            while True:
+                new_id = uuid.uuid4().hex[:7]
+                if not ContributionRecord.objects.filter(id=new_id).exists():
+                    self.id = new_id
+                    break
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.employee.nitda_id} - {self.month}/{self.year}: {self.status}"
@@ -121,7 +160,7 @@ class ContributionRecord(models.Model):
         records_created = 0
 
         for employee in employees:
-            contribution_amount = employee.contribution_setting.amount
+            contribution_amount = employee.contribution_setting.amount # type: ignore
 
             # Prevent duplicate entries for the month
             if not cls.objects.filter(employee=employee, month=current_month, year=current_year).exists():
@@ -146,3 +185,59 @@ class ContributionRecord(models.Model):
                 records_created += 1
 
         return records_created  # Return number of created records
+
+
+
+class TargetSavings(models.Model):
+    STATUS_CHOICES = [
+        ('active', 'Active'),
+        ('W-R', 'Withdrawal Request'),
+        ('completed', 'Completed'),
+    ]
+    id = models.CharField(primary_key=True, max_length=7, unique=True)
+    member = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='target_savings')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active')
+    created_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    wthdrawed_at = models.DateTimeField(null=True, blank=True)
+
+    def total_savings(self):
+        return sum(transaction.amount for transaction in self.transactions.exclude(transaction_type="withdrawal").all()) # type: ignore
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            while True:
+                new_id = uuid.uuid4().hex[:7]
+                if not TargetSavings.objects.filter(id=new_id).exists():
+                    self.id = new_id
+                    break
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.member.get_full_name} ({self.status})"
+
+class TargetSavingsTransaction(models.Model):
+    TRANSACTION_TYPE_CHOICES = [
+        ('deposit', 'Deposit'),
+        ('withdrawal', 'Withdrawal'),
+    ]
+    id = models.CharField(primary_key=True, max_length=7, unique=True)
+    target_savings = models.ForeignKey(TargetSavings, on_delete=models.CASCADE, related_name='transactions')
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPE_CHOICES)
+    receipt = models.FileField(upload_to='target_contribution_ransaction/receipts/', blank=True, null=True)
+    transaction_date = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            while True:
+                new_id = uuid.uuid4().hex[:7]
+                if not TargetSavingsTransaction.objects.filter(id=new_id).exists():
+                    self.id = new_id
+                    break
+        super().save(*args, **kwargs)
+
+
+
+    def __str__(self):
+        return f"{self.transaction_type.capitalize()} of ₦{self.amount} on {self.transaction_date}"

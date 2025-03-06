@@ -4,14 +4,13 @@ from django.contrib.auth import views as auth_views
 
 from .views import (register, activate_email, logout_view, change_password, my_login_view, 
     employee_list, create_employee, update_employee, delete_employee, 
-    employee_detail, toggle_employee_active,employee_specific_detail )
+    employee_detail, toggle_employee_active,employee_specific_detail, view_mcr )
 
 urlpatterns = [
     path("register/", register, name="register"),
     path("activate/<uidb64>/<token>/", activate_email, name="activate_email"),
     path("login/", my_login_view, name="login"),
     path("logout/", logout_view, name="logout"),
-
 
     path("password_reset/", auth_views.PasswordResetView.as_view(template_name="accounts/password_reset.html"), name="password_reset"),
     path("password_reset/done/", auth_views.PasswordResetDoneView.as_view(template_name="accounts/password_reset_done.html"), name="password_reset_done"),
@@ -21,12 +20,12 @@ urlpatterns = [
 
     path('', employee_list, name='employee_list'),
     path('create/', create_employee, name='create_employee'),
-    path('update/<int:employee_id>/', update_employee, name='update_employee'),
-    path('delete/<int:employee_id>/', delete_employee, name='delete_employee'),
-    path('details/<int:employee_id>/', employee_detail, name='employee_detail'),
-    path('my-details/<int:employee_id>/', employee_specific_detail, name='employee_specific_detail'),
+    path('update/<str:employee_id>/', update_employee, name='update_employee'),
+    path('delete/<str:employee_id>/', delete_employee, name='delete_employee'),
+    path('details/<str:employee_id>/', employee_detail, name='employee_detail'),
+    path('my-details/<str:employee_id>/', employee_specific_detail, name='employee_specific_detail'),
 
-    path('toggle_active/<int:employee_id>/', toggle_employee_active, name='toggle_employee_active'),
+    path('toggle_active/<str:employee_id>/', toggle_employee_active, name='toggle_employee_active'),
 
-
+    path('member/<int:nitda_id>/mcr/', view_mcr, name='view_mcr'),
 ]

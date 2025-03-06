@@ -1,0 +1,387 @@
+{% load static %}
+{% load humanize %}
+{% load custom_filters %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BCS Member Comprehensive Report</title>
+    <style>
+        /* Base styles for all media */
+        body {
+            font-family: sans-serif;
+            margin: 1in;
+        }
+        h1, h2, h6 {
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    
+        /* Header styles */
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        .header img {
+            max-height: 100px; /* Adjust as needed */
+        }
+        .header h1 {
+            {% comment %} margin: 10px 0; {% endcomment %}
+            font-size: 24px;
+        }
+        .header p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+    
+        /* Document Info styles */
+        .document-info {
+            margin: 20px 0;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .document-info h6 {
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+        .document-info p {
+            margin: 3px 0;
+            font-size: 14px;
+        }
+    
+        /* Print-specific styles */
+        @media print {
+
+            .header {
+                border-bottom: 1px solid #ddd; /* Darker border for print */
+            }
+            /* Any other print-specific adjustments */
+            body {
+                font-size: 12pt; /* Increase font size for print */
+                margin: .51in; /* Apply proper margins for print */
+            }
+            td, th {
+                font-size: 11px !important;
+            }
+        }
+        .member-details {
+            margin: 20px 0;
+            {% comment %} border-bottom: 1px solid #ddd; {% endcomment %}
+            padding-bottom: 10px;
+        }
+        .member-details h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .member-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr; /* Adjust ratios as needed */
+            gap: 10px;
+        }
+        .member-photo {
+            text-align: left;
+        }
+        .member-info p, .next-of-kin p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        .member-info strong, .next-of-kin strong {
+            font-weight: bold;
+        }
+        .next-of-kin h4 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        .financial-summary {
+            margin: 20px 0;
+            {% comment %} border-bottom: 1px solid #ddd; {% endcomment %}
+            padding-bottom: 10px;
+        }
+        .financial-summary h4 {
+            font-size: 14;
+            margin-bottom: 10px;
+        }
+        .financial-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .financial-table td {
+            padding: 8px;
+            text-align: left;
+            {% comment %} width: 25%; /* Divide the table into four columns */ {% endcomment %}
+        }
+        .financial-table strong {
+            font-weight: bold;
+        }
+        .total-balance {
+            text-align: center;
+            font-size: 16px;
+            padding-top: 10px;
+        }
+
+        .contribution-record {
+            margin: 20px 0;
+            {% comment %} border-bottom: 1px solid #ddd; {% endcomment %}
+            padding-bottom: 10px;
+        }
+        .contribution-record h4 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .contribution-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .contribution-table th, .contribution-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .contribution-table th {
+            background-color: #f2f2f2;
+        }
+
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+        .footer hr {
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+        }
+        .disclaimer {
+            font-style: italic;
+            margin-bottom: 5px;
+        }
+        .contact-info, .report-details {
+            margin-bottom: 3px;
+        }
+    
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="{% static 'assets/img/favicon.png' %}" alt="BENEVOLENCE COOPERATIVE SOCIETY LIMITED Logo">
+        <h1>BENEVOLENCE COOPERATIVE SOCIETY LIMITED</h1>
+        <p>Plot 28 Portharcourt Crescent, Off Gimbiya Street, Area 11. Garki Abuja.</p>
+        <p>Tel: 08030727475, 07061610419 | Email: info@bcs.or.ng</p>
+        <p>Website: www.bcs.or.ng</p>
+    </div>
+    <div class="document-info">
+        <p><strong>Document Type:</strong> BCS-MCR</p>
+        <p><strong>Compiled Date:</strong> {{ compiled_date }}</p>
+    </div>
+
+    <div class="member-details">
+        <h3>Member Personal Details</h3>
+    
+        <div class="member-info-grid">
+            <div class="member-photo">
+                {% if member.passport_photo %}
+                    <img src="{{ member.passport_photo.url }}" alt="Member Logo" style="max-width: 150px; max-height: 150px;">
+                {% endif %}
+            </div>
+    
+            <div class="member-info">
+                <p><strong>Name:</strong> {{ member.first_name }} {{ member.other_name }} {{ member.last_name }}</p>
+                <p><strong>Email:</strong> {{ member.email }}</p>
+                <p><strong>Phone Number:</strong> {{ member.phone_number }}</p>
+                <p><strong>NITDA ID:</strong> {{ member.nitda_id }}</p>
+                <p><strong>Gender:</strong> {% if member.gender == 'M' %}Male{% elif member.gender == 'F' %}Female{% endif %}</p>
+                <p><strong>Position:</strong> {{ member.position }}</p>
+            </div>
+    
+            <div class="next-of-kin">
+                <h4>Next of Kin Details</h4>
+                <p><strong>Name:</strong> {{ member.next_of_kin_name }}</p>
+                <p><strong>Phone Number:</strong> {{ member.next_of_kin_phone }}</p>
+                <p><strong>Relationship:</strong> {{ member.next_of_kin_relationship }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="financial-summary">
+        <h3>Bank Details</h3>
+        <table class="financial-table">
+            <tr>
+                <td><strong>Bank Name:</strong></td>
+                <td>{{ member.account_details.bank_name }}</td>
+            </tr>
+            <tr>
+                <td><strong>Account Name:</strong></td>
+                <td>{{  member.account_details.account_holder_name }}</td>
+            </tr>
+            <tr>
+                <td><strong>Account Name:</strong></td>
+                <td>{{  member.account_details.account_number }}</td>
+            </tr>
+        </table>
+    </div>
+    
+
+    <div class="financial-summary">
+        <h3>Financial Summary</h3>
+        <table class="financial-table">
+            <tr>
+                <td><strong>Total Contribution:</strong></td>
+                <td>NGN{{ financial_summary.total_contributions|intcomma }}</td>
+                <td><strong>Amount Withdrawal:</strong></td>
+                <td>NGN{{ financial_summary.total_withdrawn|intcomma }}</td>
+            </tr>
+            <tr>
+                <td><strong>Savings Balance (60%):</strong></td>
+                <td>NGN{{ financial_summary.savings_balance|intcomma }}</td>
+                <td><strong>Investment Balance (40%):</strong></td>
+                <td>NGN{{ financial_summary.investment_balance|intcomma }}</td>
+            </tr>
+            <tr>
+                <td><strong>Total Credit Collected:</strong></td>
+                <td>NGN{{ financial_summary.took_credits|intcomma }}</td>
+                <td><strong>Total Credit Repaid:</strong></td>
+                <td>NGN{{ financial_summary.repaid_credits|intcomma }}</td>
+            </tr>
+            <tr>
+                <td colspan="4" class="total-balance"><strong>Total Available Balance:</strong> NGN{{ financial_summary.total_remained_balance|intcomma }}</td>
+            </tr>
+        </table>
+    </div>
+
+ 
+    <div class="contribution-record">
+        <h3>Contribution Record</h3>
+        <table class="contribution-table">
+            <thead>
+                <tr>
+                    <th>S/N</th>
+                    <th>Month</th>
+                    <th>Year</th>
+                    <th>Amount (NGN)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contribution in contributions %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ contribution.month|month_name }}</td>
+                        <td>{{ contribution.year }}</td>
+                        <td>NGN{{ contribution.amount|intcomma }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4">No contribution records found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="withdrawals-record">
+        <h4>Withdrawals Record</h4>
+        <table class="withdrawals-table">
+            <thead>
+                <tr>
+                    <th>S/N</th>
+                    <th>Request Date</th>
+                    <th>Amount Requested (NGN)</th>
+                    <th>Status</th>
+                    <th>Action Date</th>
+                    <th>Payment Date</th>
+                    <th>Charges Applied (NGN)</th>
+                    <th>Total Amount Withdrawal (NGN)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for withdrawal in withdrawals %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ withdrawal.request_date|date:"d M Y" }}</td>
+                        <td>₦{{ withdrawal.amount_requested|intcomma }}</td>
+                        <td>{{ withdrawal.get_status_display }}</td>
+                        <td>{{ withdrawal.action_date|date:"d M Y"|default:"-" }}</td>
+                        <td>{{ withdrawal.payment_date|date:"d M Y"|default:"-" }}</td>
+                        <td>₦{{ withdrawal.charges_applied|intcomma }}</td>
+                        <td>₦{{ withdrawal.total_amount_withdrawn|intcomma }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="8">No withdrawal records found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+
+    <div class="credit-history">
+        <h3>Credit History</h3>
+        <table class="credit-table">
+            <thead>
+                <tr>
+                    <th>S/N</th>
+                    <th>Credit Type</th>
+                    <th>Amount (NGN)</th>
+                    <th>Repayment Period</th>
+                    <th>Date Applied</th>
+                    <th>Status</th>
+                    <th>Amount Repaid (NGN)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for credit in credits %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ credit.credit_type }}</td>
+                        {% if credit.credit_type == "Murabaha" and credit.murabaha %}
+                            <td>NGN{{ credit.murabaha.asset_price|intcomma|default:"-" }}</td>
+                        {% else %}
+                            <td>NGN{{ credit.amount_requested|intcomma|default:"-" }}</td>
+                        {% endif %}
+                        <td>{{ credit.repayment_period }} Months</td>
+                        <td>{{ credit.date_applied|date:"d M Y" }}</td>
+                        <td>{{ credit.get_status_display }}</td>
+
+                        <td>NGN{{ credit.total_repaid|intcomma|default:"-" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="9">No credit history found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div class="footer">
+        <hr>
+        <p class="disclaimer">
+            This document contains confidential information intended solely for the use of the named recipient.
+            Distribution, copying, or disclosure without express permission is prohibited.
+        </p>
+        <p class="contact-info">
+            For inquiries or support, please contact: 08030727475, 07061610419 | Email: info@bcs.or.ng
+            <br>
+            BENEVOLENCE COOPERATIVE SOCIETY LIMITED, Plot 28 Portharcourt Crescent, Off Gimbiya Street, Area 11. Garki Abuja.
+            <br>
+            Visit our website: www.bcs.or.ng
+        </p>
+    </div>
+    
+
+
+</body>
+</html>

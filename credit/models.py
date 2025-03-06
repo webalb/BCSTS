@@ -135,6 +135,7 @@ class CreditSettings(models.Model):
 
 
 class Credit(models.Model):
+
     CREDIT_TYPE_CHOICES = [
         ('Qard Hasan', 'Qard Hasan (Cash Credit)'),
         ('Murabaha', 'Murabaha (Asset-Based Financing)'),
@@ -148,6 +149,7 @@ class Credit(models.Model):
         ('Accepted', 'Accepted'), ('Disbursed', 'Disbursed'),
         ('Repaid', 'Repaid')
     ]
+    id = models.CharField(primary_key=True, max_length=7, unique=True)
 
     applicant = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="credits")
     credit_type = models.CharField(max_length=50, choices=CREDIT_TYPE_CHOICES)
@@ -220,6 +222,12 @@ class Credit(models.Model):
 
     def save(self, *args, **kwargs):
         """Ensure credit meets policy settings before saving."""
+        if not self.id:
+            while True:
+                new_id = uuid.uuid4().hex[:7]
+                if not Credit.objects.filter(id=new_id).exists():
+                    self.id = new_id
+                    break
         
         if self.pk and self.credit_type == 'Murabaha':
             self.amount_requested = self.murabaha.selling_price # type: ignore
@@ -256,11 +264,22 @@ class Credit(models.Model):
         return f"{self.credit_type} - {self.applicant.email} ({self.tracking_id})"
 
 class Guarantor(models.Model):
+    id = models.CharField(primary_key=True, max_length=7, unique=True)
+
     guarantor = models.ForeignKey(CustomUser, related_name='guarantors', on_delete=models.CASCADE)
     credit = models.ForeignKey(Credit, on_delete=models.CASCADE, related_name='guarantors')
     status_choices = [('Pending', 'Pending'), ('Approved', 'Approved'), ('Declined', 'Declined')]
     status = models.CharField(max_length=10, choices=status_choices, default='Pending')
     action_date = models.DateTimeField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            while True:
+                new_id = uuid.uuid4().hex[:7]
+                if not Guarantor.objects.filter(id=new_id).exists():
+                    self.id = new_id
+                    break
+        super().save(*args, **kwargs)
 
 
 def validate_file_extension(value):
@@ -269,6 +288,9 @@ def validate_file_extension(value):
         raise ValidationError(f"Unsupported file extension. Allowed extension is: {', '.join(valid_extensions)}")
 
 class Murabaha(models.Model):
+
+    id = models.CharField(primary_key=True, max_length=7, unique=True)
+
     credit = models.OneToOneField("Credit", on_delete=models.CASCADE, related_name="murabaha")
     asset_name = models.CharField(max_length=255)
     asset_price = models.DecimalField(max_digits=12, decimal_places=2, validators=[validate_positive])
@@ -297,6 +319,13 @@ class Murabaha(models.Model):
 
     def save(self, *args, **kwargs):
         # Auto-calculate selling price before saving
+
+        if not self.id:
+            while True:
+                new_id = uuid.uuid4().hex[:7]
+                if not Murabaha.objects.filter(id=new_id).exists():
+                    self.id = new_id
+                    break
         self.selling_price = self.calculate_selling_price()
         
         if self.selling_price:
@@ -312,19 +341,40 @@ class Murabaha(models.Model):
         super().save(*args, **kwargs)
 
 class Musharaka(models.Model):
+    id = models.CharField(primary_key=True, max_length=7, unique=True)
     credit = models.OneToOneField(Credit, on_delete=models.CASCADE, related_name='musharaka')
     partner_contribution = models.DecimalField(max_digits=12, decimal_places=2, validators=[validate_positive])
     profit_sharing_ratio = models.DecimalField(max_digits=5, decimal_places=2, validators=[validate_positive])
     created_at = models.DateField(auto_now=True)
 
+    def save(self, *args, **kwargs):
+        if not self.id:
+            while True:
+                new_id = uuid.uuid4().hex[:7]
+                if not Musharaka.objects.filter(id=new_id).exists():
+                    self.id = new_id
+                    break
+        super().save(*args, **kwargs)
+
 class Ijarah(models.Model):
+    id = models.CharField(primary_key=True, max_length=7, unique=True)
     credit = models.OneToOneField(Credit, on_delete=models.CASCADE, related_name='ijarah')
     asset_name = models.CharField(max_length=255)
     lease_period = models.IntegerField()  # in months
     rental_amount = models.DecimalField(max_digits=12, decimal_places=2, validators=[validate_positive])
     created_at = models.DateField(auto_now=True)
 
+    def save(self, *args, **kwargs):
+        if not self.id:
+            while True:
+                new_id = uuid.uuid4().hex[:7]
+                if not Ijarah.objects.filter(id=new_id).exists():
+                    self.id = new_id
+                    break
+        super().save(*args, **kwargs)
+
 class Repayment(models.Model):
+    id = models.CharField(primary_key=True, max_length=7, unique=True)
     credit = models.ForeignKey(Credit, on_delete=models.CASCADE)
     repayment_date = models.DateTimeField(auto_now_add=True)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
@@ -337,7 +387,12 @@ class Repayment(models.Model):
         # Aggregate the amount of existing repayments using SQL
         total_repaid = self.credit.total_repaid
         
-        
+        if not self.id:
+            while True:
+                new_id = uuid.uuid4().hex[:7]
+                if not Repayment.objects.filter(id=new_id).exists():
+                    self.id = new_id
+                    break
         # Add the current amount to the total repaid
         total_repaid += self.amount
         
@@ -362,6 +417,7 @@ class TransactionLog(models.Model):
         ('R', 'Repayment'),
         ('C', 'Credit Disbursement'),
     ]
+    id = models.CharField(primary_key=True, max_length=7, unique=True)
     transaction_type = models.CharField(max_length=2, choices=TRANSACTION_TYPE_CHOICES)
     transaction_date = models.DateTimeField(auto_now_add=True)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
@@ -369,6 +425,13 @@ class TransactionLog(models.Model):
     credit = models.ForeignKey(Credit, on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
+        if not self.id:
+            while True:
+                new_id = uuid.uuid4().hex[:7]
+                if not TransactionLog.objects.filter(id=new_id).exists():
+                    self.id = new_id
+                    break
+        
         if self.transaction_type == 'R':
             credit = self.credit
             if credit.repayment_start_month and credit.repayment_period:
@@ -401,6 +464,8 @@ class TransactionLog(models.Model):
 
 
 class CreditCommittee(models.Model):
+
+    id = models.CharField(primary_key=True, max_length=7, unique=True)
     member = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='credit_committee_member')
     role = models.CharField(max_length=50, choices=[('Reviewer', 'Reviewer'), ('Approver', 'Approver')])
     date_added = models.DateTimeField(auto_now_add=True)
@@ -411,6 +476,12 @@ class CreditCommittee(models.Model):
     def save(self, *args, **kwargs):
         member_email = kwargs.pop('member', None)  # Get email from kwargs, remove it
         is_new = self._state.adding
+        if not self.id:
+            while True:
+                new_id = uuid.uuid4().hex[:7]
+                if not CreditCommittee.objects.filter(id=new_id).exists():
+                    self.id = new_id
+                    break
 
         if member_email:
             try:
@@ -425,9 +496,18 @@ class CreditCommittee(models.Model):
 
 
 class CommitteeAction(models.Model):
+    id = models.CharField(primary_key=True, max_length=7, unique=True)
     committee_member = models.ForeignKey(CreditCommittee, on_delete=models.CASCADE, related_name="actions")
     action_date = models.DateTimeField(auto_now_add=True)
     action_taken = models.CharField(max_length=50, choices=[('Okay', 'Okay'), ('Not Okay', 'Not Okay'), ('Approved', 'Approved'), ('Declined', 'Declined')])
     action_reason = models.TextField()
     credit = models.ForeignKey(Credit, on_delete=models.CASCADE, related_name="committee_actions")
 
+    def save(self, *args, **kwargs):
+        if not self.id:
+            while True:
+                new_id = uuid.uuid4().hex[:7]
+                if not CommitteeAction.objects.filter(id=new_id).exists():
+                    self.id = new_id
+                    break
+        super().save(*args, **kwargs)

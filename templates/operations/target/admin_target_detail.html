@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% load custom_filters %}
+
+{% block title %}Target Saving Details | Benevolence Cooperative{% endblock %}
+
+{% block header %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+{% endblock header %}
+
+{% block content %}
+<!-- Sidebar Navigation -->
+{% include is_admin|yesno:'include/admin_sidebar.html,include/sidebar.html' %}
+
+<main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200">
+  <!-- Navbar -->
+  {% include 'include/dashboard_navbar.html' with breadcrumb='Target' page_title='Detail Page' %}
+
+  <div class="w-full px-6 py-6 mx-auto">
+    <div class="flex flex-wrap -mx-3">
+      <div class="w-full px-3">
+        <div class="relative flex flex-col bg-white p-6 rounded-xl">
+          <div class="flex justify-between items-center border-b pb-4">
+            <h2 class="text-xl font-bold text-gray-900">Target Savings Details</h2>
+            <a href="javascript:history.back()" class="px-4 py-2 bg-gray-100 border rounded-lg text-gray-700 hover:bg-gray-300">← Back</a>
+          </div>
+          
+          <div class="text-gray-800 mt-4 p-4 bg-gray-100 rounded">
+            <p><strong>Contributor:</strong> {{ target_savings.member.email }}
+            <p><strong>Target Balance:</strong> NGN{{ target_savings.total_savings|intcomma }}</p>
+            <p><strong>Target Status:</strong> {{ target_savings.get_status_display|intcomma }}</p>
+          </div>
+          
+          {% if not withdrawal_requests and not complete %}
+          <!-- Add Target Balance Form -->
+          <fieldset class="border border-gray-300 rounded-lg p-6 mt-6">
+            <legend class="font-bold text-sm uppercase">Add Target Balance</legend>
+            <form method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="mb-4 text-gray-800">
+                {{ transaction_form.as_p }}
+              </div>
+              <button type="submit" name="add_target" class="mt-4 px-4 py-2 text-sm uppercase bg-green-500 text-white rounded">Submit</button>
+            </form>
+          </fieldset>
+          {% elif not complete %}
+          <!-- Withdrawal Request Form -->
+          <fieldset class="border border-gray-300 rounded-lg p-6 mt-6">
+            <legend class="font-bold text-sm uppercase">Target Withdrawal Request</legend>
+            {% if target_savings.member.get_member_bank_details %}
+                {% with bank=target_savings.member.get_member_bank_details %}
+                <div class="p-4 shadow-soft-xl rounded-2xl bg-white mt-4">
+                    <h6 class="mb-4 font-bold leading-tight uppercase text-sm text-gray-900">Contributor Bank Details</h6>
+                    <p class="text-xs text-gray-700"><strong>Bank Name:</strong> {{ bank.bank_name }}</p>
+                    <p class="text-xs text-gray-700"><strong>Account Name:</strong> {{ bank.account_holder_name }}</p>
+                    <p class="text-xs text-gray-700"><strong>Account Number:</strong> {{ bank.account_number }}</p>
+                </div>
+                {% endwith %}
+            
+            <form method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              {{ withdrawal_form.as_p }}
+              <button type="submit" name="pay_withdrawal" class="mt-4 px-4 py-2 bg-green-600 text-white rounded">Pay Withdrawal</button>
+            </form>
+            {% else %}
+            <p class="text-red-500">Contributor should set his bank details before you can pay</p>
+            {% endif %}
+          </fieldset>
+          {% endif %}
+          
+          {% if transactions %}
+          <!-- Transactions Table -->
+          <div class="mt-6">
+            <table class="w-full border border-gray-200 text-gray-900 text-left">
+              <thead class="bg-gray-100">
+                <tr>
+                  <th class="border px-3 py-2">Transaction Date</th>
+                  <th class="border px-3 py-2">Amount</th>
+                  <th class="border px-3 py-2">Type</th>
+                  <th class="border px-3 py-2">Receipt</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for transaction in transactions %}
+                <tr>
+                  <td class="border p-2">{{ transaction.transaction_date|date:"F j, Y" }}</td>
+                  <td class="border p-2">NGN{{ transaction.amount|intcomma }}</td>
+                  <td class="border p-2">{{ transaction.get_transaction_type_display }}</td>
+                  <td class="border p-2">{% if transaction.receipt %}<a href="{{ transaction.receipt.url }}" target="_blank" class="text-blue-600">View</a>{% else %}-{% endif %}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% include 'include/dashboard_footer.html' %}
+  </div>
+</main>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% endblock %}

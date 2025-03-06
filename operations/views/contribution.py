@@ -1,19 +1,10 @@
-import calendar
-from decimal import Decimal
-from datetime import datetime, timedelta
-
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.http import HttpResponse
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
-from django.utils import timezone
 from django.utils.timezone import now
-from django.db.models import Sum, Q
+from django.db.models import Sum
 
 from operations.models import ContributionRecord, ContributionSetting, ContributionSettingHistory, ContributionChangeRequest
-from operations.forms import ContributionSettingForm, ContributionSettingAdminForm
 from accounts.models import CustomUser
 from withdrawal.models import EmployeeAccountDetails
 
@@ -51,7 +42,7 @@ def calculate_contribution_durations(employee):
             ).aggregate(total=Sum("amount"))["total"] or 0
 
             durations.append({
-                "id": entry.id,
+                "id": entry.id, # type: ignore
                 "employee_email": entry.contribution_setting.employee.email,
                 "amount": previous_entry.amount,
                 "start_date": previous_entry.changed_at,
@@ -76,16 +67,16 @@ def calculate_contribution_durations(employee):
         ).aggregate(total=Sum("amount"))["total"] or 0
 
         durations.append({
-            "id": entry.id,
-            "employee_email": entry.contribution_setting.employee.email,
+            "id": entry.id, # type: ignore
+            "employee_email": entry.contribution_setting.employee.email, # type: ignore
             "amount": previous_entry.amount,
             "start_date": previous_entry.changed_at,
             "end_date": "Still in use",
             "duration_days": duration.days,
             "duration_months": round(duration.days / 30, 2),
             "total_paid": total_paid,
-            "changed_by": entry.changed_by,
-            "change_reason": entry.change_reason,
+            "changed_by": entry.changed_by, # type: ignore
+            "change_reason": entry.change_reason, # type: ignore
 
         })
     sorted_objects = sorted(durations, key=lambda item: item['start_date'], reverse=True)
@@ -167,52 +158,6 @@ def view_contributions(request, employee_id):
     }
     
     return render(request, 'operations/contributions/view_contributions.html', context)
-
-@login_required
-def download_contribution_history(request):
-    """Generates and downloads a PDF of the user's contribution history."""
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="Contribution_History_{request.user.nitda_id}.pdf"'
-    
-    p = canvas.Canvas(response, pagesize=A4)
-    width, height = A4
-
-    # Title
-    p.setFont("Helvetica-Bold", 16)
-    p.drawString(100, height - 50, f"{request.user.nitda_id}'s Contribution History")
-    
-    # Date generated
-    p.setFont("Helvetica", 10)
-    p.drawString(200, height - 70, f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    
-    # Table headers
-    p.setFont("Helvetica-Bold", 12)
-    p.drawString(50, height - 100, "Month")
-    p.drawString(150, height - 100, "Year")
-    p.drawString(250, height - 100, "Amount")
-    p.drawString(350, height - 100, "Status")
-    
-    # Fetch contributions
-    contributions = ContributionRecord.objects.filter(employee=request.user).order_by('-year', '-month')
-    y_position = height - 120
-    p.setFont("Helvetica", 11)
-
-    for contribution in contributions:
-        p.drawString(50, y_position, calendar.month_name[contribution.month])
-        p.drawString(150, y_position, str(contribution.year))
-        p.drawString(250, y_position, f"₦{contribution.amount}")
-        p.drawString(350, y_position, "Paid" if contribution.status == "paid" else "Pending")
-        y_position -= 20  # Move to the next row
-
-        if y_position < 50:
-            p.showPage()
-            y_position = height - 50
-
-    p.showPage()
-    p.save()
-    return response
-
-
 
 # used
 @login_required

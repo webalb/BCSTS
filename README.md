@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)  [![Python](https://img.shields.io/badge/Python-3.9-blue.svg)](https://www.python.org/) [![Django](https://img.shields.io/badge/Django-4.x-green.svg)](https://www.djangoproject.com/)
 
-**Efficiently Manage Employee Finances and Foster Transparency**
+**Efficiently Manage Contributor Finances and Foster Transparency**
 
 The Benevolence Cooperative Society Tracking System is a robust web-based platform designed to streamline the management of employee contributions, loans, repayments, and financial records.  This system empowers cooperative societies to automate critical financial processes, ensuring accuracy, transparency, and real-time financial insights.
 
@@ -22,7 +22,7 @@ In today's fast-paced world, manual financial tracking for cooperative societies
 
 This system encompasses the following essential features:
 
-1. **Employee Registration & Authentication:** Securely register and authenticate employees, providing individual access to their financial information.
+1. **Contributor Registration & Authentication:** Securely register and authenticate employees, providing individual access to their financial information.
 2. **Salary-Based Contribution Tracking:** Automatically track employee contributions based on salary deductions, simplifying the contribution management process.
 3. **credit Application & Approval Process:**  Streamline the credit application and approval process with automated workflows, reducing processing time and enhancing efficiency.
 4. **Repayment Tracking & Deductions:**  Automatically track credit repayments and deduct them from employee salaries, ensuring timely and accurate repayment collection.

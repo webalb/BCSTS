@@ -4,7 +4,7 @@
 {% load custom_filters %}
 {% load humanize %}
 {% block title %}
-Member Contributions | Benovelance Cooperative
+Contributor Contributions | Benevolance Cooperative
 {% endblock title %}
 {% block style %}
 
@@ -17,28 +17,28 @@ Member Contributions | Benovelance Cooperative
 {% include 'include/admin_sidebar.html' %}
 <!-- end sidenav -->
 <main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200">
-    {% include 'include/dashboard_navbar.html' %}
+    {% include 'include/dashboard_navbar.html' with breadcrumb='Contribution' page_title='Contribution Records' %}
 
     <div class="w-full px-6 mx-auto">
         <!-- card 1 -->
-        <div class="flex flex-col shadow-soft-xl flex-auto min-w-0 p-4  break-words border-0 rounded-2xl bg-gray-100 bg-clip-border backdrop-blur-2xl backdrop-saturate-200">
+        <div class="flex flex-col shadow-soft-xl flex-auto min-w-0 p-4  break-words border-0 rounded-2xl bg-white bg-clip-border backdrop-blur-2xl backdrop-saturate-200">
             <div class="flex flex-wrap -mx-3">
                 <div class="flex-none w-auto max-w-full px-3 my-auto bg-white">
                     <div class="h-full">
-                        <h5 class="mb-1">{{ employee.nitda_id }}`s Contributions at BCS</h5>
-                        <p class="mb-0 font-semibold leading-normal text-sm">from {{ employee.date_joined|date:"F Y" }} to date</p>
+                        <h5 class="mb-1 uppercase">Contributions Record</h5>
+                        <p class="mb-0 font-semibold leading-normal text-sm mt-4"><b>Contributor:</b>  {{ employee.email }} </p>
+                        <p class="mb-0 font-semibold leading-normal text-sm mt-2"><b>From:</b>  {{ employee.date_joined|date:"F Y" }} </p>
+                        {% if contributions %}
+                        <p class="mb-0 font-semibold leading-normal text-sm mt-2"><b>To:</b>  {{ contributions.0.created_at|date:"F d, Y" }} </p>
+                        {% endif %}                        
+                        <p class="mb-0 font-semibold leading-normal text-sm mt-2">Contributed: NGN{{ total_contributed|intcomma}}</p>
+                        <a href="javascript:history.back()" class="text-blue-500 hover:underline">
+                            <i class="fa fa-arrow-left inline-block"></i>
+                            Back
+                        </a>
                     </div>
                 </div>
-                <div class="w-full max-w-full px-3 mx-auto mt-4 sm:my-auto sm:mr-0 md:w-1/2 md:flex-none lg:w-4/12">
-                    <!-- Back Button -->
-                    <a href="javascript:history.back()" class="inline-block px-4 py-2 mb-0 font-bold text-center uppercase align-middle transition-all bg-gray-200 border border-solid rounded-lg shadow-none cursor-pointer leading-pro ease-soft-in text-xs hover:scale-102 active:shadow-soft-xs tracking-tight-soft border-gray-500 text-gray-700 hover:border-gray-600 hover:bg-gray-300 hover:text-gray-900">
-                        ← Back
-                    </a>
-                         <a class="inline-block px-8 py-2 mb-0 font-bold text-center uppercase align-middle transition-all bg-transparent border border-solid rounded-lg shadow-none cursor-pointer leading-pro ease-soft-in text-xs hover:scale-102 active:shadow-soft-xs tracking-tight-soft border-fuchsia-500 text-fuchsia-500 hover:border-fuchsia-500 hover:bg-transparent hover:text-fuchsia-500 hover:opacity-75 hover:shadow-none active:bg-fuchsia-500 active:text-white active:hover:bg-transparent active:hover:text-fuchsia-500" nav-link="" active="" href="{% url 'download_contribution_history' %}" role="tab" aria-selected="true">
-                                    
-                                    <span class="ml-1">Download as PDF</span>
-                                </a>
-                </div>
+               
             </div>
         </div>
     </div>
@@ -47,16 +47,10 @@ Member Contributions | Benovelance Cooperative
             <!-- card 1 -->
             <div class="w-full max-w-full px-3 mt-0 mb-6 md:mb-0 md:flex-none lg:flex-none">
                 <div class="border-black/12.5 shadow-soft-xl relative flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid bg-white bg-clip-border">
-                    <div class="border-black/12.5 mb-0 rounded-t-2xl border-b-0 border-solid bg-white p-6 pb-0">
-                        <div class="flex flex-wrap mt-0 -mx-3">
-                            <div class="flex-none w-12/12 max-w-full px-3 mt-0 lg:w-1/2 lg:flex-none">
-                                <h6 class="text-gray-800">Complete Contributions in History</h6>
-                                <p>Contributed: ₦{{ total_contributed|intcomma}}</p>
-                            </div>
-                        </div>
-                    </div>
+                    
                     <div class="flex-auto p-6 px-0 pb-2">
                         <div class="p-4">
+                            {% if contributions %}
                             <table id="contributionsTable" class="w-full mb-0 align-top border-gray-200 text-slate-500 ">
                                 <thead class="align-bottom">
                                     <tr>
@@ -64,7 +58,6 @@ Member Contributions | Benovelance Cooperative
                                         <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800 ">Month</th>
                                         <th class="px-6 py-3 pl-2 font-bold tracking-normal text-left uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Year</th>
                                         <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle  text-sm border-b letter border-b-solid  whitespace-nowrap border-b-gray-200 text-gray-800">Amount</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800 ">Status</th>
                                         <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Date Recorded</th>
                                     </tr>
                                 </thead>
@@ -81,22 +74,20 @@ Member Contributions | Benovelance Cooperative
                                             <h6 class="mb-0 leading-normal text-sm">{{ record.year }}</h6>
                                         </td>
                                         <td class="p-2 bg-transparent border-b whitespace-nowrap">
-                                            <h6 class="mb-0 leading-normal text-sm">₦{{ record.amount|intcomma }}</h6>
+                                            <h6 class="mb-0 leading-normal text-sm">NGN{{ record.amount|intcomma }}</h6>
                                         </td>
-                                        <td class="p-2 bg-transparent border-b whitespace-nowrap">
-                                            <h6 class="mb-0 leading-normal text-sm">{{ record.get_status_display }}</h6>
-                                        </td>
+                                       
                                         <td class="p-2 bg-transparent border-b whitespace-nowrap ">
                                             <h6 class="mb-0 leading-normal text-sm">{{ record.created_at }}</h6>
                                         </td>
                                     </tr>
-                                    {% empty %}
-                                    <tr>
-                                        <td colspan="4" class="text-center text-muted">No contribution records available.</td>
-                                    </tr>
+                                    
                                     {% endfor %}
                                 </tbody>
                             </table>
+                            {% else %}
+                                <p class="text-center text-muted">No contribution records available.</p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

@@ -1,4 +1,4 @@
-import os, re
+import os, re, uuid
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
@@ -34,6 +34,9 @@ class CustomUserManager(BaseUserManager):
 
     
 class CustomUser(AbstractUser):
+
+    id = models.CharField(primary_key=True, max_length=7, unique=True)
+
     email = models.EmailField(
         unique=True,
         validators=[validate_nitda_email],
@@ -96,6 +99,12 @@ class CustomUser(AbstractUser):
     
     def save(self, *args, **kwargs):
         """Handle passport photo update by deleting the old one when a new one is uploaded."""
+        if not self.id:
+            while True:
+                new_id = uuid.uuid4().hex[:7]
+                if not CustomUser.objects.filter(id=new_id).exists():
+                    self.id = new_id
+                    break
         try:
             existing_user = CustomUser.objects.get(id=self.id) # type: ignore
         except CustomUser.DoesNotExist:
@@ -112,3 +121,4 @@ class CustomUser(AbstractUser):
             self.verification_token = get_random_string(64)
 
         super().save(*args, **kwargs)
+

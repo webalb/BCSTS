@@ -209,7 +209,7 @@ textarea {
   /* 1 */
   line-height: inherit;
   /* 1 */
-  color: inherit;
+  /* color: inherit; */
   /* 1 */
   margin: 0;
   /* 2 */
@@ -2490,6 +2490,10 @@ h6 {
 .text-xl {
   font-size: 1.25rem;
   line-height: 1.75rem;
+}
+.text-2xl {
+  font-size: 3rem;
+  line-height: 2rem;
 }
 
 .text-inherit {

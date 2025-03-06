@@ -29,7 +29,7 @@
                     <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg shadow-soft-2xl bg-center fill-current stroke-0 text-center xl:p-2.5 {% if request.resolver_match.view_name == 'employee_list' %} bg-green-500 {%else %} bg-white  {% endif %}">
                         <i class="fas fa-users {% if request.resolver_match.view_name == 'employee_list' %} text-white{% else %} text-gray-900 {% endif %}"></i>
                     </div>
-                    <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Manage Employees</span>
+                    <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Manage Contributors</span>
                 </a>
             </li>
 
@@ -43,6 +43,14 @@
                         <i class="fas fa-money-bill-wave {% if request.resolver_match.view_name == 'manage_contributions' %} text-white{% else %} text-gray-900{% endif %}"></i>
                     </div>
                     <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Manage Contributions</span>
+                </a>
+            </li>
+            <li class="mt-0.5 w-full">
+                <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors {% if request.resolver_match.view_name == 'admin_target_savings_page' %}font-bold{% endif %}" href="{% url 'admin_target_savings_page' %}">
+                    <div class="shadow-soft-2xl mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5  {% if request.resolver_match.view_name == 'admin_target_savings_page' %} bg-green-500 {% else %}bg-white{% endif %}">
+                        <i class="fas fa-bullseye {% if request.resolver_match.view_name == 'admin_target_savings_page' %} text-white{% else %} text-gray-700{% endif %}"></i>
+                    </div>
+                    <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Target Savings</span>
                 </a>
             </li>
             <li class="mt-0.5 w-full">

@@ -3,7 +3,7 @@
 {% load humanize %}
 {% load custom_filters %}
 {% block title %}
-Credit Portal | Benovelance Cooperative
+Credit Detail Page | Benevolance Cooperative
 {% endblock title %}
 {% block header %}
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
@@ -20,7 +20,7 @@ Credit Portal | Benovelance Cooperative
 <!-- end sidenav -->
 <main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200">
   <!-- Navbar -->
-  {% include 'include/dashboard_navbar.html' %}
+  {% include 'include/dashboard_navbar.html' with breadcrumb='Credit' page_title='Detail Page' %}
   <!-- end Navbar -->
   <!-- cards -->
   <div class="w-full px-6 py-6 mx-auto">
@@ -34,7 +34,14 @@ Credit Portal | Benovelance Cooperative
                     <h2 class="text-xl font-bold text-center text-gray-900 text-center"> 
                     Credit details (Tracking ID: {{ credit.tracking_id }})
                     </h2>
+                    
                 </div>
+                <p class="text-sm text-gra">
+                      
+                    <a href="javascript:history.back()" class="inline-block px-4 py-2 mb-0 font-bold text-center uppercase align-middle transition-all bg-gray-100 border border-solid rounded-lg shadow-none cursor-pointer leading-pro ease-soft-in text-xs hover:scale-102 active:shadow-soft-xs tracking-tight-soft border-gray-500 text-gray-700 hover:border-gray-600 hover:bg-gray-300 hover:text-gray-900">
+                        ← Back
+                    </a>
+                </p>
                 </div>
             </div>
             <div class="flex flex-wrap mt-6 p-6 bg-white">
@@ -122,7 +129,7 @@ Credit Portal | Benovelance Cooperative
                         
                         </div>
                 
-                        <!-- Employee ID -->
+                        <!-- Contributor ID -->
                         <div class="flex flex-col">
                             <label class="text-sm font-medium text-gray-700 mt-1">Staff ID: <span class="mt-1 text-sm text-gray-900">{{ applicant.nitda_id }}</span></label>
                             
@@ -568,12 +575,12 @@ Credit Portal | Benovelance Cooperative
                         </div>
                     </li>
             
-                    <!-- Total Withdrawn -->
+                    <!-- Total Withdrawal -->
                     <li class="relative flex justify-between px-4 py-2 pl-0 mb-2 bg-white border-0 border-t-0 rounded-b-inherit text-inherit rounded-xl">
                         <div class="flex items-center">
                             <i class="fas fa-hand-holding-usd text-red-500 text-xl mx-4"></i>
                             <div class="flex flex-col">
-                                <h6 class="mb-1 leading-normal text-sm text-gray-800">Total Withdrawn</h6>
+                                <h6 class="mb-1 leading-normal text-sm text-gray-800">Total Withdrawal</h6>
                                 <span class="leading-tight text-xs">Total amount withdrawn</span>
                             </div>
                         </div>

@@ -3,7 +3,7 @@
 {% load humanize %}
 {% load custom_filters %}
 {% block title %}
-Employee Details | Benovelance Cooperative
+Contributor Profile | Benevolance Cooperative
 {% endblock title %}
 {% block content %}
 <!-- sidenav  -->
@@ -11,7 +11,8 @@ Employee Details | Benovelance Cooperative
 <!-- end sidenav -->
 <main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200">
     <!-- Navbar -->
-    {% include 'include/dashboard_navbar.html' %}
+    {% include 'include/dashboard_navbar.html' with breadcrumb='Profile' page_title='Contributor Profile' %}
+
     <!-- end Navbar -->
     <!-- cards -->
     <div class="w-full mx-auto ">
@@ -35,25 +36,11 @@ Employee Details | Benovelance Cooperative
                 <div class="w-full max-w-full px-3 mx-auto mt-4 sm:my-auto sm:mr-0 md:w-1/2 md:flex-none lg:w-4/12 ">
                     <div class="relative right-0">
                         <ul class="relative flex gap-2 flex-wrap p-1 list-none bg-transparent rounded-xl sm:flex-row" nav-pills="" role="tablist">
-                            <!-- Buttons Inside UL -->
-                            <li class="z-30 flex-auto text-center">
-                                <a href="{% url 'update_employee' employee.id %}" class="px-3 py-2 mb-0 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer shadow-soft-md leading-pro text-xs bg-blue-500 hover:scale-102 hover:shadow-soft-xs active:opacity-85">Edit</a>
-                            </li>
-                            <li class="z-30 flex-auto text-center">
-                                <a href="{% url 'employee_list' %}" class="px-3 py-2 mb-0 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer shadow-soft-md leading-pro text-xs bg-green-500 hover:scale-102 hover:shadow-soft-xs active:opacity-85">Back to List</a>
-                            </li>
-                            <li class="z-30 flex-auto text-center">
-                                <a href="{% url 'delete_employee' employee.id %}" class="px-3 py-2 mb-0 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer shadow-soft-md leading-pro text-xs bg-red-500 hover:scale-102 hover:shadow-soft-xs active:opacity-85" onclick="return confirm('Are you sure you want to delete this employee?');">Delete</a>
-                            </li>
-                            <li class="z-30 flex-auto text-center sm:mt-6 lg-max:mt-6">
-                                <a href="{% url 'toggle_employee_active' employee.id %}" class="px-3 py-2 mb-0 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer shadow-soft-md leading-pro text-xs {% if employee.is_active %}bg-yellow-500 hover:scale-102 hover:shadow-soft-xs active:opacity-85{% else %}bg-gray-600 hover:scale-102 hover:shadow-soft-xs active:opacity-85{% endif %} " onclick="return confirm('Are you sure you want to {% if employee.is_active %}deactivate{% else %}activate{% endif %} this employee?');">
-                                    {% if employee.is_active %}
-                                    Deactivate
-                                    {% else %}
-                                    Activate
-                                    {% endif %}
-                                </a>
-                            </li>
+                            
+                            <a href="javascript:history.back()" class="inline-block px-4 py-2 mb-0 font-bold text-center uppercase align-middle transition-all bg-gray-600 text-white-p border border-solid rounded-lg shadow-none cursor-pointer leading-pro ease-soft-in text-xs hover:scale-102 active:shadow-soft-xs tracking-tight-soft border-gray-500 text-gray-700 hover:border-gray-600 hover:bg-gray-300 hover:text-gray-900">
+                                ← Back
+                            </a>
+                            
                         </ul>
                     </div>
                 </div>
@@ -81,20 +68,52 @@ Employee Details | Benovelance Cooperative
                         </div>
                     </div>
                     <div class="flex-auto p-4">
-                        <h6 class="font-bold leading-tight uppercase text-xs text-slate-500 mt-4 mb-2">Personal Details</h6>
-                        <ul class="flex flex-col pl-0 mb-0 rounded-lg">
-                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-t-lg text-sm"><strong class="text-gray-800">Full Name:</strong> &nbsp; {{ employee.get_full_name }}</li>
-                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-gray-800">Mobile:</strong> &nbsp; {{ employee.phone_number }}</li>
-                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-gray-800">Email:</strong> &nbsp; {{ employee.email }}</li>
-                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-gray-800">Staff ID:</strong> &nbsp; {{ employee.nitda_id }}</li>
-                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-gray-800">Gender:</strong> &nbsp; {{ employee.get_gender_display }}</li>
-                        </ul>
-                        <h6 class="font-bold leading-tight uppercase text-xs text-slate-500 mt-4 mb-2">Next of Kin Details</h6>
-                        <ul class="flex flex-col pl-0 mb-0 rounded-lg">
-                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-t-lg text-sm"><strong class="text-gray-800">Full Name:</strong> &nbsp; {{ employee.next_of_kin_name }}</li>
-                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-gray-800">Mobile:</strong> &nbsp; {{ employee.next_of_kin_phone }}</li>
-                            <li class="relative block px-4 py-2 pl-0 leading-normal bg-white border-0 border-t-0 text-sm"><strong class="text-gray-800">Relationship:</strong> &nbsp; {{ employee.next_of_kin_relationship }}</li>
-                        </ul>
+                        <fieldset class="border border-gray-300 rounded-lg p-4 mb-6">
+                            <legend class="text-slate-500 font-bold">Personal Details</legend>
+                            <table class="min-w-full bg-white rounded-lg">
+                                <tbody>
+                                    <tr>
+                                        <td class=" py-2 border-b border-gray-200 text-xs"><strong class="text-gray-800">Full Name:</strong></td>
+                                        <td class=" py-2 border-b border-gray-200 text-xs">{{ employee.get_full_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class=" py-2 border-b border-gray-200 text-xs"><strong class="text-gray-800">Mobile:</strong></td>
+                                        <td class=" py-2 border-b border-gray-200 text-xs">{{ employee.phone_number }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class=" py-2 border-b border-gray-200 text-xs"><strong class="text-gray-800">Email:</strong></td>
+                                        <td class=" py-2 border-b border-gray-200 text-xs">{{ employee.email }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class=" py-2 border-b border-gray-200 text-xs"><strong class="text-gray-800">Staff ID:</strong></td>
+                                        <td class=" py-2 border-b border-gray-200 text-xs" style="word-break: break-all;">{{ employee.nitda_id }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class=" py-2 border-b border-gray-200 text-xs"><strong class="text-gray-800">Gender:</strong></td>
+                                        <td class=" py-2 border-b border-gray-200 text-xs">{{ employee.get_gender_display }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </fieldset>
+                        <fieldset class="border border-gray-300 rounded-lg p-4 mt-6">
+                            <legend class="text-slate-500 font-bold">Next of Kin Details</legend>
+                            <table class="min-w-full bg-white rounded-lg">
+                                <tbody>
+                                    <tr>
+                                        <td class="border-b border-gray-200 text-xs"><strong class="text-gray-800">Full Name:</strong></td>
+                                        <td class="py-2 border-b border-gray-200 text-xs">{{ employee.next_of_kin_name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 border-b border-gray-200 text-xs"><strong class="text-gray-800">Mobile:</strong></td>
+                                        <td class="py-2 border-b border-gray-200 text-xs">{{ employee.next_of_kin_phone }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 border-b border-gray-200 text-xs"><strong class="text-gray-800">Relationship:</strong></td>
+                                        <td class="py-2 border-b border-gray-200 text-xs">{{ employee.next_of_kin_relationship }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </fieldset>
                     </div>
                 </div>
             </div>
@@ -104,39 +123,92 @@ Employee Details | Benovelance Cooperative
                         <h6 class="mb-0">Financial Informations</h6>
                     </div>
                     <div class="flex-auto p-4">
-                        <h6 class="font-bold leading-tight uppercase text-xs text-slate-500">Accounts</h6>
-                        <ul class="flex flex-col pl-0 mb-0 rounded-lg">
-                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-t-lg text-sm"><strong class="text-gray-800">Total Balance:</strong> &nbsp; ₦{{ total_remained_balance|floatformat:2|intcomma }}</li>
-                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 text-sm">
-                                <strong class="text-gray-800">Savings (60%):</strong> &nbsp; ₦{{ savings_balance|floatformat:2|intcomma }}
-                            </li>
-                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-b-lg text-sm">
-                                <strong class="text-gray-800">Investment (40%):</strong> &nbsp; ₦{{ investment_balance|floatformat:2|intcomma }} {# New Line #}
-                            </li>
-                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-b-lg text-sm">
-                                <strong class="text-gray-800">Monthly Contribution:</strong> &nbsp; ₦{{ employee.contribution_setting.amount|floatformat:2|intcomma }} {# New Line #}
-                            </li>
-                        </ul>
-                        <h6 class="mt-6 font-bold leading-tight uppercase text-xs text-slate-500">Financial Summary</h6>
-                        <ul class="flex flex-col pl-0 mb-0 rounded-lg">
-                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-b-lg text-sm">
-                                <strong class="text-gray-800">Total Withdrawed:</strong> &nbsp; ₦{{ total_withdrawn|floatformat:2|intcomma }} {# New Line #}
-                            </li>
-                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-b-lg text-sm">
-                                <strong class="text-gray-800">Austanding Credit:</strong> &nbsp; ₦{{ total_withdrawn|floatformat:2|intcomma }}                            </li>
-                            <li class="relative block px-4 py-2 pt-0 pl-0 leading-normal bg-white border-0 rounded-b-lg text-sm">
-                                <strong class="text-gray-800">Total Money Contributed:</strong> &nbsp; ₦{{ total_contributions|floatformat:2|intcomma }} {# New Line #}
-                            </li>
-                        </ul>
+                        <fieldset class="border border-gray-300 rounded-lg p-4 mb-6">
+                            <legend class="text-slate-500 font-bold">Accounts</legend>
+                            <table class="min-w-full bg-white rounded-lg">
+                                <tbody>
+                                    <tr>
+                                        <td class="py-2 border-b border-gray-200 text-xs"><strong class="text-gray-800">Total Balance:</strong></td>
+                                        <td class="py-2 border-b border-gray-200 text-xs">₦{{ total_remained_balance|floatformat:2|intcomma }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 border-b border-gray-200 text-xs"><strong class="text-gray-800">Savings (60%):</strong></td>
+                                        <td class="py-2 border-b border-gray-200 text-xs">₦{{ savings_balance|floatformat:2|intcomma }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 border-b border-gray-200 text-xs"><strong class="text-gray-800">Investment (40%):</strong></td>
+                                        <td class="py-2 border-b border-gray-200 text-xs">₦{{ investment_balance|floatformat:2|intcomma }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 border-b border-gray-200 text-xs"><strong class="text-gray-800">Monthly Contribution:</strong></td>
+                                        <td class="py-2 border-b border-gray-200 text-xs">₦{{ employee.contribution_setting.amount|floatformat:2|intcomma }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 border-b border-gray-200 text-xs"><strong class="text-gray-800">Total Money Contributed:</strong></td>
+                                        <td class="py-2 border-b border-gray-200 text-xs">₦{{ total_contributions|floatformat:2|intcomma }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </fieldset>
+                        <fieldset class="border border-gray-300 rounded-lg p-4 mt-6">
+                            <legend class="text-slate-500 font-bold">Financial Summary</legend>
+                            <table class="min-w-full bg-white rounded-lg">
+                                <tbody>
+                                    <tr>
+                                        <td class="py-2 border-b border-gray-200 text-xs"><strong class="text-gray-800">Total Withdrawal:</strong></td>
+                                        <td class="py-2 border-b border-gray-200 text-xs">₦{{ total_withdrawn|floatformat:2|intcomma }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 border-b border-gray-200 text-xs"><strong class="text-gray-800">Credit Collected:</strong></td>
+                                        <td class="py-2 border-b border-gray-200 text-xs">₦{{ took_credits|floatformat:2|intcomma }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 border-b border-gray-200 text-xs"><strong class="text-gray-800">Credit Repaid:</strong></td>
+                                        <td class="py-2 border-b border-gray-200 text-xs">₦{{ repaid_credits|floatformat:2|intcomma }}</td>
+                                    </tr>
+                                   
+                                </tbody>
+                            </table>
+                        </fieldset>
                     </div>
                 </div>
             </div>
             <div class="w-full max-w-full px-3 lg-max:mt-6 xl:w-4/12">
                 <div class="relative flex flex-col h-full min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
                     <div class="p-4 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
-                        <h6 class="mb-0">Conversations</h6>
+                        <h6 class="mb-0">Actions</h6>
                     </div>
                     <div class="flex-auto p-4">
+                        <!-- Buttons Inside UL -->
+                        <div class="mb-4">
+                            <p class="mb-4 text-sm text-gray-600">To view all contributions made by this employee, please click the button below:</p>
+                            <a href="{% url 'view_employee_contributions' employee.id %}" class="px-3 py-2 mb-0 font-bold text-center text-black uppercase align-middle transition-all rounded-lg cursor-pointer shadow-soft-md leading-pro text-xs bg-gray-200 hover:scale-102 hover:shadow-soft-xs active:opacity-85">
+                                <i class="fa fa-list mr-1"></i> All Contributions
+                            </a>
+                        </div>
+                        <div class="mb-4">
+                            <p class="mb-4 text-sm text-gray-600">To update the details of this member, please click the button below:</p>
+                            <a href="{% url 'update_employee' employee.id %}" class="px-3 py-2 mb-0 font-bold text-center text-white-p uppercase align-middle transition-all rounded-lg cursor-pointer shadow-soft-md leading-pro text-xs bg-green-500 hover:scale-102 hover:shadow-soft-xs active:opacity-85">
+                                <i class="fa fa-edit mr-1"></i> Update Details
+                            </a>
+                        </div>
+                        <fieldset class="mb-4 border border-red-500 rounded-lg p-4">
+                            <legend class="text-red-500 font-bold">Danger Zone</legend>
+                            <p class="mb-4 text-sm text-gray-600">Please be cautious with the actions below:</p>
+                            <div class="flex space-x-4">
+                                <a href="{% url 'delete_employee' employee.id %}" class="px-3 py-2 mr-4 mb-0 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer shadow-soft-md leading-pro text-xs bg-red-500 hover:scale-102 hover:shadow-soft-xs active:opacity-85" onclick="return confirm('Are you sure you want to delete this employee?');">
+                                    <i class="fa fa-trash mr-1"></i> Delete
+                                </a>
+                                <a href="{% url 'toggle_employee_active' employee.id %}" class="px-3 py-2 mb-0 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer shadow-soft-md leading-pro text-xs {% if employee.is_active %}bg-yellow-500 hover:scale-102 hover:shadow-soft-xs active:opacity-85{% else %}bg-gray-600 hover:scale-102 hover:shadow-soft-xs active:opacity-85{% endif %}" onclick="return confirm('Are you sure you want to {% if employee.is_active %}deactivate{% else %}activate{% endif %} this employee?');">
+                                    <i class="fa fa-toggle-on mr-1"></i> 
+                                    {% if employee.is_active %}
+                                    Deactivate
+                                    {% else %}
+                                    Activate
+                                    {% endif %}
+                                </a>
+                            </div>
+                        </fieldset>
                     </div>
                 </div>
             </div>

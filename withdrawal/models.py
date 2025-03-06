@@ -4,10 +4,12 @@ from django.utils.translation import gettext_lazy as _
 from django.db.models import Sum
 from django.db import models, transaction
 from django.utils.timezone import localtime
-
+import uuid
 
 class Charges(models.Model):
     """Defines the charges for withdrawals."""
+    id = models.CharField(primary_key=True, max_length=7, unique=True)
+
     charge_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('0.00'))
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(
@@ -18,10 +20,17 @@ class Charges(models.Model):
 
     def save(self, *args, **kwargs):
         """Ensure only one charge has 'current' status at a time."""
+        if not self.id:
+            while True:
+                new_id = uuid.uuid4().hex[:7]
+                if not Withdrawals.objects.filter(id=new_id).exists():
+                    self.id = new_id
+                    break
         with transaction.atomic():  # Prevents race conditions
             if self.status == 'current':
                 Charges.objects.filter(status='current').update(status='deprecated')
-            super().save(*args, **kwargs)
+        
+        super().save(*args, **kwargs)
 
     @classmethod
     def get_current_charge(cls):
@@ -38,7 +47,7 @@ class Withdrawals(models.Model):
         DECLINED = 'declined', _('Declined')
         CANCELLED = 'cancelled', _('Cancelled')
         PAID = 'paid', _('Paid')
-
+    id = models.CharField(primary_key=True, max_length=7, unique=True)
     employee = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     amount_requested = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
@@ -98,6 +107,13 @@ class Withdrawals(models.Model):
         return total_paid or Decimal('0.00')
 
     def save(self, *args, **kwargs):
+        if not self.id:
+            while True:
+                new_id = uuid.uuid4().hex[:7]
+                if not Withdrawals.objects.filter(id=new_id).exists():
+                    self.id = new_id
+                    break
+
         if self.payment_date:
             self.payment_date = localtime(self.payment_date)
         super().save(*args, **kwargs)
@@ -105,6 +121,7 @@ class Withdrawals(models.Model):
 
 class EmployeeAccountDetails(models.Model):
     """Stores employee bank account details for payments."""
+    id = models.CharField(primary_key=True, max_length=7, unique=True)
     employee = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="account_details")
     bank_name = models.CharField(max_length=255)
     account_number = models.CharField(max_length=20)
@@ -112,3 +129,14 @@ class EmployeeAccountDetails(models.Model):
 
     def __str__(self):
         return f"Account Details for {self.employee.nitda_id} - {self.bank_name}"
+
+    def save(self, *args, **kwargs):
+        if not self.id:
+            while True:
+                new_id = uuid.uuid4().hex[:7]
+                if not EmployeeAccountDetails.objects.filter(id=new_id).exists():
+                    self.id = new_id
+                    break
+        super().save(*args, **kwargs)
+
+

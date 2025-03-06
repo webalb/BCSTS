@@ -332,6 +332,9 @@ def employee_detail(request, employee_id):
         'investment_balance': financial_summary["investment_balance"],
         'total_remained_balance': financial_summary["total_remained_balance"],
         'total_withdrawn': financial_summary["total_withdrawn"],
+        'took_credits': financial_summary["took_credits"],
+        'repaid_credits': financial_summary["repaid_credits"],
+        "repaid_percentage": financial_summary["repaid_percentage"],
     }
 
     return render(request, 'operations/employee/employee_detail.html', context)
@@ -345,6 +348,7 @@ def employee_specific_detail(request, employee_id):
     # Get financial summary from utility function
     financial_summary = get_employee_financial_summary(employee)
 
+
     context = {
         'employee': employee,
         'total_contributions': financial_summary["total_contributions"],
@@ -352,6 +356,9 @@ def employee_specific_detail(request, employee_id):
         'investment_balance': financial_summary["investment_balance"],
         'total_remained_balance': financial_summary["total_remained_balance"],
         'total_withdrawn': financial_summary["total_withdrawn"],
+        'took_credits': financial_summary["took_credits"],
+        'repaid_credits': financial_summary["repaid_credits"],
+        "repaid_percentage": financial_summary["repaid_percentage"],
     }
 
     return render(request, 'operations/employee/employee_specific_detail.html', context)
@@ -364,3 +371,31 @@ def toggle_employee_active(request, employee_id):
     employee.is_active = not employee.is_active
     employee.save()
     return redirect('employee_list')  # Redirect to your employee list view
+
+
+from accounts.models import CustomUser as BCSMember
+from operations.models import ContributionRecord as Contribution
+from withdrawal.models import Withdrawals
+from credit.models import Credit  # Import your models
+import datetime
+from operations.utils import get_employee_financial_summary
+
+def view_mcr(request, nitda_id):
+    """Displays the member timeline in the browser."""
+
+    member = get_object_or_404(BCSMember, nitda_id=nitda_id)
+    contributions = Contribution.objects.filter(employee=member).order_by('-created_at')
+    withdrawals = Withdrawals.objects.filter(employee=member).order_by('-request_date')
+    credits = Credit.objects.filter(applicant=member).order_by('-date_applied')
+    financial_summary = get_employee_financial_summary(member)
+    context = {
+        'member': member,
+        'contributions': contributions,
+        'withdrawals': withdrawals,
+        'compiled_date': datetime.datetime.now(),
+        'compiled_time': datetime.datetime.now().strftime("%H:%M:%S"), #add time to context.
+        'credits': credits,
+        "financial_summary": financial_summary,
+    }
+
+    return render(request, 'documents/bcs-mcr.html', context)

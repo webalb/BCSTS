@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load static %}
+{% load l10n %}
+{% load custom_filters %}
+{% block title %}
+Target Saving List | Benevolance Cooperative
+{% endblock title %}
+{% block header %}
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<!-- Tailwind CSS -->
+<!-- <script src="https://cdn.tailwindcss.com"></script> -->
+{% endblock header %}
+{% block content %}
+<!-- sidenav  -->
+{% include 'include/admin_sidebar.html' %}
+<!-- end sidenav -->
+<main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200 text-gray-9">
+    <!-- Navbar -->
+    {% include 'include/dashboard_navbar.html' with breadcrumb='Target' page_title='Target Savings' %}
+    <!-- end Navbar -->
+    <!-- cards -->
+    <div class="w-full px-6 py-6 mx-auto">
+        <div class="flex flex-wrap mb-6 -mx-3">
+            <!-- card 1 -->
+            <div class="w-full max-w-full px-3 mt-0 mb-6 md:mb-0 lg:flex-none">
+                <div class="border-black/12.5 shadow-soft-xl relative flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid bg-white bg-clip-border">
+                    <div class="border-black/12.5 mb-0 rounded-t-2xl border-b-0 border-solid bg-white p-6 pb-0">
+                        <div class="flex flex-wrap mt-0 -mx-3">
+                            <div class="flex-none w-full px-3 mt-0">
+                                <h6 class="text-gray-800 text-lg font-bold">List of Active Target Savings</h6>
+                                <p> <a href="{% url "completed_target_savings" %}" class="text-blue-500 underline"><i class="fa fa-arrow-right mr-2"></i> Completed Target Savings</a></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex-auto p-6 px-0 pb-2">
+                        <div class="overflow-x-auto h-[600px] overflow-y-auto p-4">
+                            {% if target_savings %}
+                            <table id="employeeTable" class="items-center w-full mb-0 align-top border-gray-200 text-slate-500">
+                                <thead class="align-bottom bg-gray-100">
+                                    <tr>
+                                        <th class="border px-6 py-3 text-left text-sm font-bold uppercase border-b border-gray-300 text-gray-900">Contributor</th>
+                                        <th class="border px-6 py-3 text-left text-sm font-bold uppercase border-b border-gray-300 text-gray-800">Total Amount Raised</th>
+                                        <th class="border px-6 py-3 text-left text-sm font-bold uppercase border-b border-gray-300 text-gray-800">Started On</th>
+                                        <th class="border px-6 py-3 text-left text-sm font-bold uppercase border-b border-gray-300 text-gray-800">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for target in target_savings %}
+                                    <tr class="border-b border-gray-300">
+                                        <td class="p-2 align-middle bg-transparent border whitespace-nowrap">
+                                            <div class="flex px-2 py-1">
+                                                <div>
+                                                    {% if target.member.passport_photo %}
+                                                        <img src="{{ target.member.passport_photo.url }}" class="inline-flex items-center justify-center mr-4 h-9 w-9 rounded-xl" alt="{{ target.member.get_full_name }}">
+                                                    {% else %}
+                                                        <img src="{% static 'assets/img/default.png' %}" class="inline-flex items-center justify-center mr-4 h-9 w-9 rounded-xl" alt="Default Profile">
+                                                    {% endif %}
+                                                </div>
+                                                <div class="flex flex-col justify-center">
+                                                    <h6 class="mb-0 text-sm leading-normal">{{ target.member.get_full_name }}</h6>
+                                                    <p class="mb-0 text-xs leading-tight text-slate-400">{{ target.member.email }}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="p-2 align-middle bg-transparent whitespace-nowrap text-left border">
+                                            <h6 class="mb-0 leading-normal text-sm">{{ target.total_savings }}</h6>
+                                        </td>
+                                        <td class="border p-2 align-middle bg-transparent whitespace-nowrap text-left">
+                                            <h6 class="mb-0 leading-normal text-sm">{{ target.created_at }}</h6>
+                                        </td>
+                                        <td class="border p-2 align-middle bg-transparent whitespace-nowrap text-left">
+                                            <a href="{% url "target_savings_detail" target.id %}" class="px-3 py-2 font-bold text-center text-white uppercase transition-all rounded-lg cursor-pointer shadow-soft-md text-xs bg-green-500 hover:scale-105 hover:shadow-md active:opacity-85">Details</a>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted p-4">No active target savings found.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% else %}
+                             <p> No Active target saving to display</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% include 'include/dashboard_footer.html' %}
+    </div> <!-- end cards -->
+</main>
+<!-- jQuery and DataTables -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#employeeTable').DataTable({
+        "paging": true,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "responsive": true
+    });
+});
+</script>
+{% endblock %}

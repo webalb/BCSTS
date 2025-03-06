@@ -3,7 +3,7 @@
 {% load humanize %}
 {% load custom_filters %}
 {% block title %}
-Credit Portal | Benovelance Cooperative
+Credit Application Form | Benevolance Cooperative
 {% endblock title %}
 {% block header %}
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
@@ -14,7 +14,7 @@ Credit Portal | Benovelance Cooperative
 <!-- end sidenav -->
 <main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200">
     <!-- Navbar -->
-    {% include 'include/dashboard_navbar.html' %}
+    {% include 'include/dashboard_navbar.html' with breadcrumb='Credit' page_title='Application Form' %}
     <!-- end Navbar -->
     <!-- cards -->
     <div class="w-full px-6 py-6 mx-auto">

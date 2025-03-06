@@ -3,7 +3,7 @@
 {% load l10n %}
 {% load custom_filters %}
 {% block title %}
-Credits on Repayment | Benovelance Cooperative
+Credits on Repayment | Benevolance Cooperative
 {% endblock title %}
 {% block header %}
 <!-- DataTables CSS -->
@@ -17,7 +17,7 @@ Credits on Repayment | Benovelance Cooperative
 <!-- end sidenav -->
 <main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200 text-gray-9">
     <!-- Navbar -->
-    {% include 'include/dashboard_navbar.html' %}
+    {% include 'include/dashboard_navbar.html' with breadcrumb='Credit' page_title='Repayment Credits Page' %}
     <!-- end Navbar -->
     <!-- cards -->
     <div class="w-full px-6 py-6 mx-auto">

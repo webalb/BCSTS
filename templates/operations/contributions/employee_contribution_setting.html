@@ -3,7 +3,7 @@
 {% load static %}
 {% load humanize %}
 {% block title %}
-Manage Employee Contribution Settings | Benevolence Cooperative
+Manage Contributor Contribution Settings | Benevolence Cooperative
 {% endblock title %}
 {% block header %}
 <!-- DataTables CSS -->
@@ -15,21 +15,21 @@ Manage Employee Contribution Settings | Benevolence Cooperative
 <!-- end sidenav -->
 <main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200 text-gray-900">
     <!-- Navbar -->
-    {% include 'include/dashboard_navbar.html' %}
+    {% include 'include/dashboard_navbar.html' with breadcrumb='Contributors' page_title='Contribution Setting' %}
     <!-- end Navbar -->
     <div class="w-full py-6 px-6 mx-auto">
         <div class="min-w-0 p-4">
-            <h2 class="text-xl font-bold text-gray-900">Manage Employee Contribution Settings</h2>
+            <h2 class="text-xl font-bold text-gray-900">Manage Contributor Contribution Settings</h2>
         </div>
         
         <div class="bg-white p-4 rounded-lg shadow-md">
-            <h3 class="text-lg font-bold mb-2 text-gray-900">Employees with Contribution Settings</h3>
+            <h3 class="text-lg font-bold mb-2 text-gray-900">Contributors with Contribution Settings</h3>
             <div class="">
                 <table id="contributionSettingsTable" class="w-full text-sm text-left border border-gray-200">
                     <thead class="bg-gray-100">
                         <tr>
                             <th class="p-1">S/N</th>
-                            <th class="p-1">Employee</th>
+                            <th class="p-1">Contributor</th>
                             <th class="p-1">Contribution Amount</th>
                             <th class="p-1">Created in</th>
                             <th class="p-1">Actions</th>
@@ -65,7 +65,7 @@ Manage Employee Contribution Settings | Benevolence Cooperative
                     <thead class="bg-gray-100">
                         <tr>
                             <th class="p-2">S/N</th>
-                            <th class="p-2">Employee</th>
+                            <th class="p-2">Contributor</th>
                             <th class="p-2">Amount</th>
                             <th class="p-2">Actions</th>
                         </tr>
@@ -93,13 +93,13 @@ Manage Employee Contribution Settings | Benevolence Cooperative
             </div>
         </div>
         <div class="bg-white p-4 rounded-lg shadow-md mt-4">
-            <h3 class="text-lg font-bold mb-2 text-gray-900">Employees Without Contribution Settings</h3>
+            <h3 class="text-lg font-bold mb-2 text-gray-900">Contributors Without Contribution Settings</h3>
             <div class="">
                 {% if employees_without_settings %}
                 <table id="contributionSettings3Table" class="w-full text-sm text-left border border-gray-200">
                     <thead class="bg-gray-100">
                         <tr>
-                            <th class="p-2">Employee</th>
+                            <th class="p-2">Contributor</th>
                             <th class="p-2">Actions</th>
                         </tr>
                     </thead>

@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% load custom_filters %}
+{% block title %}
+Target Saving | Benevolance Cooperative
+{% endblock title %}
+{% block header %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+{% endblock header %}
+{% block content %}
+<!-- sidenav  -->
+{% include 'include/sidebar.html' %}
+<!-- end sidenav -->
+<main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200">
+    <!-- Navbar -->
+    {% include 'include/dashboard_navbar.html' with breadcrumb='Target' page_title='Target Saving' %}
+    <!-- end Navbar -->
+    <!-- cards -->
+    <div class="w-full px-6 py-6 mx-auto">
+        
+
+        <div class="flex flex-wrap -mx-3">
+            <div class="w-full max-w-full px-3 ">
+                <div class="relative flex flex-col h-full min-w-0 break-words border-0 shadow-soft-xl rounded-2xl bg-white shadow-lg p-6 bg-clip-border">
+                    <div class="p-4 pb-0 mb-0 border-b-0 rounded-t-2xl">
+                        <div class="flex flex-wrap -mx-3">
+                            <div class="flex items-center w-full max-w-full px-3 shrink-0 md:flex-none border-b border-gray-300">
+                                <h2 class="text-xl font-bold text-center text-gray-900 uppercase">BCS Target Saving</h2>
+                            </div>
+                        </div>
+                    </div>
+                        <div class="">
+                            
+                            {% if not active_target %}
+                                <!-- No target set: Show info and form -->
+                                <div class="flex-auto p-4">
+                                    <p class="text-gray-600 text-sm">
+                                        Target Savings is a special initiative by BCS that allows members to set aside and save money at their convenience. Unlike the regular monthly contribution, 
+                                        Target Savings is entirely voluntary—you decide when and how much to deposit.
+                                    </p>
+                                    <p class="text-gray-600 text-sm mt-2">
+                                        Every deposit is officially recorded, and members can track their savings directly from their dashboard. 
+                                        Withdrawals can be made at any time, providing financial flexibility while encouraging a disciplined savings habit.
+                                    </p>
+                                    <p class="text-gray-600 text-sm mt-2">
+                                        This initiative allows you to accumulate funds for future projects, investments, emergencies, or personal goals, 
+                                        ensuring that you always have savings when you need them.
+                                    </p>
+                                    <hr class="h-px my-6 bg-transparent bg-gradient-to-r from-transparent via-white to-transparent">
+                                
+
+                                
+                                    <!-- Form to set a target saving -->
+                                    <form method="post" class="mt-4">
+                                        {% csrf_token %}
+                                        <fieldset class="border border-gray-300 p-4 rounded">
+                                            <legend class="text-gray-700 text-sm font-semibold">Set a Target Saving</legend>
+                                            <div class="mt-4">
+                                                <p class="text-gray-700 text-sm">
+                                                    By participating in Target Savings, you acknowledge that BCS reserves the right to use deposited funds 
+                                                    for investment and financial growth, ensuring sustainability while guaranteeing the security of your savings.
+                                                </p>
+                                                <label class="flex items-center mt-2 mb-4">
+                                                    <input type="checkbox" id="agree_terms" name="agree_terms" class="mr-2 h-4 w-4 text-green-500 focus:text-green-400 border-gray-300 rounded" required>
+                                                    <span class="text-sm text-gray-600">I agree to the BCS Target Savings conditions</span>
+                                                </label>
+                                            </div>
+                                            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded">Set Target</button>
+                                        </fieldset>
+                                    </form>
+                                </div>
+                                
+
+                            {% else %}
+                                <!-- Active target: Show progress and transactions -->
+                                <h6 class="font-semibold text-gray-700">Your Target Savings</h6>
+                                <div class="mt-4 p-4 bg-gray-100 rounded">
+                                    <p class="text-lg"><strong>Total Balance:</strong> NGN{{ active_target.total_savings }}</p>
+                                    <p class="text-lg"><strong>Status:</strong> {{ active_target.get_status_display }}</p>
+                                </div>
+
+                                {% if active_target.status == 'active' and active_target.total_savings > 0 %}
+                                    {% if request.user.get_member_bank_details %}
+                                    {% with bank=request.user.get_member_bank_details %}
+                                    <div class="p-4 shadow-soft-xl rounded-2xl bg-white mt-4">
+                                        <h6 class="mb-4 font-bold leading-tight uppercase text-sm text-gray-900">Your Bank Details</h6>
+                                        <p class="text-xs text-gray-700"><strong>Bank Name:</strong> {{ bank.bank_name }}</p>
+                                        <p class="text-xs text-gray-700"><strong>Account Name:</strong> {{ bank.account_holder_name }}</p>
+                                        <p class="text-xs text-gray-700"><strong>Account Number:</strong> {{ bank.account_number }}</p>
+                                    </div>
+                                    {% endwith %}
+                                    <form method="post" action="{% url 'request_target_withdrawal' active_target.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="mt-4 px-4 py-2 text-sm uppercase bg-green-500 text-white rounded" onclick="return confirm('Are you sure you want to request a withdrawal?')" >Request Target Withdrawal</button>                                    
+                                    </form>
+                                    {% else %}
+                                    <p class="text-red-500">You have to <a href="{% url "withdrawal:add_account" %}" class="font-bold text-green-500"> setup your bank details </a> before you can withdraw your target savings</p>
+                                    {% endif %}
+                                {% endif %}
+
+                                <!-- Transactions Table -->
+                                <h6 class="mt-6 font-semibold uppercase">Target Saving Transactions</h6>
+                                <table class="w-full mt-2 border-collapse border border-gray-300">
+                                    <thead>
+                                        <tr class="bg-gray-200">
+                                            <th class="border px-4 py-2">Date</th>
+                                            <th class="border px-4 py-2">Amount</th>
+                                            <th class="border px-4 py-2">Type</th>
+                                            <th class="border px-4 py-2">Receipt</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for transaction in active_target.transactions.all %}
+                                            <tr>
+                                                <td class="border px-4 py-2">{{ transaction.transaction_date|date:"d M Y, H:i" }}</td>
+                                                <td class="border px-4 py-2">₦{{ transaction.amount }}</td>
+                                                <td class="border px-4 py-2">
+                                                    {% if transaction.transaction_type == 'deposit' %}
+                                                        <span class="text-green-500">Deposit</span>
+                                                    {% else %}
+                                                        <span class="text-red-500">Withdrawal</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td class="border px-4 py-2">
+                                                    <a href="{{ transaction.receipt.url }}" download class="text-green underline flex items-center">
+                                                      Download Receipt
+                                                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                                      </svg>
+                                                    </a>
+                                                  </td>
+                                            </tr>
+                                        {% empty %}
+                                            <tr>
+                                                <td colspan="3" class="border px-4 py-2 text-center">No transactions yet.</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+
+                            {% endif %}
+                            {% if previous_targets %}
+                            <!-- Previous Targets -->
+                            <h3 class="mt-8 text-lg font-semibold">Previous Target Contributions</h3>
+                            <table class="w-full mt-2 border-collapse border border-gray-300 overflow-x-auto">
+                                <thead>
+                                    <tr class="bg-gray-100">
+                                        <th class="border px-4 py-2">S/N</th>
+                                        <th class="border px-4 py-2">Final Balance</th>
+                                        <th class="border px-4 py-2">Status</th>
+                                        <th class="border px-4 py-2">Completed On</th>
+                                        <th class="border px-4 py-2">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for target in previous_targets %}
+                                        <tr>
+                                            <td class="border px-4 py-2">{{ forloop.counter }}</td>
+                                            <td class="border px-4 py-2">NGN{{ target.total_savings|intcomma }}</td>
+                                            <td class="border px-4 py-2">{{ target.status|title }}</td>
+                                            <td class="border px-4 py-2">{{ target.wthdrawed_at|date:"d M Y"|default:"-" }}</td>
+                                            <td class="border px-4 py-2">
+                                                <a href="{% url "member_target_detail" target.id %}" class="px-3 py-2 font-bold text-center text-white uppercase transition-all rounded-lg cursor-pointer shadow-soft-md text-xs bg-green-500 hover:scale-105 hover:shadow-md active:opacity-85">Details</a>
+                                            </td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="4" class="border px-4 py-2 text-center">No previous targets.</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% endif %}
+
+                        </div>
+
+                 
+                </div>
+            </div>
+        </div>
+        {% include 'include/dashboard_footer.html' %}
+    </div> <!-- end cards -->
+</main>
+
+<script>
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const agreeTermsCheckbox = document.getElementById('agree_terms');
+    const applyCreditButtons = document.querySelectorAll('.apply-credit-button');
+
+    function updateButtonState() {
+        applyCreditButtons.forEach(button => {
+            if (agreeTermsCheckbox.checked) {
+                button.classList.remove('disabled'); // Remove disabled class
+            } else {
+                button.classList.add('disabled'); // Add disabled class
+            }
+        });
+    }
+
+    agreeTermsCheckbox.addEventListener('change', updateButtonState);
+
+    // Initial state setup
+    updateButtonState();
+
+    applyCreditButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+            if (this.classList.contains('disabled')) {
+                event.preventDefault(); // Prevent navigation
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -4,7 +4,7 @@
 {% load custom_filters %}
 {% load humanize %}
 {% block title %}
-Member Contributions | Benovelance Cooperative
+Member Contributions | Benevolance Cooperative
 {% endblock title %}
 {% block style %}
 
@@ -17,27 +17,10 @@ Member Contributions | Benovelance Cooperative
 {% include 'include/sidebar.html' %}
 <!-- end sidenav -->
 <main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200">
-    {% include 'include/dashboard_navbar.html' %}
+    {% include 'include/dashboard_navbar.html' with breadcrumb='Contribution' page_title='Contribution Record' %}
 
-    <div class="w-full px-6 mx-auto">
-        <!-- card 1 -->
-        <div class="flex flex-col shadow-soft-xl flex-auto min-w-0 p-4  break-words border-0 rounded-2xl bg-gray-100 bg-clip-border backdrop-blur-2xl backdrop-saturate-200">
-            <div class="flex flex-wrap -mx-3">
-                <div class="flex-none w-auto max-w-full px-3 my-auto">
-                    <div class="h-full">
-                        <h5 class="mb-1">Your Contributions at BCS</h5>
-                        <p class="mb-0 font-semibold leading-normal text-sm">from {{ request.user.date_joined|date:"F Y" }} to date</p>
-                    </div>
-                </div>
-                <div class="w-full max-w-full px-3 mx-auto mt-4 sm:my-auto sm:mr-0 md:w-1/2 md:flex-none lg:w-4/12">
-                         <a class="inline-block px-8 py-2 mb-0 font-bold text-center uppercase align-middle transition-all bg-transparent border border-solid rounded-lg shadow-none cursor-pointer leading-pro ease-soft-in text-xs hover:scale-102 active:shadow-soft-xs tracking-tight-soft border-fuchsia-500 text-fuchsia-500 hover:border-fuchsia-500 hover:bg-transparent hover:text-fuchsia-500 hover:opacity-75 hover:shadow-none active:bg-fuchsia-500 active:text-white active:hover:bg-transparent active:hover:text-fuchsia-500" nav-link="" active="" href="{% url 'download_contribution_history' %}" role="tab" aria-selected="true">
-                                    
-                                    <span class="ml-1">Download as PDF</span>
-                                </a>
-                </div>
-            </div>
-        </div>
-    </div>
+
+
     <div class="w-full px-6 mx-auto">
         <div class="flex flex-wrap my-6 -mx-3">
             <!-- card 1 -->
@@ -46,8 +29,15 @@ Member Contributions | Benovelance Cooperative
                     <div class="border-black/12.5 mb-0 rounded-t-2xl border-b-0 border-solid bg-white p-6 pb-0">
                         <div class="flex flex-wrap mt-0 -mx-3">
                             <div class="flex-none w-12/12 max-w-full px-3 mt-0 lg:w-1/2 lg:flex-none">
-                                <h6 class="text-gray-800">Your Complete Contributions in History</h6>
-                                <p>Contributed: ₦{{ total_contributed|intcomma}}</p>
+                                <div class="flex items-center">
+                                    <div class="mr-4">
+                                        <i class="fas fa-history text-2xl text-green-500"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="text-gray-800 font-semibold">Your Complete Contributions in History</h6>
+                                        <p class="text-green-500 font-bold">Contributed: ₦{{ total_contributed|intcomma }}</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

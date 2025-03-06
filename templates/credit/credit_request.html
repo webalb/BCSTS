@@ -3,7 +3,7 @@
 {% load l10n %}
 {% load custom_filters %}
 {% block title %}
-Manage Credit request | Benovelance Cooperative
+Manage Credit request | Benevolance Cooperative
 {% endblock title %}
 {% block header %}
 <!-- DataTables CSS -->
@@ -17,7 +17,7 @@ Manage Credit request | Benovelance Cooperative
 <!-- end sidenav -->
 <main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200 text-gray-9">
     <!-- Navbar -->
-    {% include 'include/dashboard_navbar.html' %}
+    {% include 'include/dashboard_navbar.html' with breadcrumb='Credit' page_title='Pending Request' %}
     <!-- end Navbar -->
     <!-- cards -->
     <div class="w-full px-6 py-6 mx-auto">
@@ -30,27 +30,27 @@ Manage Credit request | Benovelance Cooperative
                     <div class="border-black/12.5 mb-0 rounded-t-2xl border-b-0 border-solid p-6 pb-0">
                         <div class="flex flex-wrap mt-0 -mx-3">
                             <div class="flex-none w-full px-3 mt-0">
-                                <h2 class="text-xl font-bold text-center text-gray-900">Credit Requests</h2>
+                                <h2 class="text-xl font-bold text-center text-gray-800">Pending Credit Requests</h2>
                             </div>
                         </div>
                     </div>
                     <div class="flex-auto p-6 px-0 pb-2">
                         <div class="h-[600px] overflow-y-auto p-4">
                             {% if pending_requests %}
-                            <table id="employeeTable" class="items-center w-full mb-0 align-top border-gray-200 text-gray-900 overflow-x-auto overflow-y-auto">
+                            <table id="employeeTable" class="items-center w-full mb-0 align-top border-gray-200 text-gray-800 overflow-x-auto overflow-y-auto">
                                 <thead class="align-bottom">
                                     <tr class="bg-gray-100 mt-1">
-                                        <th class="border px-3 py-2 text-left text-xs font-semibold uppercase border-b border-gray-900">Applicant</th>
-                                        <th class="border px-3 py-2 text-left text-xs font-semibold uppercase border-b border-gray-900">Tracking ID</th>
-                                        <th class="border px-3 py-2 text-left text-xs font-semibold uppercase border-b border-gray-900">Credit Type</th>
-                                        <th class="border px-3 py-2 text-left text-xs font-semibold uppercase border-b border-gray-900">Amount Requested</th>
-                                        <th class="border px-3 py-2 text-left text-xs font-semibold uppercase border-b border-gray-900">Date Applied</th>
-                                        <th class="border px-3 py-2 text-left text-xs font-semibold uppercase border-b border-gray-900">Actions</th>
+                                        <th class="border px-3 py-2 text-left text-xs font-semibold uppercase border-b border-gray-800">Applicant</th>
+                                        <th class="border px-3 py-2 text-left text-xs font-semibold uppercase border-b border-gray-800">Tracking ID</th>
+                                        <th class="border px-3 py-2 text-left text-xs font-semibold uppercase border-b border-gray-800">Credit Type</th>
+                                        <th class="border px-3 py-2 text-left text-xs font-semibold uppercase border-b border-gray-800">Amount Requested</th>
+                                        <th class="border px-3 py-2 text-left text-xs font-semibold uppercase border-b border-gray-800">Date Applied</th>
+                                        <th class="border px-3 py-2 text-left text-xs font-semibold uppercase border-b border-gray-800">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for request in pending_requests %}
-                                        <tr class="border-b border-gray-300 text-gray-900">
+                                        <tr class="border-b border-gray-300 text-gray-800">
                                             
                                             <td class="p-2 align-middle bg-transparent whitespace-nowrap shadow-transparent">
                                                 <div class="flex px-2 py-1">
@@ -62,7 +62,7 @@ Manage Credit request | Benovelance Cooperative
                                                         {% endif %}
                                                     </div>
                                                     <div class="flex flex-col justify-center">
-                                                        <h6 class="mb-0 text-sm text-gray-900">{{ request.applicant.get_full_name }}</h6>
+                                                        <h6 class="mb-0 text-sm text-gray-800">{{ request.applicant.get_full_name }}</h6>
                                                         <p class="mb-0 text-xs leading-tight text-gray-700">{{ request.applicant.email }}</p>
                                                     </div>
                                                 </div>
@@ -71,13 +71,13 @@ Manage Credit request | Benovelance Cooperative
                                                 <span class="mb-0 leading-normal bg-yellow-200 rounded-lg text-center py-1 px-2 text-sm">{{ request.tracking_id }}</span>
                                             </td>
                                             <td class="p-2 align-middle bg-transparent whitespace-nowrap text-left border">
-                                                <h6 class="mb-0 leading-normal text-sm text-gray-900">{{ request.get_credit_type_display }}</h6>
+                                                <h6 class="mb-0 leading-normal text-sm text-gray-800">{{ request.get_credit_type_display }}</h6>
                                             </td>
                                             <td class="border p-2 align-middle bg-transparent whitespace-nowrap text-left">
-                                                <h6 class="mb-0 leading-normal text-sm text-gray-900">{{ request.amount_requested }}</h6>
+                                                <h6 class="mb-0 leading-normal text-sm text-gray-800">{{ request.amount_requested }}</h6>
                                             </td>
                                             <td class="border p-2 align-middle bg-transparent whitespace-nowrap text-left">
-                                                <h6 class="mb-0 leading-normal text-sm text-gray-900">{{ request.date_applied|date:"d M Y" }}</h6>
+                                                <h6 class="mb-0 leading-normal text-sm text-gray-800">{{ request.date_applied|date:"d M Y" }}</h6>
                                             </td>
                                             <td class="border p-2 align-middle bg-transparent whitespace-nowrap text-left">
                                                 <a href="{% url 'credit:credit_detail' request.tracking_id %}" class="px-3 py-2 mb-0 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer shadow-soft-md leading-pro text-xs ease-soft-in tracking-tight-soft bg-green-500 hover:scale-102 hover:shadow-soft-xs active:opacity-85">Detail</a>

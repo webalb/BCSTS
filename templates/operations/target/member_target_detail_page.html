@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% load custom_filters %}
+
+{% block title %}Target Saving Details | Benevolence Cooperative{% endblock %}
+
+{% block header %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+{% endblock header %}
+
+{% block content %}
+<!-- Sidebar Navigation -->
+{% include is_admin|yesno:'include/admin_sidebar.html,include/sidebar.html' %}
+
+<main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200">
+  <!-- Navbar -->
+  {% include 'include/dashboard_navbar.html' with breadcrumb='Target' page_title='Detail Page' %}
+
+  <div class="w-full px-6 py-6 mx-auto">
+    <div class="flex flex-wrap -mx-3">
+      <div class="w-full px-3">
+        <div class="relative flex flex-col bg-white p-6 rounded-xl">
+          <div class="flex justify-between items-center border-b pb-4">
+            <h2 class="text-xl font-bold text-gray-900">Target Savings Details</h2>
+            <a href="javascript:history.back()" class="px-4 py-2 bg-gray-100 border rounded-lg text-gray-700 hover:bg-gray-300">← Back</a>
+          </div>
+          
+          <div class="text-gray-800 mt-4 p-4 bg-gray-100 rounded">
+            <p><strong>Target Balance:</strong> NGN{{ target_savings.total_savings|intcomma }}</p>
+            <p><strong>Target Status:</strong> {{ target_savings.get_status_display|intcomma }}</p>
+          </div>        
+          {% if transactions %}
+          <!-- Transactions Table -->
+          <div class="mt-6">
+            <table class="w-full border border-gray-200 text-gray-900 text-left">
+              <thead class="bg-gray-100">
+                <tr>
+                  <th class="border px-3 py-2">Transaction Date</th>
+                  <th class="border px-3 py-2">Amount</th>
+                  <th class="border px-3 py-2">Type</th>
+                  <th class="border px-3 py-2">Receipt</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for transaction in transactions %}
+                <tr>
+                  <td class="border p-2">{{ transaction.transaction_date|date:"F j, Y" }}</td>
+                  <td class="border p-2">NGN{{ transaction.amount|intcomma }}</td>
+                  <td class="border p-2">{{ transaction.get_transaction_type_display }}</td>
+                  <td class="border p-2">
+                    {% if transaction.receipt %}
+                        <a href="{{ transaction.receipt.url }}" download class="text-green underline flex items-center">
+                          Download Receipt
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                          </svg>
+                        </a>
+                    {% else %}-{% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% include 'include/dashboard_footer.html' %}
+  </div>
+</main>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% endblock %}

@@ -3,7 +3,7 @@
 {% load humanize %}
 {% load custom_filters %}
 {% block title %}
-Member Dashboard | Benovelance Cooperative
+Contributor Dashboard | Benevolance Cooperative
 {% endblock title %}
 {% block content %}
 <!-- sidenav  -->
@@ -11,7 +11,7 @@ Member Dashboard | Benovelance Cooperative
 <!-- end sidenav -->
 <main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200">
     <!-- Navbar -->
-    {% include 'include/dashboard_navbar.html' %}
+    {% include 'include/dashboard_navbar.html' with breadcrumb='Contributor' page_title='Dashboard' %}
     <!-- end Navbar -->
     <!-- cards -->
     <div class="w-full px-6 py-6 mx-auto">
