@@ -123,7 +123,7 @@ def change_password(request):
     else:
         form = PasswordChangeForm(request.user)
     
-    return render(request, 'accounts/change_password.html', {'form': form})
+    return render(request, 'accounts/settings.html', {'password_form': form})
 
 from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
@@ -399,3 +399,23 @@ def view_mcr(request, nitda_id):
     }
 
     return render(request, 'documents/bcs-mcr.html', context)
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.decorators import login_required
+from withdrawal.forms import  EmployeeAccountForm
+from operations.forms import ContributionSettingForm
+
+@login_required
+def settings(request):
+    """Handles user settings."""
+    password_form = PasswordChangeForm(request.user, prefix='password')
+    bank_form = EmployeeAccountForm(prefix='bank')
+    contribution_form = ContributionSettingForm(prefix='contribution')
+
+    return render(request, 'accounts/settings.html', {
+        'password_form': password_form,
+        'bank_form': bank_form,
+        'contribution_form': contribution_form,
+    })

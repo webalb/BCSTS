@@ -39,7 +39,6 @@ class CustomUser(AbstractUser):
 
     email = models.EmailField(
         unique=True,
-        validators=[validate_nitda_email],
         error_messages={"unique": _("A user with this email already exists.")},
     )
 

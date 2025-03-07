@@ -168,6 +168,7 @@ Withdrawal management | Benevolance Cooperative
                     </div>
                     <div class="flex-auto p-6 px-0 pb-2">
                         <div class="p-4">
+                            {% if withdrawal_history %}
                             <table id="withdrawalHistory" class="items-center w-full mb-0 align-top border-gray-200 text-slate-500 ">
                                 <thead class="align-bottom">
                                     <tr>
@@ -229,13 +230,13 @@ Withdrawal management | Benevolance Cooperative
                                             {% endif %}
                                         </td>
                                     </tr>
-                                    {% empty %}
-                                    <tr>
-                                        <td colspan="6" class="text-center text-muted">No withdrawal history available.</td>
-                                    </tr>
+                                    
                                     {% endfor %}
                                 </tbody>
                             </table>
+                            {% else %}
+                                        <p class="text-center text-muted">No withdrawal history available.</p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
