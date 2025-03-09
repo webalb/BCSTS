@@ -11,15 +11,15 @@ from .models import CustomUser
 from .forms import RegistrationForm, EmployeeUpdateForm
 from operations.models import ContributionSetting
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import update_session_auth_hash
 from django.contrib import messages
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.models import Group  # Import Group
 from operations.utils import get_employee_financial_summary  # Utility function
 from notification.models import Notification
 from notification.services import NotificationService
+from django.contrib.auth import logout
+from django.contrib.sessions.models import Session
 
-# ... other imports
 # for user registration
 def register(request):
     """Handles user registration."""
@@ -108,6 +108,8 @@ def logout_view(request):
     logout(request)
     return redirect("login")
 
+
+
 @login_required
 def change_password(request):
     if request.method == 'POST':
@@ -115,9 +117,18 @@ def change_password(request):
         if form.is_valid():
             user = form.save()
 
-            update_session_auth_hash(request, user)  # Keep the user logged in
-            messages.success(request, 'Your password has been successfully updated!')
-            return redirect('dashboard')  # Redirect to the dashboard or another page
+            # Logout user from all devices by deleting all sessions linked to the user
+            sessions = Session.objects.filter(expire_date__gte=user.last_login)
+            for session in sessions:
+                data = session.get_decoded()
+                if data.get('_auth_user_id') == str(user.id):
+                    session.delete()
+            
+            # Log out the current session
+            logout(request)
+            
+            messages.success(request, 'Your password has been successfully updated! Please log in again.')
+            return redirect('redirect_user')  # Update this with your actual login URL
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
@@ -229,7 +240,7 @@ def create_employee(request):
             NotificationService.send_notification(
                 employee,
                 "Welcome to Benevolence Cooperative!",
-                "You have been successfully registered as a member of BCS, with initial monthly contribution amount: ₦{contribution_amount:,.2f}",
+                "You have been successfully registered as a member of BCS, with initial monthly contribution amount: ₦{contribution_amount}",
                 notification_type=Notification.NotificationType.IN_APP
             )
             # Send email notification with initial contribution amount
@@ -408,7 +419,7 @@ from withdrawal.forms import  EmployeeAccountForm
 from operations.forms import ContributionSettingForm
 
 @login_required
-def settings(request):
+def account_settings(request):
     """Handles user settings."""
     password_form = PasswordChangeForm(request.user, prefix='password')
     bank_form = EmployeeAccountForm(prefix='bank')
@@ -418,4 +429,5 @@ def settings(request):
         'password_form': password_form,
         'bank_form': bank_form,
         'contribution_form': contribution_form,
+        'API_KEY': settings.PAYSTACK_SCRET_KEY,
     })

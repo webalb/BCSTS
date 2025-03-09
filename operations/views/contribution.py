@@ -166,7 +166,7 @@ def request_contribution_change(request):
     """ Employee requests to change their contribution amount. """
 
     if request.method == "POST":
-        new_amount = request.POST.get("requested_amount")
+        new_amount = request.POST.get("contribution-amount")
 
         # Ensure amount is valid
         try:
@@ -181,7 +181,7 @@ def request_contribution_change(request):
         existing_request = ContributionChangeRequest.objects.filter(employee=request.user, status="pending").exists()
         if existing_request:
             messages.error(request, "You already have a pending request.")
-            return redirect("contribution_setting_history")
+            return redirect("settings")
 
         # Create the request
         ContributionChangeRequest.objects.create(
@@ -193,4 +193,4 @@ def request_contribution_change(request):
         messages.success(request, "Your request has been submitted for admin approval.")
         return redirect("dashboard")
 
-    return render(request, "operations/contributions/request_change.html")
+    return render(request, 'accounts/settings.html')

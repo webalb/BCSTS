@@ -4,7 +4,7 @@ from django.contrib.auth import views as auth_views
 
 from .views import (register, activate_email, logout_view, change_password, my_login_view, 
     employee_list, create_employee, update_employee, delete_employee, 
-    employee_detail, toggle_employee_active,employee_specific_detail, view_mcr, settings )
+    employee_detail, toggle_employee_active,employee_specific_detail, view_mcr, account_settings )
 
 urlpatterns = [
     path("register/", register, name="register"),
@@ -29,5 +29,5 @@ urlpatterns = [
 
     path('member/<int:nitda_id>/mcr/', view_mcr, name='view_mcr'),
 
-    path('settings', settings, name='settings'),
+    path('settings', account_settings, name='settings'),
 ]

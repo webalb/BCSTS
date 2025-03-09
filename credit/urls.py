@@ -33,6 +33,7 @@ urlpatterns = [
 
     path('record-credit-repayments/', settings.record_monthly_repayment, name='record_monthly_repayment'),
     path('accept-or-reject/<str:tracking_id>/', disbursement.accept_or_reject, name='accept_or_reject'),
+    path('credit_history/', disbursement.credit_history, name='credit_history'),
 
 ]
 

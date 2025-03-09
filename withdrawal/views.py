@@ -9,6 +9,9 @@ from django.core.exceptions import ValidationError
 from operations.utils import get_employee_financial_summary, get_system_financial_summary
 from decimal import Decimal
 from django.utils import timezone
+from notification.services import NotificationService
+from notification.models import Notification
+
 # Admin check function
 def is_admin(user):
     return user.groups.filter(name="admin").exists()
@@ -64,13 +67,21 @@ def add_account(request):
             account.employee_id = request.user.id
             account.save()
             messages.success(request, "Bank account added successfully!")
+            NotificationService.send_notification(
+                request.user, 
+                "Bank Account Added",
+                "Your bank account has been successfully added to your profile.",
+                link=reverse("dashboard"),  # Or a more specific link if needed
+                notification_type=Notification.NotificationType.IN_APP
+            )
             return redirect('dashboard')
         else:
+            print(form.errors)
             messages.error(request, "Error adding account. Try again.")
     else:
         form = EmployeeAccountForm()
 
-    return render(request, 'withdrawal/add_account.html', {'form': form, 'API_KEY': settings.PAYSTACK_SCRET_KEY})
+    return render(request, 'accounts/settings.html', {'bank_form': form, 'API_KEY': settings.PAYSTACK_SCRET_KEY})
 
 @login_required
 @user_passes_test(is_employee)
@@ -78,6 +89,13 @@ def delete_account(request, pk):
     """Delete an employee account"""
     account = get_object_or_404(EmployeeAccountDetails, pk=pk)
     if request.method == 'POST':
+        NotificationService.send_notification(
+            account.employee,  # Get the employee from the account
+            "Bank Account Removed",
+            "Your bank account details have been removed. You can add a new bank account in your profile.",
+            link=reverse("settings"),  # Or a more specific link
+            notification_type=Notification.NotificationType.IN_APP
+        )
         account.delete()
         messages.success(request, "Bank account deleted successfully.")
         return redirect('dashboard')
@@ -124,10 +142,10 @@ def update_charge(request):
 # # =======================================
 # # WITHDRAWAL REQUEST IMPLEMENTATION VIEWS
 # # ======================================
-# from django.http import HttpResponseRedirect
 
 
 @login_required
+@user_passes_test(is_employee)
 def withdrawal_request(request):
     """Processes employee withdrawal request and redirects to the management page."""
     if request.method == "POST":
@@ -167,6 +185,9 @@ def withdrawal_request(request):
 
     return redirect("withdrawal:employee_withdrawal_management")  # Fallback for GET request
 
+from django.contrib.auth.models import Group
+
+
 @login_required
 @user_passes_test(is_employee)
 def cancel_request(request, request_id):
@@ -177,6 +198,17 @@ def cancel_request(request, request_id):
         withdrawal.status = 'cancelled'
         withdrawal.action_date = timezone.now()
         withdrawal.save()
+        admin_group = Group.objects.get(name='Admin')
+        admins = admin_group.user_set.all()
+
+        for admin in admins:
+            NotificationService.send_notification(
+                admin,
+                "Withdrawal Request Cancelled",
+                f"Withdrawal request #{withdrawal.id} has been cancelled.",
+                link=reverse("withdrawal:admin_withdrawal_management"),
+                notification_type=Notification.NotificationType.IN_APP
+            )
         messages.success(request, "Withdrawal request has been canceled.")
     else:
         messages.error(request, "You can only cancel pending or approved requests.")
@@ -190,6 +222,15 @@ def approve_request(request, request_id):
         withdrawal.status = 'approved'
         withdrawal.action_date = timezone.now()
         withdrawal.save()
+        # send notification to the requester (withdrawal.employee)
+
+        NotificationService.send_notification(
+            withdrawal.employee,  # Send to the employee who requested the withdrawal
+            "Withdrawal Request Approved",
+            f"Your withdrawal request #{withdrawal.id} has been approved.",  # Or withdrawal.pk
+            link=reverse("withdrawal:employee_withdrawal_management"),  # Or a more specific link to withdrawal details
+            notification_type=Notification.NotificationType.IN_APP
+        )
         messages.success(request, "Withdrawal request approved successfully.")
     return redirect('withdrawal:admin_withdrawal_management')
 
@@ -211,7 +252,14 @@ def update_withdrawal_status(request):
             withdrawal.status = Withdrawals.Status.DECLINED
             withdrawal.action_note = reason
             withdrawal.action_date = now()
-            messages.success(request, "Withdrawal request declined successfully.")
+            NotificationService.send_notification(
+                withdrawal.employee,  # Send to the employee who requested the withdrawal
+                "Withdrawal Request Declined",
+                f"Your withdrawal request #{withdrawal.id} has been Declined.",  # Or withdrawal.pk
+                link=reverse("withdrawal:employee_withdrawal_management"),  # Or a more specific link to withdrawal details
+                notification_type=Notification.NotificationType.IN_APP
+            )
+            messages.success(request, "Withdrawal request declined.")
 
         elif action == 'pay':
             if withdrawal.status not in [Withdrawals.Status.PENDING, Withdrawals.Status.APPROVED]:
@@ -227,27 +275,15 @@ def update_withdrawal_status(request):
 
             withdrawal.status = Withdrawals.Status.PAID
             withdrawal.total_amount_withdrawn = withdrawal.amount_requested + withdrawal.charges_applied
+            NotificationService.send_notification(
+                withdrawal.employee,  # Send to the employee who requested the withdrawal
+                "Withdrawal Request Paid",
+                f"Your withdrawal request #{withdrawal.id} has been Paid.",  # Or withdrawal.pk
+                link=reverse("withdrawal:employee_withdrawal_management"),  # Or a more specific link to withdrawal details
+                notification_type=Notification.NotificationType.IN_APP
+            )
             messages.success(request, "Withdrawal request marked as paid successfully.")
 
         withdrawal.save()
     
     return redirect('withdrawal:admin_withdrawal_management')
-
-def decline_request(request, request_id):
-    pass
-    # withdrawal = get_object_or_404(WithdrawalRequest, id=request_id)
-    # if withdrawal.status == 'pending':
-    #     withdrawal.status = 'declined'
-    #     withdrawal.save()
-    #     messages.error(request, "Withdrawal request declined.")
-    # return redirect('withdrawal:admin_withdrawal_management')
-
-def pay_request(request, request_id):
-    pass
-    # withdrawal = get_object_or_404(WithdrawalRequest, id=request_id)
-    # if withdrawal.status == 'approved':
-    #     withdrawal.status = 'paid'
-    #     withdrawal.save()
-    #     messages.success(request, "Withdrawal request marked as paid.")
-    # return redirect('withdrawal:admin_withdrawal_management')
-

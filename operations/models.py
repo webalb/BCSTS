@@ -5,6 +5,10 @@ from django.core.mail import send_mail
 from django.db.models import Q, Sum
 import uuid
 from decimal import Decimal
+from notification.services import NotificationService
+from notification.models   import Notification
+from django.urls import reverse
+
 class ContributionSetting(models.Model):
     """ Stores employee's preferred contribution amount and its history. """
     id = models.CharField(primary_key=True, max_length=7, unique=True)
@@ -176,10 +180,18 @@ class ContributionRecord(models.Model):
                 #     subject="Monthly Contribution Deducted",
                 #     message=f"Dear {employee.nitda_id},\n\nYour monthly contribution of {contribution_amount} "
                 #             f"has been recorded for {current_month}/{current_year}. Please ensure timely payment.",
-                #     from_email="no-reply@benevolence.com",
+                #     from_email="no-reply@bcs.org.ng",
                 #     recipient_list=[employee.email],
                 #     fail_silently=True
                 # )
+                message=f"Dear {employee.get_full_name},\n\nYour monthly contribution of {contribution_amount} has been recorded for {current_month}/{current_year}.",
+                NotificationService.send_notification(
+                    employee,
+                    heading="Monthly Contribution Deducted",
+                    message=message,
+                    link=reverse("dashboard"),  
+                    notification_type=Notification.NotificationType.IN_APP
+                )
 
                 records_created += 1
 

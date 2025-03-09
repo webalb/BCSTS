@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     
     'channels', 
     'notification.apps.NotificationConfig',
+    'axes',
 ]
 
 MIDDLEWARE = [
@@ -59,6 +60,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'axes.middleware.AxesMiddleware',
 
 ]
 
@@ -121,6 +123,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'axes.backends.AxesStandaloneBackend',
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
@@ -192,3 +198,12 @@ CHANNEL_LAYERS = {
 
 # Define the date to assume salary will be paid on as a constant
 SALARY_PAYMENT_DATE = "1"
+
+# SECURE_SSL_REDIRECT = True  # Redirect HTTP to HTTPS
+# SESSION_COOKIE_SECURE = True  # Protect session cookies
+# CSRF_COOKIE_SECURE = True  # Secure CSRF cookies
+# X_FRAME_OPTIONS = 'DENY'  # Prevent clickjacking
+
+SECURE_BROWSER_XSS_FILTER = True
+AXES_FAILURE_LIMIT = 5  # Allow 5 failed attempts instead of 3
+AXES_COOLOFF_TIME = 1  # Lockout time in hours (1 hour)

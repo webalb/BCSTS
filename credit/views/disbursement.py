@@ -144,3 +144,18 @@ def accept_or_reject(request, tracking_id):
         return redirect('credit:create_credit_application')
     
     return render(request, 'credit/accept_or_reject.html', {'credit': credit})
+
+
+@login_required
+@user_passes_test(is_admin)
+def credit_history(request):
+    """
+    Displays the credit history for the logged-in user, excluding pending, approved, accepted, and disbursed requests.
+    """
+    excluded_statuses = ['Pending', 'Approved', 'Accepted', 'Disbursed']
+    credits = Credit.objects.filter(applicant=request.user).exclude(status__in=excluded_statuses).order_by('-date_applied')
+
+    context = {
+        'credits': credits,
+    }
+    return render(request, 'credit/credit_history.html', context)

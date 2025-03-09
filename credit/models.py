@@ -173,7 +173,7 @@ class Credit(models.Model):
         max_digits=10, decimal_places=2, default=Decimal(0.00),
         help_text="Fixed administrative charge applied."
     )
-    amount_repaid = models.IntegerField(blank=True, null=True)
+    amount_repaid = models.DecimalField(max_digits=12, decimal_places=2, blank=True, null=True)
 
     def can_be_cancelled(self):
         """A credit can be canceled only if it is still pending."""

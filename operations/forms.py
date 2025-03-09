@@ -6,7 +6,7 @@ class ContributionSettingForm(forms.ModelForm):
         model = ContributionSetting
         fields = ['amount']
         widgets = {
-            'amount': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01', 'min': '0'}),
+            'amount': forms.NumberInput(attrs={'min': '0'}),
         }
 
     def clean_amount(self):

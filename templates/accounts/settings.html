@@ -6,9 +6,21 @@
 Account Settings | Benevolance Cooperative
 {% endblock title %}
 {% block header %}
-<!-- DataTables CSS -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.location.hash) {
+            const targetElement = document.querySelector(window.location.hash);
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth' }); // Optional: smooth scrolling
+            }
+        }
+    });
+</script>
 {% endblock header %}
+
+
 {% block content %}
 <!-- sidenav  -->
  {% if is_admin %}
@@ -51,7 +63,7 @@ Account Settings | Benevolance Cooperative
 
                                 <label class="mb-2 ml-1 font-bold text-xs text-gray-800">Old Password</label>
                                 <div class="mb-4">
-                                    <input type="password" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" placeholder="Old Password" aria-label="Old Password" id="old_password" name="old_password" required />
+                                    <input type="password" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Old Password" aria-label="Old Password" id="old_password" name="old_password" required />
                                     {% if password_form.old_password.errors %}
                                         <ul class="errorlist">
                                             {% for error in password_form.old_password.errors %}
@@ -63,7 +75,7 @@ Account Settings | Benevolance Cooperative
 
                                 <label class="mb-2 ml-1 font-bold text-xs text-gray-800">New Password</label>
                                 <div class="mb-4">
-                                    <input type="password" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" placeholder="New Password" aria-label="New Password" id="new_password1" name="new_password1" required />
+                                    <input type="password" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="New Password" aria-label="New Password" id="new_password1" name="new_password1" required />
                                     {% if password_form.new_password1.errors %}
                                         <ul class="errorlist">
                                             {% for error in password_form.new_password1.errors %}
@@ -75,7 +87,7 @@ Account Settings | Benevolance Cooperative
 
                                 <label class="mb-2 ml-1 font-bold text-xs text-gray-800">Confirm New Password</label>
                                 <div class="mb-4">
-                                    <input type="password" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" placeholder="Confirm New Password" aria-label="Confirm New Password" id="new_password2" name="new_password2" required />
+                                    <input type="password" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Confirm New Password" aria-label="Confirm New Password" id="new_password2" name="new_password2" required />
                                     {% if password_form.new_password2.errors %}
                                         <ul class="errorlist">
                                             {% for error in password_form.new_password2.errors %}
@@ -86,8 +98,8 @@ Account Settings | Benevolance Cooperative
                                 </div>
 
                                 <div class="text-right">
-                                    <a href="javascript::history().back" class="inline-block px-6 py-3 mt-6 mb-2 font-bold text-center text-white uppercase transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gray-700 text-white">Go Back</a>
-                                    <button type="submit" class="inline-block px-6 py-3 mt-6 mb-2 font-bold text-center text-white uppercase transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gray-700 text-white">Change Password</button>
+                                    <a href="javascript::history().back" class="inline-block px-6 py-3 mt-6 mb-2 font-bold text-center text-white uppercase transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gray-800 text-white">Go Back</a>
+                                    <button type="submit" class="inline-block px-6 py-3 mt-6 mb-2 font-bold text-center text-white uppercase transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-green-600 text-white">Change Password</button>
                                 </div>
                             </form>
                         </div>
@@ -95,7 +107,9 @@ Account Settings | Benevolance Cooperative
                 </div>
             </div>
         </div>   
-        <div class="flex flex-wrap mt-6 -mx-3">
+        {% if not is_admin  %}
+        {% if not request.user.get_member_bank_details %}
+        <div class="flex flex-wrap mt-6 -mx-3"  id="bank-details">
             <div class="w-full max-w-full px-3 mt-0 mb-6 md:mb-0 md:flex-none lg:flex-none">
                 <div class="border-black/12.5 shadow-soft-xl relative flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid bg-white bg-clip-border">
                     <div class="border-black/12.5 mb-0 rounded-t-2xl border-b-0 border-solid bg-white p-6 pb-0">
@@ -107,12 +121,26 @@ Account Settings | Benevolance Cooperative
                     </div>
                     <div class="flex-auto p-6 px-0 pb-2">
                         <div class="overflow-x-auto px-6">
-                            <form role="form text-left" method="post" action="">
+                            <form role="form text-left" method="post" action="{% url 'withdrawal:add_account' %}">
                                 {% csrf_token %}
+
+                                {% if bank_form.errors %}
+                                    <div class="bg-red-100 border border-red-400 text-red-800 px-4 py-3 rounded relative" role="alert">
+                                        <strong class="font-bold">Error!</strong>
+                                        <span class="block sm:inline">
+                                            {% for error in bank_form.non_field_errors %}
+                                            {{ error }}<br>
+                                            {% endfor %}
+                                        </span>
+                                        <button class="absolute top-0 bottom-0 right-0 px-3 py-1 text-red-500 hover:text-red-800 focus:outline-none" type="button" data-dismiss="alert" aria-label="Close">
+                                            <span>&times;</span>
+                                        </button>
+                                    </div>
+                                {% endif %}
         
                                 <label class="mb-2 ml-1 font-bold text-xs text-gray-800">Account Number</label>
                                 <div class="mb-4">
-                                    <input type="text" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" placeholder="Account Number" aria-label="Account Number" id="account_number" name="bank-account_number" value="{{ bank_form.account_number.value|default:'' }}" required />
+                                    <input type="text" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Account Number" aria-label="Account Number" id="account_number" name="account_number" value="{{ bank_form.account_number.value|default:'' }}" required />
                                     {% if bank_form.account_number.errors %}
                                         <ul class="errorlist">
                                             {% for error in bank_form.account_number.errors %}
@@ -124,7 +152,8 @@ Account Settings | Benevolance Cooperative
         
                                 <label class="mb-2 ml-1 font-bold text-xs text-gray-800">Bank Name</label>
                                 <div class="mb-4">
-                                    <input type="text" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" placeholder="Bank Name" aria-label="Bank Name" id="bank_name" name="bank-bank_name" value="{{ bank_form.bank_name.value|default:'' }}" required />
+                                    <input type="text" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Bank name" id="bank_name" name="bank_name" list="bankList" required autocomplete="off" />
+                                    <datalist id="bankList"></datalist>                                    
                                     {% if bank_form.bank_name.errors %}
                                         <ul class="errorlist">
                                             {% for error in bank_form.bank_name.errors %}
@@ -136,7 +165,7 @@ Account Settings | Benevolance Cooperative
         
                                 <label class="mb-2 ml-1 font-bold text-xs text-gray-800">Account Holder Name</label>
                                 <div class="mb-4">
-                                    <input type="text" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" placeholder="Account Holder Name" aria-label="Account Holder Name" id="account_holder_name" name="bank-account_name" value="{{ bank_form.account_name.value|default:'' }}" required />
+                                    <input type="text" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Account Holder Name" aria-label="Account Holder Name" id="account_holder_name" name="account_holder_name" value="{{ bank_form.account_name.value|default:'' }}" required />
                                     {% if bank_form.account_name.errors %}
                                         <ul class="errorlist">
                                             {% for error in bank_form.account_name.errors %}
@@ -146,8 +175,11 @@ Account Settings | Benevolance Cooperative
                                     {% endif %}
                                 </div>
         
+                                <div class="text-right mr-4">
+                                    <button type="button" class="inline-block px-6 py-3 mt-6 mb-2 font-bold text-center text-white uppercase align-middle transition-all border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gray-800" id="verifyButton">Verify</button>
+                                </div>
                                 <div class="text-right">
-                                    <button type="submit" class="inline-block px-6 py-3 mt-6 mb-2 font-bold text-center text-white uppercase transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gray-700 text-white">Update Bank Details</button>
+                                    <button type="submit" class="inline-block px-6 py-3 mt-6 mb-2 font-bold text-center text-white uppercase align-middle transition-all border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-green-500" id="saveButton" style="display:none;">Save</button>
                                 </div>
                             </form>
                         </div>
@@ -155,8 +187,9 @@ Account Settings | Benevolance Cooperative
                 </div>
             </div>
         </div>
+        {% endif %}
 
-        <div class="flex flex-wrap mt-6 -mx-3">
+        <div class="flex flex-wrap mt-6 -mx-3" id="request-change-contribution-amount">
             <div class="w-full max-w-full px-3 mt-0 mb-6 md:mb-0 md:flex-none lg:flex-none">
                 <div class="border-black/12.5 shadow-soft-xl relative flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid bg-white bg-clip-border">
                     <div class="border-black/12.5 mb-0 rounded-t-2xl border-b-0 border-solid bg-white p-6 pb-0">
@@ -168,7 +201,7 @@ Account Settings | Benevolance Cooperative
                     </div>
                     <div class="flex-auto p-6 px-0 pb-2">
                         <div class="overflow-x-auto px-6">
-                            <form role="form text-left" method="post">
+                            <form role="form text-left" method="post" action="{% url 'request_contribution_change' %}">
                                 {% csrf_token %}
 
                                 <label class="mb-2 ml-1 font-bold text-xs text-gray-800">Requested Amount</label>
@@ -183,20 +216,8 @@ Account Settings | Benevolance Cooperative
                                     {% endif %}
                                 </div>
 
-                                <label class="mb-2 ml-1 font-bold text-xs text-gray-800">Reason</label>
-                                <div class="mb-4">
-                                    {{ contribution_form.reason }}
-                                    {% if contribution_form.reason.errors %}
-                                        <ul class="errorlist">
-                                            {% for error in contribution_form.reason.errors %}
-                                                <li style="color:red;">{{ error }}</li>
-                                            {% endfor %}
-                                        </ul>
-                                    {% endif %}
-                                </div>
-
                                 <div class="text-right">
-                                    <button type="submit" class="inline-block px-6 py-3 mt-6 mb-2 font-bold text-center text-white uppercase transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gray-700 text-white">Submit Request</button>
+                                    <button type="submit" class="inline-block px-6 py-3 mt-6 mb-2 font-bold text-center text-white uppercase transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-gray-800 text-white">Submit Request</button>
                                 </div>
                             </form>
                         </div>
@@ -204,9 +225,71 @@ Account Settings | Benevolance Cooperative
                 </div>
             </div>
         </div>
+        {% endif %}
 
 
         {% include 'include/dashboard_footer.html' %}
     </div> <!-- end cards -->
 </main>
+
+<script>
+    let bankData = {};
+    
+    // Load bank list from Paystack API
+    fetch("https://api.paystack.co/bank", {
+        headers: {
+            'Authorization': 'Bearer {{API_KEY}}'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status) {
+            bankData = data.data.reduce((acc, bank) => {
+                acc[bank.name] = bank.code;
+                return acc;
+            }, {});
+            
+            let bankList = document.getElementById("bankList");
+            data.data.forEach(bank => {
+                let option = document.createElement("option");
+                option.value = bank.name;
+                bankList.appendChild(option);
+            });
+        } else {
+            console.error("Error loading bank list from Paystack:", data.message);
+        }
+    })
+    .catch(error => console.error("Error fetching bank list:", error));
+    
+    // Account verification
+    document.getElementById("verifyButton").addEventListener("click", function() {
+        let accountNumber = document.getElementById("account_number").value;
+        let bankName = document.getElementById("bank_name").value;
+        let bankCode = bankData[bankName];
+    
+        if (!accountNumber || !bankCode) {
+            alert("Please enter a valid account number and select a bank.");
+            return;
+        }
+    
+        axios.get(`https://api.paystack.co/bank/resolve?account_number=${accountNumber}&bank_code=${bankCode}`, {
+            headers: {
+                'Authorization': 'Bearer {{API_KEY}}',
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.data.status) {
+                document.getElementById("account_holder_name").value = response.data.data.account_name;
+                document.getElementById("verifyButton").style.display = "none";
+                document.getElementById("saveButton").style.display = "block";
+            } else {
+                alert("Account verification failed.");
+            }
+        }).catch(error => {
+            console.error("Verification error:", error);
+            alert("Error verifying account.");
+        });
+    });
+    </script>
+    
 {% endblock %}

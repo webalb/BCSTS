@@ -4,6 +4,10 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django import forms
 from .models import CustomUser
 
+admin.site.site_header = "BCS Super Admin Dashboard"  # Change Admin Header
+admin.site.site_title = "BCS Super Admin"  # Browser Tab Title
+admin.site.index_title = "Welcome to BCS Super Admin Panel"  # Dashboard Title
+
 # Custom User Creation Form
 class CustomUserCreationForm(UserCreationForm):
     class Meta:

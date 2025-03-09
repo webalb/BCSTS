@@ -1,24 +1,20 @@
 from accounts.models import CustomUser as User
 from accounts.models import CustomUser
-from django.contrib.auth.models import Group
-import json
-import calendar
 from decimal import Decimal
-from datetime import datetime, timedelta, date
+from datetime import timedelta, date
 from django.urls import reverse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib import messages
 from django.http import Http404
 
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.timezone import now
 from django.db.models import Sum, Q
 
 from operations.models import ContributionRecord, ContributionSetting, ContributionSettingHistory, ContributionChangeRequest
-from operations.forms import ContributionSettingForm, ContributionSettingAdminForm
-from withdrawal.models import EmployeeAccountDetails, Charges, Withdrawals
+from operations.forms import ContributionSettingAdminForm
+from withdrawal.models import Withdrawals
 from .contribution import calculate_contribution_durations
 
 from operations.utils import get_system_financial_summary  # Importing your utility function
@@ -155,6 +151,14 @@ def record_individual_contribution(request, employee_id):
             year=selected_year,
             status='Paid'
         )
+        message=f"Dear {employee.get_full_name},\n\nYour monthly contribution of {employee.contribution_setting.amount} has been recorded for {selected_month}/{selected_year}.", # type: ignore
+        NotificationService.send_notification(
+            employee,
+            heading="Monthly Contribution Deducted",
+            message=message,
+            link=reverse("dashboard"),  
+            notification_type=Notification.NotificationType.IN_APP
+        )
         messages.success(request, f"Contribution recorded for {employee.nitda_id}.")
 
     return redirect('manage_contributions')
@@ -185,6 +189,14 @@ def record_all_missing_contributions(request):
             month=selected_month,
             year=selected_year,
             status='pending'
+        )
+        message=f"Dear {employee.get_full_name},\n\nYour monthly contribution of {employee.contribution_setting.amount} has been recorded for {selected_month}/{selected_year}.", # type: ignore
+        NotificationService.send_notification(
+            employee,
+            heading="Monthly Contribution Deducted",
+            message=message,
+            link=reverse("dashboard"),  
+            notification_type=Notification.NotificationType.IN_APP
         )
         records_created += 1
 
@@ -306,7 +318,16 @@ def create_contribution_setting(request, employee_id):
         if form.is_valid():
             contribution_setting = form.save(commit=False)
             contribution_setting.employee = employee  # Assign the employee (Crucial)
+            
             contribution_setting.save()
+            message=f"Dear {employee.get_full_name},\n\nYour monthly contribution is updated.",
+            NotificationService.send_notification(
+                employee,
+                heading="Contribution Setting Updated",
+                message=message,
+                link=reverse("contribution_setting_history"),  
+                notification_type=Notification.NotificationType.IN_APP
+            )
             messages.success(request, "Contribution setting created successfully.")
             return redirect('manage_employee_contributions')
     else:
@@ -327,6 +348,14 @@ def update_contribution_setting(request, pk):
         form = ContributionSettingAdminForm(request.POST, instance=contribution_setting)
         if form.is_valid():
             form.save()  # No need to assign employee again, it's already linked
+            message=f"Dear {employee.get_full_name},\n\nYour monthly contribution is updated.",
+            NotificationService.send_notification(
+                employee,
+                heading="Contribution Setting Updated",
+                message=message,
+                link=reverse("contribution_setting_history"),  
+                notification_type=Notification.NotificationType.IN_APP
+            )
             messages.success(request, "Contribution setting updated successfully.")
             return redirect('manage_employee_contributions')
     else:
@@ -378,11 +407,10 @@ def delete_contribution(request, contribution_id):
     messages.success(request, "Contribution record deleted successfully.")
     return redirect('manage_contributions')
 
-# used
 @login_required
 @user_passes_test(is_admin)
 def process_contribution_request(request, request_id, action):
-    """ Admin approves or rejects a request. """
+    """Admin approves or rejects a request."""
     change_request = get_object_or_404(ContributionChangeRequest, id=request_id)
 
     if action == "approve":
@@ -393,18 +421,37 @@ def process_contribution_request(request, request_id, action):
         contribution_setting.save()
 
         change_request.status = "approved"
-        messages.success(request, f"Request approved. Contribution updated from {old_amount} to {change_request.requested_amount}.")
+        employee = change_request.employee
+        message = f"Dear {employee.get_full_name()},\n\nYour monthly contribution has been updated to ₦{change_request.requested_amount:,.2f}."
+
+        NotificationService.send_notification(
+            employee,
+            heading="Contribution Amount Request Approved",
+            message=message,
+            link=reverse("contribution_setting_history"),
+            notification_type=Notification.NotificationType.IN_APP  # Assuming this is the correct way to access the enum
+        )
+        messages.success(request, f"Request approved. Contribution updated from ₦{old_amount:,.2f} to ₦{change_request.requested_amount:,.2f}.")
 
     elif action == "reject":
         change_request.status = "rejected"
+        employee = change_request.employee
+        message = f"Dear {employee.get_full_name()},\n\nYour request to change your monthly contribution to ₦{change_request.requested_amount:,.2f} has been rejected."
+
+        NotificationService.send_notification(
+            employee,
+            heading="Contribution Amount Request Rejected",
+            message=message,
+            link=reverse("contribution_setting_history"),
+            notification_type=Notification.NotificationType.IN_APP
+        )
         messages.warning(request, "Request has been rejected.")
 
-    change_request.reviewed_at = now()
+    change_request.reviewed_at = timezone.now()
     change_request.reviewed_by = request.user
     change_request.save()
 
     return redirect("manage_employee_contributions")
-
 from django.http import JsonResponse
 from django.utils.timezone import now
 from django.db.models import Sum

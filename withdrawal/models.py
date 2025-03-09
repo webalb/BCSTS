@@ -23,7 +23,7 @@ class Charges(models.Model):
         if not self.id:
             while True:
                 new_id = uuid.uuid4().hex[:7]
-                if not Withdrawals.objects.filter(id=new_id).exists():
+                if not Charges.objects.filter(id=new_id).exists():
                     self.id = new_id
                     break
         with transaction.atomic():  # Prevents race conditions
@@ -34,8 +34,8 @@ class Charges(models.Model):
 
     @classmethod
     def get_current_charge(cls):
-        """Returns the active charge percentage."""
-        return cls.objects.filter(status='current').first()
+        return cls.objects.filter(status='current').order_by('-created_at').first()
+
 
     def __str__(self):
         return f"Charge: {self.charge_percentage}% ({self.status})"
