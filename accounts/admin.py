@@ -29,15 +29,15 @@ class CustomUserAdmin(UserAdmin):
     form = CustomUserChangeForm
     model = CustomUser
 
-    list_display = ['email', 'first_name', 'last_name', 'nitda_id', 'is_staff']
+    list_display = ['email', 'full_name', , 'usermane', 'is_staff']
     list_filter = ['is_staff', 'is_superuser', 'is_active', 'gender']
     ordering = ['email']
-    search_fields = ['email', 'first_name', 'last_name', 'nitda_id']
+    search_fields = ['email', 'full_name', 'last_name', 'nitda_id']
 
     # Remove username from fieldsets
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        ('Personal info', {'fields': ('first_name', 'last_name', 'other_name', 'phone_number',
+        ('Personal info', {'fields': ('full_name', 'phone_number',
                                       'nitda_id', 'gender', 'passport_photo')}),
         ('Next of Kin', {'fields': ('next_of_kin_name', 'next_of_kin_phone', 'next_of_kin_relationship')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
@@ -49,10 +49,9 @@ class CustomUserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'username', 'password1', 'password2', 'first_name', 'last_name',
-                       'phone_number', 'nitda_id', 'gender', 'passport_photo',
-                       'next_of_kin_name', 'next_of_kin_phone', 'next_of_kin_relationship',
-                       'is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+            'fields': ('email', 'username', 'password1', 'password2',
+                       'gender', 'passport_photo',
+                       'is_active', 'groups',),
         }),
     )
 
