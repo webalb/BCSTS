@@ -43,7 +43,7 @@ class ContributionSetting(models.Model):
                 contribution_setting=self,
                 amount=self.amount,
                 changed_by=self.employee,
-                change_reason="Amount updated, Approved by Admin"
+                change_reason="Amount updated"
             )
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -184,7 +184,7 @@ class ContributionRecord(models.Model):
                 #     recipient_list=[employee.email],
                 #     fail_silently=True
                 # )
-                message=f"Dear {employee.get_full_name},\n\nYour monthly contribution of {contribution_amount} has been recorded for {current_month}/{current_year}.",
+                message=f"Dear {employee.full_name},\n\nYour monthly contribution of {contribution_amount} has been recorded for {current_month}/{current_year}.",
                 NotificationService.send_notification(
                     employee,
                     heading="Monthly Contribution Deducted",
@@ -225,7 +225,7 @@ class TargetSavings(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.member.get_full_name} ({self.status})"
+        return f"{self.member.full_name} ({self.status})"
 
 class TargetSavingsTransaction(models.Model):
     TRANSACTION_TYPE_CHOICES = [

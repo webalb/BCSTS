@@ -113,7 +113,7 @@ Credit Detail Page | Benevolance Cooperative
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <!-- Full Name -->
                         <div class="flex flex-col">
-                            <label class="text-sm font-medium text-gray-700 mt-1">Full Name: <span class="mt-1 text-sm text-gray-900">{{ applicant.get_full_name }}</sp></label>
+                            <label class="text-sm font-medium text-gray-700 mt-1">Full Name: <span class="mt-1 text-sm text-gray-900">{{ applicant.full_name }}</sp></label>
                             
                         </div>
                 
@@ -155,7 +155,7 @@ Credit Detail Page | Benevolance Cooperative
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <!-- Full Name -->
                         <div class="flex flex-col">
-                            <label class="text-sm font-medium text-gray-700">Full Name: <span class="mt-1 text-sm text-gray-900">{{ guarantor.guarantor.get_full_name }}</span></label>
+                            <label class="text-sm font-medium text-gray-700">Full Name: <span class="mt-1 text-sm text-gray-900">{{ guarantor.guarantor.full_name }}</span></label>
                         </div>
                 
                         <!-- Email -->
@@ -359,7 +359,7 @@ Credit Detail Page | Benevolance Cooperative
                                                     <i class="fas fa-user-times text-red-500 text-xl mx-4"></i>
                                                 {% endif %}
                                                 <div class="flex flex-col">
-                                                    <h6 class="mb-1 leading-normal text-sm text-gray-800">{{ action.committee_member.member.get_full_name }}</h6>
+                                                    <h6 class="mb-1 leading-normal text-sm text-gray-800">{{ action.committee_member.member.full_name }}</h6>
                                                     <span class="leading-tight text-xs">{{ action.action_date|date:"F j, Y, g:i a" }}</span>
                                                 </div>
                                             </div>

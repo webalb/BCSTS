@@ -70,7 +70,7 @@ Upload Contributions | Benevolence Cooperative
                 <table id="contributionsTable" class="w-full text-sm text-left border border-gray-200 overflow-x-auto, overflow-y-auto">
                     <thead class="bg-gray-100">
                         <tr>
-                            <th class="p-2">Contributor Email</th>
+                            <th class="p-2">Contributor NITDA ID</th>
                             <th class="p-2">Amount</th>
                             <th class="p-2">Month</th>
                             <th class="p-2">Year</th>
@@ -159,7 +159,7 @@ function uploadFile() {
             tableBody.empty();
             response.preview_data.forEach(row => {
                 tableBody.append(`<tr class="border-t border-gray-300">
-                                    <td class="p-2">${row.Email}</td>
+                                    <td class="p-2">${row.NITDAID}</td>
                                     <td class="p-2">${row.Amount}</td>
                                     <td class="p-2">${row.Month}</td>
                                     <td class="p-2">${row.Year}</td>

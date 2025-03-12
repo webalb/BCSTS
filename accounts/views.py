@@ -1,14 +1,11 @@
+import re
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
-from django.contrib.sites.shortcuts import get_current_site
-from django.template.loader import render_to_string
-from django.core.mail import send_mail
 from django.conf import settings
-from django.http import HttpResponse
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes, force_str
+
+from withdrawal.views import is_admin
 from .models import CustomUser
-from .forms import RegistrationForm, EmployeeUpdateForm
+from .forms import EmployeeUpdateForm
 from operations.models import ContributionSetting
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -20,88 +17,6 @@ from notification.services import NotificationService
 from django.contrib.auth import logout
 from django.contrib.sessions.models import Session
 
-# for user registration
-def register(request):
-    """Handles user registration."""
-
-    if request.method == "POST":
-        form = RegistrationForm(request.POST, request.FILES)
-        if form.is_valid():
-            contribution_amount = form.cleaned_data.get("contribution_amount")
-
-            # Ensure contribution is at least 1000
-            if contribution_amount is None or contribution_amount < 1000:
-                form.add_error("contribution_amount", "Contribution amount must be at least 1,000.")
-                return render(request, "accounts/register.html", {"form": form})
-
-            user = form.save(commit=False)
-            user.is_active = True 
-            user.save()
-
-            # Assign default role (employee group)
-            try:
-                employee_group = Group.objects.get(name="Employee")
-                user.groups.add(employee_group)
-            except Group.DoesNotExist:
-                messages.error(request, "The 'Employee' group does not exist. Please contact the administrator.")
-                user.delete()  # Prevent incomplete registration
-                return redirect("register")
-
-            # Create contribution setting
-            ContributionSetting.objects.create(employee=user, amount=contribution_amount)
-
-            # # Send email verification
-            # current_site = get_current_site(request)
-            # subject = "Verify your Email - Benevolence Cooperative"
-            # message = render_to_string(
-            #     "accounts/email_verification.html",
-            #     {
-            #         "user": user,
-            #         "domain": current_site.domain,
-            #         "uid": urlsafe_base64_encode(force_bytes(user.pk)),
-            #         "token": user.verification_token,
-            #     },
-            # )
-            # send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
-            return redirect("login")
-
-            # return HttpResponse("Check your email for a verification link.")
-    else:
-        form = RegistrationForm()
-
-    return render(request, "accounts/register.html", {"form": form, 'action': "Create"})
-
-
-
-def activate_email(request, uidb64, token):
-    try:
-        uid = force_str(urlsafe_base64_decode(uidb64))
-        user = CustomUser.objects.get(pk=uid, verification_token=token)
-    except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
-        return HttpResponse("Invalid verification link.")
-
-    # Activate the user
-    user.is_active = True
-    user.is_email_verified = True
-    user.verification_token = None
-    user.save()
-
-    # Send in-app notification
-    link = reverse("dashboard")
-    NotificationService.send_notification(
-        user,
-        "Welcome to BCS",
-        "Congratulations! Your account has been successfully activated. Explore BCS and enjoy the benefits.",
-        link,
-        notification_type=Notification.NotificationType.IN_APP
-    )
-
-    # Log the user in and redirect to dashboard
-    login(request, user)
-    return redirect("dashboard")
-
-from django.contrib.auth import logout
-from django.shortcuts import redirect
 
 @login_required
 def logout_view(request):
@@ -150,11 +65,11 @@ def my_login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
+            
 
             # Extract User Agent Data
             user_agent_str = request.META.get('HTTP_USER_AGENT', '')
             user_agent = user_agents.parse(user_agent_str)
-            device = user_agent.device.brand or "Unknown Device"
             browser = user_agent.browser.family or "Unknown Browser"
             os_family = user_agent.os.family or "Unknown OS"
 
@@ -190,9 +105,9 @@ def my_login_view(request):
 
 
 
-        # ============================
-        # User CRUD for admin
-        # ===========================
+# ============================
+# User CRUD for admin
+# ===========================
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -243,25 +158,7 @@ def create_employee(request):
                 "You have been successfully registered as a member of BCS, with initial monthly contribution amount: ₦{contribution_amount}",
                 notification_type=Notification.NotificationType.IN_APP
             )
-            # Send email notification with initial contribution amount
-            subject = "Welcome to Benevolence Cooperative!"
-            message = f"""
-            Dear {employee.first_name},
-
-            You have been successfully registered as a member of Benevolence Cooperative Society by the admin.
-
-            Benevolence Cooperative operates under a Shariah-compliant financial model, ensuring ethical and interest-free financial transactions. We are committed to your financial growth and stability.
-
-            Your initial monthly contribution amount has been set at **₦{contribution_amount:,.2f}**.
-
-            Welcome aboard, and we look forward to growing together!
-
-            Regards,  
-            Benevolence Cooperative Management
-            """
-            # send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [employee.email])
-
-            messages.success(request, f"Employee created successfully with an initial contribution of ₦{contribution_amount:,.2f}. An email notification has been sent!")
+            messages.success(request, f"Contributor created successfully with an initial contribution of ₦{contribution_amount:,.2f}")
             return redirect("employee_list")
 
     else:
@@ -378,7 +275,7 @@ def employee_specific_detail(request, employee_id):
 @login_required
 @user_passes_test(lambda u: u.is_superuser or u.groups.filter(name="Admin").exists())
 def toggle_employee_active(request, employee_id):
-    employee = get_object_or_404(CustomUser, pk=employee_id)
+    employee = get_object_or_404(CustomUser, id=employee_id)
     employee.is_active = not employee.is_active
     employee.save()
     return redirect('employee_list')  # Redirect to your employee list view
@@ -431,3 +328,148 @@ def account_settings(request):
         'contribution_form': contribution_form,
         'API_KEY': settings.PAYSTACK_SCRET_KEY,
     })
+
+
+import pandas as pd
+from django.shortcuts import render, redirect
+from django.core.files.storage import FileSystemStorage
+from django.http import JsonResponse
+from django.contrib import messages
+from django.db import IntegrityError
+from accounts.models import CustomUser
+from django.utils.crypto import get_random_string
+
+@login_required
+@user_passes_test(is_admin)
+def bulk_upload_users(request):
+    if request.method == 'POST' and request.FILES.get('file'):
+
+        if request.session and 'users_preview' in request.session:
+            del request.session['users_preview']
+
+        file = request.FILES['file']
+        fs = FileSystemStorage()
+        filename = fs.save(file.name, file)
+        file_url = fs.path(filename)
+
+        try:
+            df = pd.read_excel(file_url)
+
+            # Validate columns
+            required_columns = {'Username', 'Email', 'Phone', 'Name', 'NITDAID'}
+            if not required_columns.issubset(df.columns):
+                return JsonResponse({"error": "Invalid file format. Required columns: Username, Email, Phone, Name, NITDAID"}, status=400)
+
+            preview_data = df.to_dict(orient='records')
+            request.session['users_preview'] = preview_data  # Store data in session for final submission
+            return JsonResponse({"success": True, "preview_data": preview_data})  # Send preview JSON
+        
+        except Exception as e:
+            return JsonResponse({"error": f"Error processing file: {str(e)}"}, status=500)
+
+    return render(request, 'accounts/bulk_create_users.html')
+
+@login_required
+@user_passes_test(is_admin)
+def confirm_bulk_user_upload(request):
+    preview_data = request.session.get('users_preview', [])
+    if not preview_data:
+        return JsonResponse({"error": "No data to process."}, status=400)
+
+    success_count, duplicate_count = 0, 0
+
+    for row in preview_data:
+        username = row.get('Username')
+        email = row.get('Email')
+        phone_number = row.get('Phone')
+        full_name = row.get('Name')
+        nitda_id = row.get('NITDAID')
+
+        if CustomUser.objects.filter(username=username).exists() or \
+           CustomUser.objects.filter(email=email).exists() or \
+           CustomUser.objects.filter(phone_number=phone_number).exists() or \
+           CustomUser.objects.filter(nitda_id=nitda_id).exists():
+            duplicate_count += 1
+            continue
+
+        try:
+            user = CustomUser.objects.create_user(
+                username=username,
+                email=email,
+                phone_number=phone_number,
+                full_name=full_name,
+                nitda_id=nitda_id,
+                password="default-bcs"  # Generate a random password
+            )
+            success_count += 1
+        except IntegrityError:
+            duplicate_count += 1
+
+    del request.session['users_preview']
+    return JsonResponse({"success": True, "uploaded": success_count, "duplicates": duplicate_count})
+
+from django.http import JsonResponse
+from django.contrib import messages
+from django.utils.timezone import make_aware
+from datetime import datetime
+from operations.models import ContributionRecord
+from accounts.models import CustomUser
+from django.db import models
+from django.db.models import Min
+
+def update_employee_date_joined(request):
+    # Step 1: Get the earliest year for each employee
+    employee_earliest_years = (
+        ContributionRecord.objects.values("employee")
+        .annotate(first_year=Min("year"))  # Find the earliest year per employee
+    )
+
+    for record in employee_earliest_years:
+        employee_id = record["employee"]
+        first_year = record["first_year"]
+
+        # Step 2: Find the earliest month in that specific year
+        first_month = (
+            ContributionRecord.objects.filter(employee=employee_id, year=first_year)
+            .aggregate(first_month=Min("month"))["first_month"]
+        )
+
+        if first_month:
+            # Construct the first day of that month
+            first_contribution_date = datetime(first_year, first_month, 1)
+            aware_date = make_aware(first_contribution_date)  # Ensure timezone-aware datetime
+
+            # Update the employee's date_joined field
+            CustomUser.objects.filter(id=employee_id).update(date_joined=aware_date)
+
+    messages.success(request, "Employees' date_joined has been updated successfully.")
+    return JsonResponse({"message": "Employee join dates updated successfully!"})
+
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth import get_user_model
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
+import json
+
+User = get_user_model()
+
+@csrf_exempt
+def admin_reset_member_password(request, employee_id):
+    member = User.objects.get(id=employee_id)
+
+    if request.method == "POST":
+        new_password = request.POST.get("new_password")
+
+        try:
+            member.set_password(new_password)
+            member.save()
+            messages.success(request, f"Password changed successfully for {member.full_name}")
+            return redirect("employee_detail", employee_id=employee_id)
+        except User.DoesNotExist:
+            messages.error(request, f"Something went wrong!")
+            return redirect("employee_detail", employee_id=employee_id)
+    
+    return redirect("employee_detail", employee_id=employee_id)
+
+  

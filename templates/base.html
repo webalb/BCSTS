@@ -9,42 +9,11 @@
     <meta name="description" content="A Non-interest Cooperative Committed to Ethical Finance and Community Growth. Join Benevolence Cooperative Society to experience ethical finance and sustainable community-driven economic growth.">
     <meta name="keywords" content="Ethical Finance, Cooperative Society, Non-Interest Banking, Community Growth, Benevolence Cooperative">
     <meta name="author" content="Benevolence Cooperative Society">
-    <link rel="canonical" href="{{ request.build_absolute_uri }}">
-
-    <!-- Open Graph (Facebook, LinkedIn) -->
-    <meta property="og:title" content="Welcome to Benevolence Cooperative Society">
-    <meta property="og:description" content="A Non-interest Cooperative Committed to Ethical Finance and Community Growth. Join us for a sustainable future.">
-    <meta property="og:image" content="{% static 'assets/img/og-image.png' %}">
-    <meta property="og:url" content="{{ request.build_absolute_uri }}">
-    <meta property="og:type" content="website">
-
-    <!-- Twitter Card (for better previews on Twitter) -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Welcome to Benevolence Cooperative Society">
-    <meta name="twitter:description" content="A Non-interest Cooperative Committed to Ethical Finance and Community Growth. Join us for a better financial future.">
-    <meta name="twitter:image" content="{% static 'assets/img/og-image.png' %}">
-
-    <!-- JSON-LD Structured Data (SEO Boost) -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "Benevolence Cooperative Society",
-        "url": "{{ request.build_absolute_uri }}",
-        "description": "A Non-interest Cooperative Committed to Ethical Finance and Community Growth.",
-        "logo": "{% static 'assets/img/favicon.png' %}"
-    }
-    </script>
 
     <!-- Favicon and Apple Touch Icons -->
     <link rel="apple-touch-icon" sizes="180x180" href="{% static 'assets/img/favicon.png' %}">
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'assets/img/favicon.png' %}">
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'assets/img/favicon.png' %}">
-
-    <!-- Preconnect for Faster External Resources -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
     <!-- Title -->
     <title>
         {% block title %}{% endblock title %}

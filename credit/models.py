@@ -403,7 +403,7 @@ class Repayment(models.Model):
             self.credit.status = 'Repaid'
             self.credit.save()
             heading = "Credit Repayment Completion Notification"
-            body = f"Dear {self.credit.applicant.get_full_name()}, congratulations! You have completed the repayment of your credit."
+            body = f"Dear {self.credit.applicant.full_name()}, congratulations! You have completed the repayment of your credit."
             # link = reverse('credit:transactions')
             link=''
             notify_applicant(self.credit, heading, body, link)

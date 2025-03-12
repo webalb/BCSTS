@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Upload Users | Benevolence Cooperative{% endblock title %}
+{% block header %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+{% endblock header %}
+{% block content %}
+{% include 'include/admin_sidebar.html' %}
+<main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200 text-gray-900">
+    {% include 'include/dashboard_navbar.html' %}
+    <div class="w-full py-6 px-6 mx-auto">
+        <div class="min-w-0 p-4">
+            <h2 class="text-xl font-bold">Upload Users</h2>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-md">
+            <label for="file-upload" class="text-sm font-medium text-gray-700">Upload (.xlsx):</label>
+            <input class="p-2 mb-4 border rounded-md w-full sm:w-auto" type="file" id="file-upload" />
+            <button id="upload-btn" type="button" class="px-3 mb-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 sm:w-auto" onclick="uploadFile()">Upload</button>
+            <div id="success-message" class="hidden p-2 bg-green-100 rounded-lg my-6"></div>
+            <div id="error-message" class="hidden p-2 bg-red-100 rounded-lg"></div>
+        </div>
+        <div class="bg-white p-4 rounded-lg shadow-md mt-4">
+            <h3 class="text-lg font-bold mb-2">Preview Data</h3>
+            <button id="confirm-btn" disabled onclick="confirmUpload()" class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-green-600">Confirm Upload</button>
+            <div id="preview-table-container">
+                <table id="usersTable" class="w-full text-sm text-left border border-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="p-2">Username</th>
+                            <th class="p-2">Email</th>
+                            <th class="p-2">Phone Number</th>
+                            <th class="p-2">Full Name</th>
+                            <th class="p-2">NITDA ID</th>
+                        </tr>
+                    </thead>
+                    <tbody id="preview-table"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+<script>
+    function uploadFile() {
+        let fileInput = document.getElementById("file-upload");
+        let file = fileInput.files[0];
+        let uploadBtn = $("#upload-btn");
+    
+        if (!file) {
+            alert("Please select a file.");
+            return;
+        }
+    
+        // Disable and update upload button
+        uploadBtn.prop("disabled", true).text("Uploading...").removeClass("bg-green-500").addClass("bg-gray-600");
+    
+        let formData = new FormData();
+        formData.append("file", file);
+        formData.append("csrfmiddlewaretoken", "{{ csrf_token }}");
+    
+        $.ajax({
+            url: "{% url 'bulk_upload_users' %}",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                $("#success-message").text("Review the preview data below and confirm!").show();
+                $("#error-message").hide();
+                let tableBody = $("#preview-table");
+                tableBody.empty();
+                response.preview_data.forEach(row => {
+                    tableBody.append(`<tr class="border-t border-gray-300">
+                                        <td class="p-2">${row.Username}</td>
+                                        <td class="p-2">${row.Email}</td>
+                                        <td class="p-2">${row.Phone}</td>
+                                        <td class="p-2">${row.Name}</td>
+                                        <td class="p-2">${row.NITDAID}</td>
+                                      </tr>`);
+                });
+    
+                $("#preview-table-container").show();
+                $("#confirm-btn").prop("disabled", false);
+            },
+            error: function(xhr) {
+                $("#error-message").text(xhr.responseJSON?.error || "An error occurred. Please try again.").show();
+            },
+            complete: function() {
+                // Restore upload button state
+                uploadBtn.prop("disabled", false).text("Upload").removeClass("bg-gray-600").addClass("bg-green-500");
+            }
+        });
+    }
+    
+    function confirmUpload() {
+        let confirmBtn = $("#confirm-btn");
+    
+        // Disable and update confirm button
+        confirmBtn.prop("disabled", true).text("Confirming...").removeClass("bg-blue-500").addClass("bg-gray-600");
+    
+        $.ajax({
+            url: "{% url 'confirm_bulk_user_upload' %}",
+            type: "POST",
+            data: { csrfmiddlewaretoken: "{{ csrf_token }}" },
+            success: function(response) {
+                $("#success-message").html(`Successfully uploaded ${response.uploaded} users. <br>Skipped ${response.duplicates} duplicates.`).show();
+                $("#preview-table").empty();
+                $("#preview-table-container").hide();
+                $("#confirm-btn").prop("disabled", true);
+            },
+            error: function(response) {
+                $("#error-message").text(response.responseJSON.error).show();
+            },
+            complete: function() {
+                // Restore confirm button state
+                confirmBtn.prop("disabled", false).text("Confirm Upload").removeClass("bg-gray-600").addClass("bg-blue-500");
+            }
+        });
+    }
+    </script>
+    
+{% endblock %}

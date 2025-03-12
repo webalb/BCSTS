@@ -84,7 +84,7 @@ def save_guarantor(credit, guarantor_user):
     NotificationService.send_notification(
         guarantor_user,
         "Guarantor Request",
-        f"You have been requested as a guarantor for {credit.applicant.get_full_name()} in his/her credit application.",
+        f"You have been requested as a guarantor for {credit.applicant.full_name()} in his/her credit application.",
         link=reverse("credit:create_credit_application"),
         notification_type=Notification.NotificationType.IN_APP
     )
@@ -165,7 +165,7 @@ def notify_committee(credit):
         NotificationService.send_notification(
             member.member,
             "New Credit Request (Guarantor Approved)",
-            f"A credit request from {credit.applicant.get_full_name()} has passed guarantor approval and requires commitee review.",
+            f"A credit request from {credit.applicant.full_name()} has passed guarantor approval and requires commitee review.",
             link=reverse("credit:credit_detail", kwargs={'tracking_id': credit.tracking_id}), # link to credit detail.
             notification_type=Notification.NotificationType.IN_APP
         )

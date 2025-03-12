@@ -119,7 +119,7 @@ def credit_settings(request):
 
                 # Email Notification
                 subject = "BCS Committee Membership"
-                message = f"Dear {user.get_full_name()},\n\nYou have been added as a committee member in BCS. Please log in to your account to check your responsibilities.\n\nBest regards,\nBCS Team"
+                message = f"Dear {user.full_name()},\n\nYou have been added as a committee member in BCS. Please log in to your account to check your responsibilities.\n\nBest regards,\nBCS Team"
                 send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
 
                 messages.success(request, "New committee member added successfully.")
@@ -157,7 +157,7 @@ def remove_credit_committee_member(request, member_id):
         link,
         notification_type=Notification.NotificationType.IN_APP
     )
-    messages.success(request, f"The credit committee member {user.get_full_name()} has been successfully removed.")
+    messages.success(request, f"The credit committee member {user.full_name()} has been successfully removed.")
     return redirect('credit:credit_settings') # Replace with your URL name
 
 
@@ -193,7 +193,7 @@ def record_monthly_repayment(request):
                 )
                 
                 heading = "Monthly Repayment Notification"
-                body = f"Dear {credit.applicant.get_full_name()}, your monthly repayment of NGN{credit.monthly_deduction} has been recorded successfully."
+                body = f"Dear {credit.applicant.full_name()}, your monthly repayment of NGN{credit.monthly_deduction} has been recorded successfully."
                 link = reverse('credit:create_credit_application')
                 notify_applicant(credit, heading, body, link)
             except ValidationError as e:

@@ -5,6 +5,16 @@
 {% block title %}
 Contributor Profile | Benevolance Cooperative
 {% endblock title %}
+{% block header %}
+<script>
+    function openResetPasswordModal(memberId) {
+        document.getElementById("passwordResetModal").classList.remove("hidden");
+    }
+    
+    function closeResetPasswordModal() {
+        document.getElementById("passwordResetModal").classList.add("hidden");
+    }
+</script>{% endblock header %}
 {% block content %}
 <!-- sidenav  -->
 {% include 'include/admin_sidebar.html' %}
@@ -29,8 +39,9 @@ Contributor Profile | Benevolance Cooperative
                 </div>
                 <div class="flex-none w-auto max-w-full px-3 my-auto">
                     <div class="h-full">
-                        <h5 class="mb-1"> {{ employee.get_full_name }} </h5>
-                        <p class="mb-0 font-semibold leading-normal text-sm">{{ employee.email }}</p>
+                        <h5 class="mb-1"> {{ employee.full_name }} </h5>
+                        <p class="mb-0 font-semibold leading-normal text-sm">Username: {{ employee.username }}</p>
+                        <p class="mb-0 leading-normal text-xs">Date Join: {{ employee.date_joined|date:"F Y" }}</p>
                     </div>
                 </div>
                 <div class="w-full max-w-full px-3 mx-auto mt-4 sm:my-auto sm:mr-0 md:w-1/2 md:flex-none lg:w-4/12 ">
@@ -45,6 +56,30 @@ Contributor Profile | Benevolance Cooperative
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="w-full mx-auto mt-4">
+        <div class="relative flex flex-col flex-auto min-w-0 p-4 mx-6 overflow-hidden min-h-10 break-words border-0 shadow-blur rounded-2xl bg-gray-100 bg-clip-border backdrop-blur-2xl backdrop-saturate-200">
+
+            <fieldset class="border border-gray-300 rounded-lg p-4">
+                <legend class="text-gray-800 font-bold">Bank Details</legend>
+                <table class="min-w-full rounded-lg">
+                    <tbody>
+                        <tr>
+                            <td class="py-2 border-b border-gray-200 text-xs"><strong class="text-gray-800">Bank Name:</strong></td>
+                            <td class="py-2 border-b border-gray-200 text-xs">{{ employee.get_member_bank_details.bank_name }}</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2 border-b border-gray-200 text-xs"><strong class="text-gray-800">Account Number:</strong></td>
+                            <td class="py-2 border-b border-gray-200 text-xs">{{ employee.get_member_bank_details.account_number }}</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2 border-b border-gray-200 text-xs"><strong class="text-gray-800">Account Holder Name:</strong></td>
+                            <td class="py-2 border-b border-gray-200 text-xs">{{ employee.get_member_bank_details.account_holder_name }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </fieldset>
         </div>
     </div>
     <div class="w-full p-6 mx-auto">
@@ -74,7 +109,7 @@ Contributor Profile | Benevolance Cooperative
                                 <tbody>
                                     <tr>
                                         <td class=" py-2 border-b border-gray-200 text-xs"><strong class="text-gray-800">Full Name:</strong></td>
-                                        <td class=" py-2 border-b border-gray-200 text-xs">{{ employee.get_full_name }}</td>
+                                        <td class=" py-2 border-b border-gray-200 text-xs">{{ employee.full_name }}</td>
                                     </tr>
                                     <tr>
                                         <td class=" py-2 border-b border-gray-200 text-xs"><strong class="text-gray-800">Mobile:</strong></td>
@@ -147,9 +182,14 @@ Contributor Profile | Benevolance Cooperative
                                         <td class="py-2 border-b border-gray-200 text-xs"><strong class="text-gray-800">Total Money Contributed:</strong></td>
                                         <td class="py-2 border-b border-gray-200 text-xs">₦{{ total_contributions|floatformat:2|intcomma }}</td>
                                     </tr>
+                                    
+                                    
+                                    
                                 </tbody>
                             </table>
+                            
                         </fieldset>
+                        
                         <fieldset class="border border-gray-300 rounded-lg p-4 mt-6">
                             <legend class="text-slate-500 font-bold">Financial Summary</legend>
                             <table class="min-w-full bg-white rounded-lg">
@@ -180,6 +220,14 @@ Contributor Profile | Benevolance Cooperative
                     </div>
                     <div class="flex-auto p-4">
                         <!-- Buttons Inside UL -->
+                         <!-- Reset Password Button -->
+                        <div class="mb-4">
+                            <p class="mb-4 text-sm text-gray-600">To change password for this contributor, click the button below and enter the new password:</p>
+                            <button type="button" class="px-3 py-2 mb-0 font-bold text-center text-white uppercase align-middle transition-all rounded-lg cursor-pointer shadow-soft-md leading-pro text-xs bg-gray-700 hover:scale-102 hover:shadow-soft-xs active:opacity-85"
+                                onclick="openResetPasswordModal('{{ employee.id }}')">
+                                Reset/Change Password
+                            </button>
+                        </div>
                         <div class="mb-4">
                             <p class="mb-4 text-sm text-gray-600">To view all contributions made by this employee, please click the button below:</p>
                             <a href="{% url 'view_employee_contributions' employee.id %}" class="px-3 py-2 mb-0 font-bold text-center text-black uppercase align-middle transition-all rounded-lg cursor-pointer shadow-soft-md leading-pro text-xs bg-gray-200 hover:scale-102 hover:shadow-soft-xs active:opacity-85">
@@ -217,4 +265,24 @@ Contributor Profile | Benevolance Cooperative
     {% include 'include/dashboard_footer.html' %}
     </div> <!-- end cards -->
 </main>
+<div id="passwordResetModal" class="hidden fixed bottom-4 right-4 z-50 bg-gray-900 bg-opacity-50 p-4">
+    <div class="bg-gray-500 p-6 rounded-lg shadow-lg w-80 border-black/12.5 shadow-soft-xl bg-clip-border" 
+         style="position: fixed; bottom: 20px; right: 20px;">
+        <h2 class="text-lg font-bold mb-4 text-white">Reset Member Password</h2>
+        <form id="passwordResetForm" method="post" action="{% url 'admin_reset_member_password' employee.id %}">
+            {% csrf_token %}            
+            <label for="newPassword" class="block mb-2 text-white">New Password:</label>
+            <input type="password" id="newPassword" name="new_password" required class="w-full p-2 border rounded">
+            
+            <div class="mt-4 flex justify-end">
+                <button type="button" onclick="closeResetPasswordModal()" 
+                        class="px-4 py-2 bg-gray-700 text-white rounded mr-2">Cancel</button>
+                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded">Reset</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
 {% endblock %}

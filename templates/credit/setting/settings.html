@@ -179,16 +179,16 @@ Manage Credit Settings | Benevolence Cooperative
                                 <div class="inline-flex items-center justify-center w-12 h-12 mr-4 text-white transition-all duration-200 text-base ease-soft-in-out rounded-xl">
                                     
                                          {% if member.member.profile_picture %}
-                                            <img src="{{ member.member.passport_photo.url }}" alt="{{ member.member.get_full_name }}" 
+                                            <img src="{{ member.member.passport_photo.url }}" alt="{{ member.member.full_name }}" 
                                          class="w-full shadow-soft-2xl rounded-xl">
                                         {% else %}
-                                            <img src="{% static 'assets/img/default.png' %}" alt="{{ member.member.get_full_name }}" 
+                                            <img src="{% static 'assets/img/default.png' %}" alt="{{ member.member.full_name }}" 
                                          class="w-full shadow-soft-2xl rounded-xl">
                                         {% endif %}
 
                                 </div>
                                 <div class="flex flex-col items-start justify-center">
-                                    <h6 class="mb-0 leading-normal text-sm">{{ member.member.get_full_name }}</h6>
+                                    <h6 class="mb-0 leading-normal text-sm">{{ member.member.full_name }}</h6>
                                     <p class="mb-0 leading-tight text-xs">{{ member.member.email }}</p>
                                     <p class="mb-0 leading-tight text-xs">{{ member.role }}</p>
                                 </div>

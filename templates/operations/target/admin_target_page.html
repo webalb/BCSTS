@@ -52,13 +52,13 @@ Target Saving List | Benevolance Cooperative
                                             <div class="flex px-2 py-1">
                                                 <div>
                                                     {% if target.member.passport_photo %}
-                                                        <img src="{{ target.member.passport_photo.url }}" class="inline-flex items-center justify-center mr-4 h-9 w-9 rounded-xl" alt="{{ target.member.get_full_name }}">
+                                                        <img src="{{ target.member.passport_photo.url }}" class="inline-flex items-center justify-center mr-4 h-9 w-9 rounded-xl" alt="{{ target.member.full_name }}">
                                                     {% else %}
                                                         <img src="{% static 'assets/img/default.png' %}" class="inline-flex items-center justify-center mr-4 h-9 w-9 rounded-xl" alt="Default Profile">
                                                     {% endif %}
                                                 </div>
                                                 <div class="flex flex-col justify-center">
-                                                    <h6 class="mb-0 text-sm leading-normal">{{ target.member.get_full_name }}</h6>
+                                                    <h6 class="mb-0 text-sm leading-normal">{{ target.member.full_name }}</h6>
                                                     <p class="mb-0 text-xs leading-tight text-slate-400">{{ target.member.email }}</p>
                                                 </div>
                                             </div>

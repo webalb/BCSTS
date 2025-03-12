@@ -36,8 +36,31 @@ Account Settings | Benevolance Cooperative
     <!-- cards -->
     <div class="w-full px-6 py-6 mx-auto">
         <!-- row 1 -->
+        {% if is_admin %}
+        <div class="text-left">
+            <a href="{% url 'bulk_upload_users' %}" class="inline-block px-6 py-3 mt-6 mb-2 font-bold text-center text-white uppercase transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-green-500 text-white">
+                <i class="fa-solid fa-file-import"></i> Upload users using excel file
+            </a>
+
+            <!-- Update Contribution Settings Button -->
+            <button id="updateContributionsBtn" 
+                class="inline-block px-6 py-3 mt-6 mb-2 font-bold text-center text-white uppercase transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-blue-600 text-white" 
+                onclick="confirmUpdateContributions()">
+                    Update Contribution Amount Settings For All Contributors
+            </button>
+
+            <!-- Update Contributors' Join Date Button -->
+            <button id="updateDateJoinedBtn" 
+                class="inline-block px-6 py-3 mt-6 mb-2 font-bold text-center text-white uppercase transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-green-800 text-white" 
+                onclick="confirmUpdateDateJoined()">
+                    Update Contributors' Join Date
+            </button>
+
+        </div>
+
         
- 
+        {% endif %}
+
         <div class="flex flex-wrap mt-6 -mx-3">
             <div class="w-full max-w-full px-3 mt-0 mb-6 md:mb-0 md:flex-none lg:flex-none">
                 <div class="border-black/12.5 shadow-soft-xl relative flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid bg-white bg-clip-border">
@@ -231,7 +254,71 @@ Account Settings | Benevolance Cooperative
         {% include 'include/dashboard_footer.html' %}
     </div> <!-- end cards -->
 </main>
+{% if is_admin %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+<script>
+    function confirmUpdateContributions() {
+        if (confirm("Are you sure you want to update the contribution settings for all contributors?")) {
+            updateContributions();
+        }
+    }
+    
+    function confirmUpdateDateJoined() {
+        if (confirm("Are you sure you want to update contributors' join date?")) {
+            updateDateJoined();
+        }
+    }
+    function updateDateJoined() {
+        var button = $("#updateDateJoinedBtn");
+
+        // Change button text, color, and disable it
+        button.text("Updating...");
+        button.removeClass("bg-green-800").addClass("bg-gray-500");
+        button.prop("disabled", true);
+
+        $.ajax({
+            url: "{% url 'update_date_joined' %}",  // Django URL mapping
+            type: "GET",  // Change to "POST" if needed
+            dataType: "json",
+            success: function(response) {
+                button.text("Update Complete");
+                button.removeClass("bg-gray-500").addClass("bg-green-800");
+            },
+            error: function(xhr, status, error) {
+                button.text("Error! Try Again");
+                button.removeClass("bg-gray-500").addClass("bg-red-600");
+                button.prop("disabled", false); // Re-enable on failure
+            }
+        });
+    }
+
+    function updateContributions() {
+        var button = $("#updateContributionsBtn");
+
+        // Change button text, color, and disable it
+        button.text("Updating...");
+        button.removeClass("bg-blue-600").addClass("bg-gray-500");
+        button.prop("disabled", true);
+
+        $.ajax({
+            url: "{% url 'update_contributions' %}", // Django URL mapping
+            type: "GET", // Change to "POST" if needed
+            dataType: "json",
+            success: function(response) {
+                button.text("Update Complete");
+                button.removeClass("bg-gray-500").addClass("bg-blue-600");
+            },
+            error: function(xhr, status, error) {
+                button.text("Error! Try Again");
+                button.removeClass("bg-gray-500").addClass("bg-red-600");
+                button.prop("disabled", false); // Re-enable on failure
+            }
+        });
+    }
+</script>
+{% endif %}
+{% if not is_admin %}
 <script>
     let bankData = {};
     
@@ -291,5 +378,5 @@ Account Settings | Benevolance Cooperative
         });
     });
     </script>
-    
+    {% endif %}
 {% endblock %}

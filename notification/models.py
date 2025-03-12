@@ -16,5 +16,11 @@ class Notification(models.Model):
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['user', 'is_read']),
+            models.Index(fields=['created_at']),
+        ]
+
     def __str__(self):
         return f"{self.user.email} - {self.heading} - {self.notification_type} - {'Read' if self.is_read else 'Unread'}"

@@ -151,7 +151,7 @@ def record_individual_contribution(request, employee_id):
             year=selected_year,
             status='Paid'
         )
-        message=f"Dear {employee.get_full_name},\n\nYour monthly contribution of {employee.contribution_setting.amount} has been recorded for {selected_month}/{selected_year}.", # type: ignore
+        message=f"Dear {employee.full_name},\n\nYour monthly contribution of {employee.contribution_setting.amount} has been recorded for {selected_month}/{selected_year}.", # type: ignore
         NotificationService.send_notification(
             employee,
             heading="Monthly Contribution Deducted",
@@ -190,7 +190,7 @@ def record_all_missing_contributions(request):
             year=selected_year,
             status='pending'
         )
-        message=f"Dear {employee.get_full_name},\n\nYour monthly contribution of {employee.contribution_setting.amount} has been recorded for {selected_month}/{selected_year}.", # type: ignore
+        message=f"Dear {employee.full_name},\n\nYour monthly contribution of {employee.contribution_setting.amount} has been recorded for {selected_month}/{selected_year}.", # type: ignore
         NotificationService.send_notification(
             employee,
             heading="Monthly Contribution Deducted",
@@ -320,7 +320,7 @@ def create_contribution_setting(request, employee_id):
             contribution_setting.employee = employee  # Assign the employee (Crucial)
             
             contribution_setting.save()
-            message=f"Dear {employee.get_full_name},\n\nYour monthly contribution is updated.",
+            message=f"Dear {employee.full_name},\n\nYour monthly contribution is updated.",
             NotificationService.send_notification(
                 employee,
                 heading="Contribution Setting Updated",
@@ -333,7 +333,7 @@ def create_contribution_setting(request, employee_id):
     else:
         form = ContributionSettingAdminForm()  # No initial here
 
-    return render(request, 'operations/contributions/contribution_setting.html', {'form': form, 'employee': employee})  # Pass employee to the template
+    return render(request, 'operations/contributions/set_contribution_setting.html', {'form': form, 'employee': employee})  # Pass employee to the template
 
 # used - SETTINGS
 # Admin view to update an existing contribution setting
@@ -348,7 +348,7 @@ def update_contribution_setting(request, pk):
         form = ContributionSettingAdminForm(request.POST, instance=contribution_setting)
         if form.is_valid():
             form.save()  # No need to assign employee again, it's already linked
-            message=f"Dear {employee.get_full_name},\n\nYour monthly contribution is updated.",
+            message=f"Dear {employee.full_name},\n\nYour monthly contribution is updated.",
             NotificationService.send_notification(
                 employee,
                 heading="Contribution Setting Updated",
@@ -422,7 +422,7 @@ def process_contribution_request(request, request_id, action):
 
         change_request.status = "approved"
         employee = change_request.employee
-        message = f"Dear {employee.get_full_name()},\n\nYour monthly contribution has been updated to ₦{change_request.requested_amount:,.2f}."
+        message = f"Dear {employee.full_name()},\n\nYour monthly contribution has been updated to ₦{change_request.requested_amount:,.2f}."
 
         NotificationService.send_notification(
             employee,
@@ -436,7 +436,7 @@ def process_contribution_request(request, request_id, action):
     elif action == "reject":
         change_request.status = "rejected"
         employee = change_request.employee
-        message = f"Dear {employee.get_full_name()},\n\nYour request to change your monthly contribution to ₦{change_request.requested_amount:,.2f} has been rejected."
+        message = f"Dear {employee.full_name()},\n\nYour request to change your monthly contribution to ₦{change_request.requested_amount:,.2f} has been rejected."
 
         NotificationService.send_notification(
             employee,

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Contribution Setting | Benevolence Cooperative{% endblock title %}
+
+{% block content %}
+{% include 'include/admin_sidebar.html' %}
+<main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200 text-gray-900">
+    {% include 'include/dashboard_navbar.html' %}
+
+    <div class="w-full py-6 px-6 mx-auto">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-bold mb-4">Update Contribution Amount</h2>
+
+            <form method="POST" action="" class="space-y-4">
+                {% csrf_token %}
+
+                <div class="mb-4">
+                    <label for="{{ form.amount.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Contribution Amount (Min: 1000)
+                    </label>
+                    {{ form.amount }}
+                    {% if form.amount.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.amount.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
+                    Save Changes
+                </button>
+            </form>
+        </div>
+    </div>
+</main>
+{% endblock %}

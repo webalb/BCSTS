@@ -29,21 +29,35 @@
                         <div class="flex-auto p-6">
                             <form role="form text-left" method="post">
                                 {% csrf_token %}
-                                <label class="mb-2 ml-1 font-bold text-xs text-green-700">Email</label>
+                                <label class="mb-2 ml-1 font-bold text-xs text-green-700">Username</label>
                                 <div class="mb-4">
-                                    <input type="email" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" placeholder="Email" aria-label="Email" aria-describedby="email-addon" id="username" name="username" required />
+                                    <input type="text" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" 
+                                           placeholder="Enter your username" 
+                                           aria-label="Username" 
+                                           aria-describedby="username-addon" 
+                                           id="username" 
+                                           name="username" 
+                                           required />
                                 </div>
+                            
                                 <label class="mb-2 ml-1 font-bold text-xs text-green-700">Password</label>
                                 <div class="mb-4">
-                                    <input type="password" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" placeholder="Password" aria-label="Password" aria-describedby="password-addon" id="password" name="password" required />
+                                    <input type="password" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow" 
+                                           placeholder="Enter your password" 
+                                           aria-label="Password" 
+                                           aria-describedby="password-addon" 
+                                           id="password" 
+                                           name="password" 
+                                           required />
                                 </div>
+                            
                                 <div class="text-center">
-                                    <button type="submit" class="inline-block w-full px-6 py-3 mt-6 mb-2 font-bold text-center text-white uppercase align-middle transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-green-500">Sign In</button>
+                                    <button type="submit" class="inline-block w-full px-6 py-3 mt-6 mb-2 font-bold text-center text-white uppercase align-middle transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-green-500">
+                                        Sign In
+                                    </button>
                                 </div>
-                                <p class="mt-4 mb-0 leading-normal text-sm">Don't have an account? <a href="{% url 'register' %}" class="font-bold text-green-700">Sign Up</a></p>
-                                <p class="mt-4 mb-0 leading-normal text-sm text-green-700 font-bold"><a href="{% url 'password_reset' %}">Forgot your password?</a>
-                                </p>
                             </form>
+                            
                         </div>
                     </div>
                 </div>

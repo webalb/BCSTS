@@ -17,7 +17,13 @@ Manage Contributions | Benevolence Cooperative
     {% include 'include/dashboard_navbar.html' with breadcrumb='Contributions' page_title='Manage Contributions' %}
     <!-- end Navbar -->
     <div class="w-full py-6 px-6 mx-auto">
-
+        <p>
+                                
+            <a href="{% url 'bulk_upload_contributions' %}" class="inline-block px-6 py-3 mt-6 mb-2 font-bold text-center text-white uppercase align-middle transition-all bg-transparent border-0 rounded-lg cursor-pointer active:opacity-85 hover:scale-102 hover:shadow-soft-xs leading-pro text-xs ease-soft-in tracking-tight-soft shadow-soft-md bg-150 bg-x-25 bg-green-500">
+                <i class="fas fa-file-invoice-dollar mr-2"></i>
+                <span>Upload previous contributions record</span>
+            </a>
+        </p>
         <div class="relative flex flex-col flex-auto min-w-0 p-4 mb-4 overflow-hidden min-h-10 break-words border-0 rounded-2xl bg-white bg-clip-border backdrop-blur-2xl backdrop-saturate-200">
             <div class="flex flex-wrap -mx-3 ">
                 
@@ -36,16 +42,8 @@ Manage Contributions | Benevolence Cooperative
                                 <p class="text-green-600">
                                     <i class="fas fa-check-circle mr-2"></i>
                                     Contributions for this month were recorded
-                                </p>
-                                {% else %}
-                                <p>
-                                
-                                    <a href="{% url 'bulk_upload_contributions' %}" class=" text-center text-green-600 underline text-sm  cursor-pointer font-bold pt-4">
-                                        <i class="fas fa-file-invoice-dollar mr-2"></i>
-                                        <span>Upload contributions record</span>
-                                    </a>
-                                    </p>
-                                    {% endif %}
+                                </p>                               
+                                {% endif %}
                             </div>
                         
                     </div>
@@ -134,7 +132,7 @@ Manage Contributions | Benevolence Cooperative
                     <tbody>
                         {% for employee in missing_contributions %}
                         <tr class="border-t border-gray-300">
-                            <td class="p-2">{{ employee.nitda_id }}</td>
+                            <td class="p-2">{{ employee.full_name }}(username: {{ employee.username}})</td>
                             <td class="p-2">
                                 <a href="{% url 'record_individual_contribution' employee.id %}" class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">Record Contribution</a>
                             </td>

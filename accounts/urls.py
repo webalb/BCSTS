@@ -1,14 +1,12 @@
-from django.contrib.auth.views import LoginView
 from django.urls import path
 from django.contrib.auth import views as auth_views
 
-from .views import (register, activate_email, logout_view, change_password, my_login_view, 
+from .views import (logout_view, change_password, my_login_view, 
     employee_list, create_employee, update_employee, delete_employee, 
-    employee_detail, toggle_employee_active,employee_specific_detail, view_mcr, account_settings )
+    employee_detail, toggle_employee_active,employee_specific_detail, view_mcr, account_settings,
+     bulk_upload_users, confirm_bulk_user_upload, update_employee_date_joined, admin_reset_member_password )
 
 urlpatterns = [
-    path("register/", register, name="register"),
-    path("activate/<uidb64>/<token>/", activate_email, name="activate_email"),
     path("login/", my_login_view, name="login"),
     path("logout/", logout_view, name="logout"),
 
@@ -30,4 +28,11 @@ urlpatterns = [
     path('member/<int:nitda_id>/mcr/', view_mcr, name='view_mcr'),
 
     path('settings', account_settings, name='settings'),
+
+    path("bulk-upload-users/", bulk_upload_users, name="bulk_upload_users"),
+    path("confirm-bulk-upload-users/", confirm_bulk_user_upload, name="confirm_bulk_user_upload"),
+
+    path('update-date-joined/', update_employee_date_joined, name='update_date_joined'),
+    path('reset-contributor--password/<str:employee_id>/', admin_reset_member_password, name='admin_reset_member_password'),
+
 ]

@@ -11,6 +11,7 @@ from decimal import Decimal
 from django.utils import timezone
 from notification.services import NotificationService
 from notification.models import Notification
+from accounts.models import CustomUser
 
 # Admin check function
 def is_admin(user):
@@ -179,6 +180,17 @@ def withdrawal_request(request):
             charges_applied=charges_applied,
             status="pending",
         )
+        # Send notification to all Admin users
+        admin_users = CustomUser.objects.filter(groups__name="Admin")
+        for user in admin_users:
+            NotificationService.send_notification(
+                user,
+                "New Withdrawal Request",
+                f"A new withdrawal request of ₦{amount_requested} has been submitted by {user.get_full_name()} ({user.email}).",
+                link=reverse("withdrawal:admin_withdrawal_management"),
+                notification_type=Notification.NotificationType.IN_APP,
+            )
+
 
         messages.success(request, "Withdrawal request submitted successfully.")
         return redirect("withdrawal:employee_withdrawal_management")
@@ -238,7 +250,7 @@ from django.utils.timezone import now
 
 def update_withdrawal_status(request):
     if request.method == 'POST':
-        withdrawal_id = int(request.POST.get('request_id'))
+        withdrawal_id = request.POST.get('request_id')
         action = request.POST.get('action')
 
         withdrawal = get_object_or_404(Withdrawals, id=withdrawal_id)

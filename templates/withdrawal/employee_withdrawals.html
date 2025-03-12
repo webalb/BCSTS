@@ -158,15 +158,11 @@ Withdrawal management | Benevolance Cooperative
                                     <input type="number" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-gray-300 bg-white py-2 px-3 text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none" placeholder="Enter Amount" id="amount_requested" name="amount_requested" required oninput="validateAmount()" min="1" />
                                     <p id="amount_warning" class="mb-2 ml-1 font-bold text-xs text-red-600 hidden">You cannot withdraw more than {{ savings_balance|intcomma }}</p>
                                 </div>
-                                <!-- Charges Display -->
-                                <label class="mb-2 ml-1 font-bold text-xs text-gray-800">
-                                    Charges to be applied:
-                                    <span id="charges" class="text-red-600 font-semibold">0</span>
-                                </label>
+                                
                                 <!-- Agreement Checkbox -->
                                 <div class="flex items-center mt-4">
                                     <input type="checkbox" id="agree_terms" class="mr-2" onclick="toggleSubmit()" required />
-                                    <label for="agree_terms" class="text-xs text-gray-700">I agree to the <span class="text-red-500 font-bold">{{ charge.charge_percentage }}% administrative charges</span>.</label>
+                                    <label for="agree_terms" class="text-xs text-gray-700">I agree to the <span class="">BCS withdrawal Agreement</span>.</label>
                                 </div>
                                 <!-- Submit Button (Initially Disabled) -->
                                 <div class="text-center">
@@ -187,7 +183,7 @@ Withdrawal management | Benevolance Cooperative
                         <div class="p-6">
                             <p class="text-gray-600 text-sm">
                                 Your request will go through an <span class="font-bold text-blue-600">administrative review</span>, including security verification. This is to ensure that even if your account is compromised, unauthorized withdrawals cannot be made. 
-                                If approved, funds will be deducted from your savings balance. And a <span class="text-red-600 font-bold">{{charge.charge_percentage}}% administrative charge</span> will be applied.
+                                If approved, funds will be deducted from your savings balance.
                             </p>
                             <h6 class="mb-0 text-sm font-semibold text-gray-700">Payment will be made to the following account:</h6>
 
@@ -310,13 +306,11 @@ var savingsBalance = {{savings_balance|default:"0"|escapejs}};
 
 function validateAmount() {
     let amountInput = document.getElementById("amount_requested");
-    let chargeDisplay = document.getElementById("charges");
     let warning = document.getElementById("amount_warning");
     let submitBtn = document.getElementById("submit_btn");
 
     let amount = parseFloat(amountInput.value) || 0;
-    let chargeAmount = (amount * parseFloat(chargeRate) / 100).toFixed(2);
-    let totalAmount = amount + parseFloat(chargeAmount);
+    let totalAmount = amount;
 
     chargeDisplay.textContent = chargeAmount;
 
@@ -333,8 +327,7 @@ function toggleSubmit() {
     let checkbox = document.getElementById("agree_terms");
     let submitBtn = document.getElementById("submit_btn");
     let amount = parseFloat(document.getElementById("amount_requested").value) || 0;
-    let chargeAmount = (amount * parseFloat(chargeRate) / 100).toFixed(2);
-    let totalAmount = amount + parseFloat(chargeAmount);
+    let totalAmount = amount;
 
     if (checkbox.checked && totalAmount <= savingsBalance) {
         submitBtn.disabled = false;

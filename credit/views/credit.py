@@ -211,7 +211,7 @@ def credit_application(request, credit_type):
                 save_guarantor(credit, guarantor_user)
                 notify_admins(
                     heading="New Credit Application",
-                    body=f"A new credit application has been submitted by {credit.applicant.get_full_name()}.",
+                    body=f"A new credit application has been submitted by {credit.applicant.full_name()}.",
                     link=reverse("credit:credit_request")
                 )
 

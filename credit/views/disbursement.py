@@ -57,7 +57,7 @@ def disburse_credit(request, tracking_id):
                 messages.error(request, str(e))
                 return redirect('credit:credit_detail', tracking_id=credit.tracking_id)
             heading = "Credit Disbursement Notification"
-            body = f"Dear {credit.applicant.get_full_name()}, your credit request has been disbursed successfully."
+            body = f"Dear {credit.applicant.full_name()}, your credit request has been disbursed successfully."
             link = reverse('credit:create_credit_application')
             notify_applicant(credit, heading, body, link)
             messages.success(request, 'Credit has been successfully disbursed.')
@@ -103,7 +103,7 @@ def clear_credit(request, tracking_id):
                 )
                 
                 heading = "Credit Clearance Notification"
-                body = f"Dear {credit.applicant.get_full_name()}, your credit has been cleared successfully. Amount cleared: NGN{amount_to_clear}."
+                body = f"Dear {credit.applicant.full_name()}, your credit has been cleared successfully. Amount cleared: NGN{amount_to_clear}."
                 link = reverse('credit:create_credit_application')
                 notify_applicant(credit, heading, body, link)
                 
@@ -128,11 +128,11 @@ def accept_or_reject(request, tracking_id):
         if action == 'accept':
             credit.status = 'Accepted'
             heading = "Credit Accepted Notification"
-            body = f"Dear Admin, the credit request from {credit.applicant.get_full_name()} has been accepted."
+            body = f"Dear Admin, the credit request from {credit.applicant.full_name()} has been accepted."
         elif action == 'reject':
             credit.status = 'Cancelled'
             heading = "Credit Rejection Notification"
-            body = f"Dear Admin, the credit request from {credit.applicant.get_full_name()} has been cancelled."
+            body = f"Dear Admin, the credit request from {credit.applicant.full_name()} has been cancelled."
         else:
             messages.error(request, 'Invalid action.')
             return redirect('credit:create_credit_application')

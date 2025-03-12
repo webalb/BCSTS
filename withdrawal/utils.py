@@ -16,7 +16,7 @@ def generate_withdrawal_receipt(transaction):
     
     # Employee Details
     pdf.setFont("Helvetica", 12)
-    pdf.drawString(50, 750, f"Employee Name: {transaction.request.employee.get_full_name()}")
+    pdf.drawString(50, 750, f"Employee Name: {transaction.request.employee.full_name()}")
     pdf.drawString(50, 730, f"NITDA ID: {transaction.request.employee.nitda_id}")
 
     # Transaction Details

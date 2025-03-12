@@ -1,6 +1,6 @@
 from django.urls import path
 from operations.views import views, admin, target
-from operations.views import bulk_upload_contributions, confirm_bulk_upload
+from operations.views import bulk_upload_contributions, confirm_bulk_upload, update_contributions_from_records
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -44,4 +44,7 @@ urlpatterns = [
     path('target/<str:target_id>/', target.target_savings_detail, name='target_savings_detail'),
     path('my-target/<str:target_id>/', target.member_target_detail, name='member_target_detail'),
     path('target-savings/withdrawal/<str:target_id>/', target.request_target_withdrawal, name='request_target_withdrawal'),
+
+    path('update-contributions/', update_contributions_from_records, name='update_contributions'),
+
 ]

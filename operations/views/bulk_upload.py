@@ -1,14 +1,13 @@
 
 import pandas as pd
-import json
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.core.files.storage import FileSystemStorage
 from django.http import JsonResponse
 from django.contrib import messages
 from django.db import IntegrityError
-from operations.models import ContributionRecord
+from operations.models import ContributionRecord, ContributionSetting
 from accounts.models import CustomUser
-from datetime import datetime
+from accounts.models import CustomUser
 
 def bulk_upload_contributions(request):
     if request.method == 'POST' and request.FILES.get('file'):
@@ -19,9 +18,9 @@ def bulk_upload_contributions(request):
 
         try:
             df = pd.read_excel(file_url)
-
-            if not {'Email', 'Amount', 'Month', 'Year'}.issubset(df.columns):
-                return JsonResponse({"error": "Invalid file format. Columns should be Email, Amount, Month, Year."}, status=400)
+            required_columns = {'NITDAID', 'Amount', 'Month', 'Year'}
+            if not required_columns.issubset(df.columns):
+                return JsonResponse({"error": "Invalid file format. Columns should be NITDAID, Amount, Month, Year."}, status=400)
 
             preview_data = df.to_dict(orient='records')
             request.session['contributions_preview'] = preview_data  # Store for final submission
@@ -46,9 +45,13 @@ def confirm_bulk_upload(request):
     success_count, duplicate_count = 0, 0
 
     for row in preview_data:
-        email, amount, month, year = row.get('Email'), row.get('Amount'), row.get('Month'), row.get('Year')
-        user = CustomUser.objects.filter(email=email).first()
-        
+        nitda_id, amount, month, year = row.get('NITDAID'), row.get('Amount'), row.get('Month'), row.get('Year')
+        user = CustomUser.objects.filter(nitda_id=nitda_id).first()
+
+        amount = str(amount).strip() if isinstance(amount, (int, float)) else amount
+        month = str(month).strip() if isinstance(month, (int, str)) else month
+        year = str(year).strip() if isinstance(year, (int, str)) else year
+
         month = month_mapping.get(month.lower(), None)  # Convert month to number
 
         if user:
@@ -62,7 +65,6 @@ def confirm_bulk_upload(request):
                     amount=amount,
                     month=month,
                     year=year,
-                    status='paid'
                 )
                 success_count += 1
             except IntegrityError:
@@ -70,3 +72,30 @@ def confirm_bulk_upload(request):
 
     del request.session['contributions_preview']
     return JsonResponse({"success": True, "uploaded": success_count, "duplicates": duplicate_count})
+
+
+def update_contributions_from_records(request):
+    # Delete all existing contribution settings
+    ContributionSetting.objects.all().delete()
+
+    # Fetch contribution records sorted by year and month in ascending order
+    contribution_records = ContributionRecord.objects.all().order_by("year", "month")
+
+    for record in contribution_records:
+        employee = record.employee
+        amount = record.amount
+
+        # Check if a contribution setting exists for this employee
+        contribution_setting = ContributionSetting.objects.filter(employee=employee).first()
+
+        if contribution_setting:
+            # Update the existing record
+            contribution_setting.amount = amount
+            contribution_setting.save()
+        else:
+            # Create a new contribution setting if none exists
+            ContributionSetting.objects.create(employee=employee, amount=amount)
+
+    messages.success(request, "Contribution settings have been updated successfully.")
+    
+    return JsonResponse({"message": "Contributions updated successfully!"})
