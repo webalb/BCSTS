@@ -29,7 +29,7 @@ class CustomUserAdmin(UserAdmin):
     form = CustomUserChangeForm
     model = CustomUser
 
-    list_display = ['email', 'full_name', , 'usermane', 'is_staff']
+    list_display = ['email', 'full_name', 'username', 'is_staff']
     list_filter = ['is_staff', 'is_superuser', 'is_active', 'gender']
     ordering = ['email']
     search_fields = ['email', 'full_name', 'last_name', 'nitda_id']
