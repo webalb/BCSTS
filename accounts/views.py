@@ -471,5 +471,39 @@ def admin_reset_member_password(request, employee_id):
             return redirect("employee_detail", employee_id=employee_id)
     
     return redirect("employee_detail", employee_id=employee_id)
+import os
+from django.conf import settings
+from django.http import FileResponse, HttpResponse
+from django.shortcuts import render
+from django.core.management import call_command
 
-  
+def generate_and_download_backup(request):
+    """
+    Generates a database backup and provides it as a downloadable file.
+    """
+    if request.method == 'POST':
+        try:
+            # Generate the database backup
+            call_command('dbbackup', interactive=False)
+
+            # Find the latest backup file
+            backup_dir = settings.DBBACKUP_STORAGE_OPTIONS.get('location', settings.MEDIA_ROOT) #defaults to media root if not specified.
+            backup_files = [f for f in os.listdir(backup_dir) if f.endswith('.dump')] #change to .zip or whatever your backup extension is.
+
+            if not backup_files:
+                return HttpResponse("No backup files found.", status=404)
+
+            latest_backup = max(backup_files, key=lambda f: os.path.getctime(os.path.join(backup_dir, f)))
+            backup_path = os.path.join(backup_dir, latest_backup)
+
+            # Provide the file as a download
+            response = FileResponse(open(backup_path, 'rb'), as_attachment=True, filename=latest_backup)
+            return response
+
+        except Exception as e:
+            # Handle any errors that occur during backup generation or download
+            return HttpResponse(f"An error occurred: {e}", status=500)
+
+    # Render a simple HTML page with a button
+    return redirect('settings')
+

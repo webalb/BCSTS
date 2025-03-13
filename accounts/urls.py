@@ -4,7 +4,8 @@ from django.contrib.auth import views as auth_views
 from .views import (logout_view, change_password, my_login_view, 
     employee_list, create_employee, update_employee, delete_employee, 
     employee_detail, toggle_employee_active,employee_specific_detail, view_mcr, account_settings,
-     bulk_upload_users, confirm_bulk_user_upload, update_employee_date_joined, admin_reset_member_password )
+     bulk_upload_users, confirm_bulk_user_upload, update_employee_date_joined,
+       admin_reset_member_password, generate_and_download_backup)
 
 urlpatterns = [
     path("login/", my_login_view, name="login"),
@@ -34,5 +35,7 @@ urlpatterns = [
 
     path('update-date-joined/', update_employee_date_joined, name='update_date_joined'),
     path('reset-contributor--password/<str:employee_id>/', admin_reset_member_password, name='admin_reset_member_password'),
+
+    path('generate_and_download_backup/', generate_and_download_backup, name='generate_and_download_backup'),
 
 ]

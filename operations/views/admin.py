@@ -422,7 +422,7 @@ def process_contribution_request(request, request_id, action):
 
         change_request.status = "approved"
         employee = change_request.employee
-        message = f"Dear {employee.full_name()},\n\nYour monthly contribution has been updated to ₦{change_request.requested_amount:,.2f}."
+        message = f"Your monthly contribution has been updated to ₦{change_request.requested_amount:,.2f}."
 
         NotificationService.send_notification(
             employee,
@@ -436,7 +436,7 @@ def process_contribution_request(request, request_id, action):
     elif action == "reject":
         change_request.status = "rejected"
         employee = change_request.employee
-        message = f"Dear {employee.full_name()},\n\nYour request to change your monthly contribution to ₦{change_request.requested_amount:,.2f} has been rejected."
+        message = f"Your request to change your monthly contribution to ₦{change_request.requested_amount:,.2f} has been rejected."
 
         NotificationService.send_notification(
             employee,

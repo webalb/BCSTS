@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'channels', 
     'notification.apps.NotificationConfig',
     'axes',
+    'dbbackup',
 ]
 
 MIDDLEWARE = [
@@ -207,3 +208,8 @@ SALARY_PAYMENT_DATE = "1"
 SECURE_BROWSER_XSS_FILTER = True
 AXES_FAILURE_LIMIT = 5  # Allow 5 failed attempts instead of 3
 AXES_COOLOFF_TIME = 1  # Lockout time in hours (1 hour)
+
+
+# Store backups in MEDIA_ROOT/db_backups/
+DBBACKUP_STORAGE = "django.core.files.storage.FileSystemStorage"
+DBBACKUP_STORAGE_OPTIONS = {"location": os.path.join(MEDIA_ROOT, "db_backups")}

@@ -3,7 +3,10 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.timezone import now
 from django.db.models import Sum
+from django.urls import reverse
 
+from notification.services import NotificationService
+from notification.models import Notification
 from operations.models import ContributionRecord, ContributionSetting, ContributionSettingHistory, ContributionChangeRequest
 from accounts.models import CustomUser
 from withdrawal.models import EmployeeAccountDetails
@@ -113,6 +116,13 @@ def dashboard(request):
     # Fetch contribution records ordered by year and month
     contribution_records = ContributionRecord.objects.filter(employee=employee).order_by('-year', '-month')[:5]
 
+    NotificationService.send_notification(
+        employee,
+        heading="Monthly Contribution Deducted",
+        message="message for testing",
+        link=reverse("dashboard"),  
+        notification_type=Notification.NotificationType.IN_APP
+    )
     # Fetch employee account details
     account_details = EmployeeAccountDetails.objects.filter(employee=employee).first()
 
