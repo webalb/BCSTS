@@ -116,13 +116,6 @@ def dashboard(request):
     # Fetch contribution records ordered by year and month
     contribution_records = ContributionRecord.objects.filter(employee=employee).order_by('-year', '-month')[:5]
 
-    NotificationService.send_notification(
-        employee,
-        heading="Monthly Contribution Deducted",
-        message="message for testing",
-        link=reverse("dashboard"),  
-        notification_type=Notification.NotificationType.IN_APP
-    )
     # Fetch employee account details
     account_details = EmployeeAccountDetails.objects.filter(employee=employee).first()
 
