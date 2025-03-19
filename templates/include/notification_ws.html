@@ -24,7 +24,7 @@
             listItem.innerHTML = `
                 <div class="ease-soft py-1.2 clear-both block w-full px-4 transition-colors duration-300 hover:bg-gray-100 hover:text-gray-800"
                 style="border-top: 1px solid #aaa">
-                    <div class="flex py-1">
+                    <a class="flex py-1"  href="${notification.link ? notification.link : 'javascript:void(0)'}">
                         <div class="my-auto">
                             <i class="fa fa-bell text-xl text-gray-900 mr-4"></i>
                         </div>
@@ -38,7 +38,7 @@
                             </p>
                         </div>
                         
-                    </div>
+                    </a>
                     <div>
                             <button class="ml-4 text-green-500 transition duration-300 hover:bg-blue-600"
                             onclick="markAsRead(${notification.id}, this)">Mark as Read</button>

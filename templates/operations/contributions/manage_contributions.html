@@ -42,7 +42,12 @@ Manage Contributions | Benevolence Cooperative
                                 <p class="text-green-600">
                                     <i class="fas fa-check-circle mr-2"></i>
                                     Contributions for this month were recorded
-                                </p>                               
+                                </p>
+                                {% else %}  
+                                <p class="text-yellow-500">
+                                    <i class="fas fa-clock mr-2"></i>
+                                    Contribution recording: Available from {{salary_payment_date}}th of every month.
+                                </p>                       
                                 {% endif %}
                             </div>
                         
@@ -80,7 +85,7 @@ Manage Contributions | Benevolence Cooperative
             <div class="">
                 {% if contributions %}
                   
-                <table id="contributionsTable" class="w-full text-sm text-left border border-gray-200 text-slate-800">
+                <table id="contributionsTable" class="w-full text-sm text-left border border-gray-200">
                     <thead class="bg-transparent">
                         <tr>
                             <th class="px-6 py-3 pl-2 font-bold tracking-normal text-left uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Contributor</th>
@@ -93,8 +98,8 @@ Manage Contributions | Benevolence Cooperative
                     <tbody>
                         {% for contribution in contributions %}
                         <tr class="border-t">
-                            <td class="p-2 border-b leading-normal text-sm  text-gray-800">{{ contribution.employee.email }}</td>
-                            <td class="p-2 border-b leading-normal text-sm  text-gray-800">₦{{ contribution.amount|intcomma }}</td>
+                            <td class="p-2 border-b leading-normal text-sm  text-gray-800">{{ contribution.employee.full_name }}</td>
+                            <td class="p-2 border-b leading-normal text-sm  text-gray-800">NGN{{ contribution.amount|intcomma }}</td>
                             <td class="p-2 border-b leading-normal text-sm  text-gray-800">{{ contribution.month|month_name }}</td>
                             <td class="p-2 border-b leading-normal text-sm  text-gray-800">{{ contribution.year }}</td>
                             <td class="p-2 border-b leading-normal text-sm  text-gray-800">
@@ -132,7 +137,7 @@ Manage Contributions | Benevolence Cooperative
                     <tbody>
                         {% for employee in missing_contributions %}
                         <tr class="border-t border-gray-300">
-                            <td class="p-2">{{ employee.full_name }}(username: {{ employee.username}})</td>
+                            <td class="p-2">{{ employee.full_name }}</td>
                             <td class="p-2">
                                 <a href="{% url 'record_individual_contribution' employee.id %}" class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">Record Contribution</a>
                             </td>
@@ -143,7 +148,7 @@ Manage Contributions | Benevolence Cooperative
             </div>
         </div>
         {% else %}
-        <p class="p-2 font-bold uppercase">All employees have recorded contributions.</p>
+        <p class="p-2 font-bold uppercase text-gray-800">All contributors have recorded contributions.</p>
         {% endif %}
         {% include 'include/dashboard_footer.html' %}
     </div>

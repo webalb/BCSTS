@@ -211,57 +211,66 @@ def record_all_missing_contributions(request):
 # =======================================
 # ||| END OF RECORD COTRIBUTION VIEWS |||
 # =======================================
-
-from django.db.models import Max, Count, OuterRef, Subquery, Exists
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.db.models import Max, OuterRef, Exists, Value
+from django.shortcuts import render
 from django.utils.timezone import now
+from datetime import date
+from django.conf import settings
 
 @login_required
 @user_passes_test(is_admin)
 def manage_contributions(request):
-    """View to manage contributions for a specific month and year."""
-    
-    # Fetch available months and years from database
+    """View to manage contributions for a specific month and year with optimized queries."""
+
+    # Fetch available months and years in a single query
     available_contributions = ContributionRecord.objects.values_list("month", "year").distinct()
-    available_months = sorted(set(month for month, _ in available_contributions))
-    available_years = sorted(set(year for _, year in available_contributions), reverse=True)
+    available_months = sorted({month for month, _ in available_contributions})
+    available_years = sorted({year for _, year in available_contributions}, reverse=True)
 
-    # Default to latest year & month if none selected
-    latest_contribution = ContributionRecord.objects.aggregate(latest_year=Max('year'), latest_month=Max('month'))
-    default_year = latest_contribution['latest_year'] or now().year
-    default_month = latest_contribution['latest_month'] or now().month
-    if default_month > now().month and default_year == now().year:
-        default_month = now().month
+    # Get the latest recorded year first
+    latest_year = ContributionRecord.objects.aggregate(latest_year=Max('year'))["latest_year"]
 
-    selected_month = int(request.GET.get('month', default_month))
-    selected_year = int(request.GET.get('year', default_year))
-
-    # Get all recorded contributions for the selected month and year
-    contributions = ContributionRecord.objects.filter(
-        month=selected_month, year=selected_year
+    # Get the latest recorded month for that specific latest year
+    latest_month = (
+        ContributionRecord.objects.filter(year=latest_year)
+        .aggregate(latest_month=Max("month"))["latest_month"]
+        if latest_year else None
     )
+    
+    latest_year = latest_year or now().year
+    latest_month = latest_month or now().month
 
-    # Subquery to check if a user has a contribution record for the selected month & year
+    # Ensure default month/year are valid
+    if latest_month > now().month and latest_year == now().year:
+        latest_month = now().month
+
+    selected_year = int(request.GET.get('year', latest_year))
+    selected_month = int(request.GET.get('month', latest_month))
+
+    # Get all recorded contributions for the selected month and year (single query)
+    contributions = ContributionRecord.objects.filter(month=selected_month, year=selected_year)
+
+    # Subquery to check if an employee has a contribution for the selected month/year
     existing_contributions = ContributionRecord.objects.filter(
         employee=OuterRef('pk'), month=selected_month, year=selected_year
     ).values('id')
 
-    # Query employees who have contribution settings but no record for the selected month/year
+    # Employees with contribution settings but missing a contribution for the selected month/year
     missing_contributions = CustomUser.objects.filter(
-        contribution_setting__isnull=False,  # Ensure they have a contribution setting
+        contribution_setting__isnull=False,  # Ensure the user has contribution settings
         contribution_setting__updated_at__year__lte=selected_year,
         contribution_setting__updated_at__month__lte=selected_month
     ).annotate(
         has_contribution=Exists(existing_contributions)
-    ).filter(
-        has_contribution=False  # Employees who have settings but no record
-    )
+    ).filter(has_contribution=False)
 
-    # Check if contributions have been recorded for the selected month and year
-    contributions_recorded = ContributionRecord.is_contribution_recorded_for_month(selected_month, selected_year)
+    # Check if contributions have been recorded for this month/year
+    contributions_recorded = ContributionRecord.objects.filter(month=now().month, year=now().year).exists()
 
     # Check if today is the salary payment date
-    salary_payment_date = settings.SALARY_PAYMENT_DATE
-    is_salary_payment_day = date.today().day >= int(salary_payment_date)
+    salary_payment_date = int(settings.SALARY_PAYMENT_DATE)
+    is_salary_payment_day = date.today().day >= salary_payment_date
 
     context = {
         "contributions": contributions,
@@ -271,13 +280,12 @@ def manage_contributions(request):
         "available_months": available_months,
         "available_years": available_years,
         "today": date.today(),
-        'is_salary_payment_day': is_salary_payment_day,
-        'salary_payment_date': salary_payment_date,
+        "is_salary_payment_day": is_salary_payment_day,
+        "salary_payment_date": salary_payment_date,
         "contributions_recorded": contributions_recorded,
     }
     
     return render(request, "operations/contributions/manage_contributions.html", context)
-
 
 # used - SETTINGS
 @login_required
@@ -374,12 +382,29 @@ def delete_contribution_setting(request, pk):
     return redirect('manage_employee_contributions')
 
 
-
+from operations.forms import ContributionRecordForm
 @login_required
 @user_passes_test(is_admin)
 def admin_contribution_history(request, employee_id):
+    employee = get_object_or_404(CustomUser, id=employee_id)
     records = calculate_contribution_durations(employee_id)
-    return render(request, 'operations/contributions/contribution_history.html', {'records': records})
+    if request.method == "POST":
+         # Replace currency comma with empty string for amount
+        if 'amount' in request.POST:
+            request.POST = request.POST.copy()  # Make POST mutable
+            request.POST['amount'] = request.POST['amount'].replace(',', '')
+        form = ContributionRecordForm(request.POST)
+        if form.is_valid():
+            record = form.save(commit=False)
+            record.employee = employee
+            record.save()
+            messages.success(request, "Contribution set successfully.")
+            return redirect("admin_contributions")
+        else:
+            messages.error(request, "Error setting contribution.")
+    else:
+        form = ContributionRecordForm()
+    return render(request, 'operations/contributions/contribution_history.html', {'records': records, 'form': form})
 
 @login_required
 @user_passes_test(is_admin)
@@ -502,6 +527,7 @@ def get_monthly_contributions(request):
 
     return JsonResponse({'months': last_9_months, 'contributions': contributions, 'withdrawals': withdrawals, 'credits': credits, 'repayments': repayments})
 
+from django.db import IntegrityError
 
 @login_required
 @user_passes_test(is_admin)
@@ -510,11 +536,30 @@ def view_employee_contributions(request, employee_id):
     contributions = ContributionRecord.objects.filter(employee=employee).order_by('-year', '-month')
     
     total_contributed = contributions.aggregate(total=Sum("amount"))["total"] or 0
+
+    if request.method == "POST":
+        if 'amount' in request.POST:
+            request.POST = request.POST.copy()  # Make POST mutable
+            request.POST['amount'] = request.POST['amount'].replace(',', '')
+        form = ContributionRecordForm(request.POST)
+        if form.is_valid():
+            record = form.save(commit=False)
+            record.employee = employee
+            try:
+                record.save()
+                messages.success(request, "Contribution set successfully.")
+            except IntegrityError:
+                messages.error(request, "A contribution record for this employee, month, and year already exists.") # more user friendly message.
+        else:
+            messages.error(request, "Error setting contribution. Please correct the errors below.") # more user friendly message.
+    else:
+        form = ContributionRecordForm()
     
     context = {
         'employee': employee,
         'contributions': contributions,
         'total_contributed': total_contributed,
+        'form': form
     }
     
     return render(request, 'operations/contributions/view_employee_contributions.html', context)

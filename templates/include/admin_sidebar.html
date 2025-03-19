@@ -134,6 +134,22 @@
                     <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Credit History</span>
                 </a>
             </li>
+            <li class="w-full mt-4">
+                <h6 class="pl-6 ml-2 font-bold leading-tight uppercase text-xs opacity-60">Expenses</h6>
+            </li>
+
+            <li class="mt-0.5 w-full">
+                <a class="py-2.7 text-sm ease-nav-brand my-0 mx-4 flex items-center whitespace-nowrap px-4 transition-colors 
+                    {% if request.resolver_match.view_name == 'manage_expenses' %}font-bold{% endif %}" 
+                    href="{% url 'manage_expenses' %}">
+                    <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg shadow-soft-2xl bg-center fill-current stroke-0 text-center xl:p-2.5 
+                        {% if request.resolver_match.view_name == 'manage_expenses' %}bg-red-500 {% else %} bg-white {% endif %}">
+                        <i class="fas fa-money-bill-wave {% if request.resolver_match.view_name == 'manage_expenses' %} text-white{% else%} text-gray-900{% endif %}"></i>
+                    </div>
+                    <span class="ml-1 duration-300 opacity-100 pointer-events-none ease-soft">Expense Tracking</span>
+                </a>
+            </li>
+            
 
 
         </ul>

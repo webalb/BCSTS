@@ -198,7 +198,7 @@ CHANNEL_LAYERS = {
 }
 
 # Define the date to assume salary will be paid on as a constant
-SALARY_PAYMENT_DATE = "1"
+SALARY_PAYMENT_DATE = "20"
 
 # SECURE_SSL_REDIRECT = True  # Redirect HTTP to HTTPS
 # SESSION_COOKIE_SECURE = True  # Protect session cookies

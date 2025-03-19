@@ -19,7 +19,7 @@ class EmployeeForm(UserCreationForm):
         min_value=1000,
         required=True,
         label="Initial Contribution Amount",
-        widget=forms.NumberInput(attrs={
+        widget=forms.TextInput(attrs={
             "class": "text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-700 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-700 focus:outline-none focus:transition-shadow",
             "placeholder": "Enter contribution amount (min: 1,000)"
         }),
@@ -31,6 +31,11 @@ class EmployeeForm(UserCreationForm):
             'passport_photo', "next_of_kin_name", "next_of_kin_phone", "next_of_kin_relationship",
             "password1", "password2"
         ]
+        widgets = {
+            "next_of_kin_name": forms.TextInput(attrs={'required': False}),
+            "next_of_kin_phone": forms.TextInput(attrs={'required': False}),
+            "next_of_kin_relationship": forms.TextInput(attrs={'required': False}),
+        }
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -55,6 +60,11 @@ class EmployeeUpdateForm(forms.ModelForm):
             'full_name', 'email', 'phone_number', 'nitda_id', 'gender', 'position',
             'passport_photo', "next_of_kin_name", "next_of_kin_phone", "next_of_kin_relationship"
         ]
+        widgets = {
+            "next_of_kin_name": forms.TextInput(attrs={'required': False}),
+            "next_of_kin_phone": forms.TextInput(attrs={'required': False}),
+            "next_of_kin_relationship": forms.TextInput(attrs={'required': False}),
+        }
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

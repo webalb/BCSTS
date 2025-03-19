@@ -1,5 +1,5 @@
 from django.urls import path
-from operations.views import views, admin, target
+from operations.views import views, admin, target, expense
 from operations.views import bulk_upload_contributions, confirm_bulk_upload, update_contributions_from_records
 
 urlpatterns = [
@@ -47,4 +47,8 @@ urlpatterns = [
 
     path('update-contributions/', update_contributions_from_records, name='update_contributions'),
 
+
+    path("expenses/", expense.manage_expenses, name="manage_expenses"),
+    path("expenses/delete/<str:expense_id>/", expense.delete_expense, name="delete_expense"),
 ]
+

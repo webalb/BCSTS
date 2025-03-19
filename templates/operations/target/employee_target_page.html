@@ -36,11 +36,11 @@ Target Saving | Benevolence Cooperative
                                 <!-- No target set: Show info and form -->
                                 <div class="flex-auto p-4">
                                     <p class="text-gray-600 text-sm">
-                                        Target Savings is a special initiative by BCS that allows members to set aside and save money at their convenience. Unlike the regular monthly contribution, 
+                                        Target Savings is a special initiative by BCS that allows contributors to set aside and save money at their convenience. Unlike the regular monthly contribution, 
                                         Target Savings is entirely voluntary—you decide when and how much to deposit.
                                     </p>
                                     <p class="text-gray-600 text-sm mt-2">
-                                        Every deposit is officially recorded, and members can track their savings directly from their dashboard. 
+                                        Every deposit is officially recorded, and contributors can track their savings directly from their dashboard. 
                                         Withdrawals can be made at any time, providing financial flexibility while encouraging a disciplined savings habit.
                                     </p>
                                     <p class="text-gray-600 text-sm mt-2">
@@ -76,7 +76,7 @@ Target Saving | Benevolence Cooperative
                                 <!-- Active target: Show progress and transactions -->
                                 <h6 class="font-semibold text-gray-700">Your Target Savings</h6>
                                 <div class="mt-4 p-4 bg-gray-100 rounded">
-                                    <p class="text-lg"><strong>Total Balance:</strong> NGN{{ active_target.total_savings }}</p>
+                                    <p class="text-lg"><strong>Total Balance:</strong> NGN{{ active_target.total_savings|intcomma }}</p>
                                     <p class="text-lg"><strong>Status:</strong> {{ active_target.get_status_display }}</p>
                                 </div>
 
@@ -95,7 +95,7 @@ Target Saving | Benevolence Cooperative
                                         <button type="submit" class="mt-4 px-4 py-2 text-sm uppercase bg-green-500 text-white rounded" onclick="return confirm('Are you sure you want to request a withdrawal?')" >Request Target Withdrawal</button>                                    
                                     </form>
                                     {% else %}
-                                    <p class="text-red-500">You have to <a href="{% url "withdrawal:add_account" %}" class="font-bold text-green-500"> setup your bank details </a> before you can withdraw your target savings</p>
+                                    <p class="text-red-500">You have to <a href="{% url "settings" %}#bank-details" class="font-bold text-green-500"> setup your bank details </a> before you can withdraw your target savings</p>
                                     {% endif %}
                                 {% endif %}
 
@@ -103,7 +103,8 @@ Target Saving | Benevolence Cooperative
                                 <h6 class="mt-6 font-semibold uppercase">Target Saving Transactions</h6>
                                 <table class="w-full mt-2 border-collapse border border-gray-300">
                                     <thead>
-                                        <tr class="bg-gray-200">
+                                        <tr class="bg-gray-100">
+                                            <th class="border px-4 py-2">S/N</th>
                                             <th class="border px-4 py-2">Date</th>
                                             <th class="border px-4 py-2">Amount</th>
                                             <th class="border px-4 py-2">Type</th>
@@ -113,8 +114,9 @@ Target Saving | Benevolence Cooperative
                                     <tbody>
                                         {% for transaction in active_target.transactions.all %}
                                             <tr>
+                                                <td class="border px-4 py-2">{{ forloop.counter }}</td>
                                                 <td class="border px-4 py-2">{{ transaction.transaction_date|date:"d M Y, H:i" }}</td>
-                                                <td class="border px-4 py-2">₦{{ transaction.amount }}</td>
+                                                <td class="border px-4 py-2">NGN{{ transaction.amount|intcomma }}</td>
                                                 <td class="border px-4 py-2">
                                                     {% if transaction.transaction_type == 'deposit' %}
                                                         <span class="text-green-500">Deposit</span>

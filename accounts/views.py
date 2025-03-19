@@ -23,8 +23,6 @@ def logout_view(request):
     logout(request)
     return redirect("login")
 
-
-
 @login_required
 def change_password(request):
     if request.method == 'POST':
@@ -36,7 +34,7 @@ def change_password(request):
             sessions = Session.objects.filter(expire_date__gte=user.last_login)
             for session in sessions:
                 data = session.get_decoded()
-                if data.get('_auth_user_id') == str(user.id):
+                if data.get('_auth_user_id') == str(user.id): # type: ignore
                     session.delete()
             
             # Log out the current session
@@ -128,6 +126,10 @@ def employee_list(request):
 def create_employee(request):
     """View for creating a new employee."""
     if request.method == "POST":
+
+        if 'contribution_amount' in request.POST:
+            request.POST = request.POST.copy()  # Make POST mutable
+            request.POST['contribution_amount'] = request.POST['contribution_amount'].replace(',', '')
         form = EmployeeForm(request.POST, request.FILES)
         if form.is_valid():
             contribution_amount = form.cleaned_data.get("contribution_amount")
@@ -155,7 +157,7 @@ def create_employee(request):
             NotificationService.send_notification(
                 employee,
                 "Welcome to Benevolence Cooperative!",
-                "You have been successfully registered as a member of BCS, with initial monthly contribution amount: ₦{contribution_amount}",
+                f"You have been successfully registered as a member of BCS, with initial monthly contribution amount: ₦{contribution_amount}",
                 notification_type=Notification.NotificationType.IN_APP
             )
             messages.success(request, f"Contributor created successfully with an initial contribution of ₦{contribution_amount:,.2f}")
@@ -300,8 +302,8 @@ def view_mcr(request, nitda_id):
         'member': member,
         'contributions': contributions,
         'withdrawals': withdrawals,
-        'compiled_date': datetime.datetime.now(),
-        'compiled_time': datetime.datetime.now().strftime("%H:%M:%S"), #add time to context.
+        'compiled_date': datetime.datetime.now(), # type: ignore
+        'compiled_time': datetime.datetime.now().strftime("%H:%M:%S"), # type: ignore
         'credits': credits,
         "financial_summary": financial_summary,
     }
@@ -464,7 +466,7 @@ def admin_reset_member_password(request, employee_id):
         try:
             member.set_password(new_password)
             member.save()
-            messages.success(request, f"Password changed successfully for {member.full_name}")
+            messages.success(request, f"Password changed successfully for {member.full_name}") # type: ignore
             return redirect("employee_detail", employee_id=employee_id)
         except User.DoesNotExist:
             messages.error(request, f"Something went wrong!")

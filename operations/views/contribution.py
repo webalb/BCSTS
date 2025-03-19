@@ -1,3 +1,4 @@
+from tkinter import N
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -32,7 +33,8 @@ def calculate_contribution_durations(employee):
 
     durations = []
     previous_entry = None
-
+    start_date = None
+    duration_months = None
     for entry in history:
         if previous_entry:
             duration = entry.changed_at - previous_entry.changed_at
@@ -41,19 +43,34 @@ def calculate_contribution_durations(employee):
             total_paid = ContributionRecord.objects.filter(
                 employee=employee,
                 created_at__range=[previous_entry.changed_at, entry.changed_at],
-                status="paid"
             ).aggregate(total=Sum("amount"))["total"] or 0
+            if total_paid == 0:
+                total_paid =  ContributionRecord.objects.filter(
+                    employee=employee,
+                    amount=entry.amount,  # Filter by entry amount
+                    created_at__lte=entry.changed_at,  # Ensure it's within the timeframe
+                ).aggregate(total=Sum("amount"))["total"]
+                duration_months =  ContributionRecord.objects.filter(
+                    employee=employee,
+                    amount=entry.amount,  # Filter by entry amount
+                    created_at__lte=entry.changed_at,  # Ensure it's within the timeframe
+                ).count()
+                start_date = ContributionRecord.objects.filter(
+                    employee=employee,
+                    amount=entry.amount,  # Filter by entry amount
+                    created_at__lte=entry.changed_at,  # Ensure it's within the timeframe
+                ).last().get_date_based_on_month_and_year() # type: ignore
 
             durations.append({
                 "id": entry.id, # type: ignore
                 "employee_email": entry.contribution_setting.employee.email,
                 "amount": previous_entry.amount,
-                "start_date": previous_entry.changed_at,
+                "start_date": start_date if start_date else previous_entry.changed_at,
                 "end_date": entry.changed_at,
-                "duration_days": duration.days,
+                "duration_days":duration.days,
                 "changed_by": entry.changed_by,
                 "change_reason": entry.change_reason,
-                "duration_months": round(duration.days / 30),
+                "duration_months": duration_months if duration_months else  round(duration.days / 30),
                 "total_paid": total_paid
             })
         previous_entry = entry
@@ -68,15 +85,31 @@ def calculate_contribution_durations(employee):
             created_at__gte=previous_entry.changed_at,
             status="paid"
         ).aggregate(total=Sum("amount"))["total"] or 0
+        if total_paid == 0:
+            total_paid =  ContributionRecord.objects.filter(
+                employee=employee,
+                amount=previous_entry.amount,  # Filter by entry amount
+                created_at__lte=previous_entry.changed_at,  # Ensure it's within the timeframe
+            ).aggregate(total=Sum("amount"))["total"]
+            duration_months =  ContributionRecord.objects.filter(
+                employee=employee,
+                amount=previous_entry.amount,  # Filter by entry amount
+                created_at__lte=previous_entry.changed_at,  # Ensure it's within the timeframe
+            ).count()
+            start_date = ContributionRecord.objects.filter(
+                    employee=employee,
+                    amount=previous_entry.amount,  # Filter by entry amount
+                    created_at__lte=previous_entry.changed_at,  # Ensure it's within the timeframe
+                ).last().get_date_based_on_month_and_year() # type: ignore
 
         durations.append({
             "id": entry.id, # type: ignore
             "employee_email": entry.contribution_setting.employee.email, # type: ignore
             "amount": previous_entry.amount,
-            "start_date": previous_entry.changed_at,
+            "start_date": start_date if start_date else previous_entry.changed_at,
             "end_date": "Still in use",
             "duration_days": duration.days,
-            "duration_months": round(duration.days / 30, 2),
+            "duration_months": duration_months if duration_months else round(duration.days / 30, 2),
             "total_paid": total_paid,
             "changed_by": entry.changed_by, # type: ignore
             "change_reason": entry.change_reason, # type: ignore
@@ -92,7 +125,6 @@ def contribution_setting_history(request):
     employee = request.user
     # Calculate contribution durations
     contribution_durations = calculate_contribution_durations(employee)
-
     context = {
       'contribution_durations': contribution_durations ,
     }
@@ -169,13 +201,13 @@ def request_contribution_change(request):
     """ Employee requests to change their contribution amount. """
 
     if request.method == "POST":
-        new_amount = request.POST.get("contribution-amount")
-
+        amount = request.POST.get("contribution-amount")
+        new_amount = amount.replace(',', '')
         # Ensure amount is valid
         try:
             new_amount = float(new_amount)
-            if new_amount <= 15000:
-                raise ValueError("Amount must not be less than N15,000.")
+            if new_amount <= 1000:
+                raise ValueError("Amount must not be less than N1,000.")
         except ValueError:
             messages.error(request, "Invalid amount entered.")
             return redirect("request_contribution_change")

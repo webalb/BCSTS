@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+{% load static %}
+{% load humanize %}
+{% load custom_filters %}
+{% block title %}
+Expenses Management | Benevolence Cooperative
+{% endblock title %}
+{% block header %}
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+{% endblock header %}
+{% block content %}
+<!-- sidenav  -->
+{% include 'include/admin_sidebar.html' %}
+<!-- end sidenav -->
+<main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200">
+    <!-- Navbar -->
+    {% include 'include/dashboard_navbar.html' with breadcrumb='Expenses' page_title='Manage Expenses' %}
+    <!-- end Navbar -->
+    <!-- cards -->
+    <div class="w-full px-6 py-6 mx-auto">
+        <!-- row 1 -->
+        <div class="flex flex-wrap -mx-3">
+            <!-- card1 -->
+            <div class="w-full max-w-full px-3 sm:w-1/2 sm:flex-none xl:mb-0 xl:w-1/2">
+                <div class="relative flex flex-col mb-6 min-w-0 break-words shadow-soft-xl rounded-2xl bg-clip-border bg-white">
+                    <div class="flex-auto p-4">
+                        <div class="flex flex-row -mx-3">
+                            <div class="flex-none w-2/3 max-w-full px-3">
+                                <div>
+                                    <p class="mb-0 font-sans font-semibold leading-normal text-sm">Investment Balance</p>
+                                    <h4 class="mb-0 font-bold text-gray-900">
+                                        
+                                        <span class="balance">₦{{ investment_balance|intcomma }}</span>
+                                        <span class="hidden-balance hidden-b"> *** </span>
+                                    </h4>
+                                    <p></p>
+                                </div>
+                            </div>
+                            <div class="px-3 text-right basis-1/3">
+                                <div class="inline-block w-12 h-12 text-center rounded-lg bg-green-500">
+                                    <i class="fa fa-coins leading-none  text-lg relative top-3.5 text-white"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- card2 -->
+            <div class="w-full max-w-full px-3 sm:w-1/2  mb-6 sm:flex-none xl:mb-0 xl:w-1/2">
+                <div class="relative flex flex-col min-w-0 break-words shadow-soft-xl rounded-2xl bg-white bg-clip-border">
+                    <div class="flex-auto p-4">
+                        <div class="flex flex-row -mx-3">
+                            <div class="flex-none w-2/3 max-w-full pl-3">
+                                <div>
+                                    <p class="mb-0 font-sans font-semibold leading-normal text-sm">Total Expenses</p>
+                                    <h4 class="mb-0 font-bold text-gray-900">
+                                        
+                                        <span class="balance">₦{{ total_expense|intcomma }}</span>
+                                        <span class="hidden-balance hidden-b"> *** </span>
+                                    </h4>
+                                    <p class="leading-normal text-sm font-weight-bolder"></p>
+                                </div>
+                            </div>
+                            <div class="px-3 text-right basis-1/3">
+                                <div class="inline-block w-12 h-12 text-center rounded-lg bg-green-500">
+                                    <i class="fas fa-chart-line leading-none text-lg relative top-3.5  text-white"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- cards row 2 -->
+        <div class="flex flex-wrap -mx-3">
+            <div class="w-full max-w-full px-3 md:w-12/12 md:flex-none">
+                <div class="relative flex flex-col min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
+                    <div class="p-6 px-4 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
+                        <h6 class="mb-0 text-lg font-semibold text-gray-700">Record Expenses</h6>
+                    </div>
+                    <div class="flex-auto p-4 pt-6">
+                        <form role="form text-left" method="post">
+                            {% csrf_token %}
+                            {% if form.non_field_errors %}
+                                <div class="mb-4 p-4 rounded-lg bg-red-100 text-red-700">
+                                    {% for error in form.non_field_errors %}
+                                        <p>{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            
+                            {% for field in form %}
+                                <div class="mb-4">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                                        {{ field.label }}
+                                    </label>
+                                    {{ field }}
+                                    {% if field.errors %}
+                                        <div class="mt-1 text-red-600 text-sm">
+                                            {% for error in field.errors %}
+                                                <p>{{ error }}</p>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    {% if field.help_text %}
+                                        <p class="mt-1 text-sm text-gray-500">{{ field.help_text }}</p>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                            
+                            <div class="text-center">
+                                <button type="submit" class="inline-block w-full px-6 py-3 text-xs mt-6 font-bold text-white uppercase transition-all bg-green-500 rounded-lg hover:scale-105 hover:shadow-lg active:opacity-85">
+                                    Save Expense
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- cards row 3 -->
+        <div class="flex flex-wrap my-6 -mx-3">
+            <!-- card 1 -->
+            <div class="w-full max-w-full px-3 mt-0 mb-6 md:mb-0 md:flex-none lg:flex-none">
+                <div class="border-black/12.5 shadow-soft-xl relative flex min-w-0 flex-col break-words rounded-2xl border-0 border-solid bg-white bg-clip-border px-4">
+                    <div class="border-black/12.5 mb-0 rounded-t-2xl border-b-0 border-solid bg-white p-6 pb-0">
+                        <div class="flex flex-wrap mt-0 -mx-3">
+                            <div class="flex-none w-12/12 max-w-full px-3 mt-0 lg:w-1/2 lg:flex-none">
+                                <h6 class="text-gray-800">Recorded Expenses</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex-auto p-6 px-0 pb-2">
+                        <div class="">
+                            {% if expenses %} 
+                            <table id="expenses" class="items-center w-full mb-0 align-top border-gray-200 text-slate-500" id="historyTable">
+                                <thead class="align-bottom">
+                                    <tr>
+                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">S/N</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Amount</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Description</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Date Recorded</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for expense in expenses %}
+                                    <tr>
+                                        <td class="ml-3 p-2 align-middle bg-transparent border-b whitespace-nowrap ">
+                                            <h6 class="mb-0 leading-normal text-sm">{{ forloop.counter }}</h6>
+                                        </td>
+                                        <td class="ml-3 p-2 align-middle bg-transparent border-b whitespace-nowrap ">
+                                            <h6 class="mb-0 leading-normal text-sm">NGN{{ expense.amount|intcomma }}</h6>
+                                        </td>
+                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap">
+                                            <h6 class="mb-0 leading-normal text-sm">{{ expense.description }}</h6>
+                                        </td>
+                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap">
+                                            <h6 class="mb-0 leading-normal text-sm">{{ expense.created_at|date:"d M, Y" }}</h6>
+                                        </td>
+                                        
+                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap">
+                                            <form action="{% url 'delete_expense' expense.id %}" method="post" style="display: inline;"
+                                                  onsubmit="return confirm('Are you sure you want to delete this expense?')">
+                                                {% csrf_token %}
+                                                <button type="submit" class="text-red-600 hover:text-red-800 border-0 bg-transparent cursor-pointer">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
+                                            </form>
+                                        </td>
+                                      
+                                    </tr>
+                                    
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            {% else %}
+                            <p class="text-center text-muted">No recorded expense history available.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% include 'include/dashboard_footer.html' %} </div> <!-- end cards -->
+</main>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#expenses').DataTable({
+        "paging": true,
+        "searching": true,
+        "ordering": true,
+        "info": true,
+        "responsive": true,
+        "scrollX": true,
+        "autoWidth": false,
+    });
+});
+
+const amountInput = document.getElementById('amount');
+
+amountInput.addEventListener('input', function(e) {
+    // Remove any non-numeric characters except decimal
+    let value = this.value.replace(/[^0-9.]/g, '');
+    
+    // Split into whole number and decimal parts
+    let parts = value.split('.');
+    let wholeNumber = parts[0];
+    let decimal = parts[1] || '';
+
+    // Add commas to whole number part
+    wholeNumber = wholeNumber.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    
+    // Limit decimal to 2 places if exists
+    if (decimal) {
+        decimal = decimal.slice(0, 2);
+        this.value = wholeNumber + '.' + decimal;
+    } else {
+        this.value = wholeNumber;
+    }
+});
+</script>
+{% endblock %}

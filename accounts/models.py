@@ -91,7 +91,7 @@ class CustomUser(AbstractUser):
             )
         ],
     )
-    next_of_kin_relationship = models.CharField(max_length=50)
+    next_of_kin_relationship = models.CharField(max_length=50, blank=True, null=True)
     position = models.CharField(max_length=100, blank=True, null=True, default='Member')
 
     is_email_verified = models.BooleanField(default=False)

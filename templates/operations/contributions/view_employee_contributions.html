@@ -19,26 +19,76 @@ Contributor Contributions | Benevolence Cooperative
 <main class="ease-soft-in-out xl:ml-68.5 relative h-full max-h-screen rounded-xl transition-all duration-200">
     {% include 'include/dashboard_navbar.html' with breadcrumb='Contribution' page_title='Contribution Records' %}
 
+    
     <div class="w-full px-6 mx-auto">
-        <!-- card 1 -->
-        <div class="flex flex-col shadow-soft-xl flex-auto min-w-0 p-4  break-words border-0 rounded-2xl bg-white bg-clip-border backdrop-blur-2xl backdrop-saturate-200">
-            <div class="flex flex-wrap -mx-3">
-                <div class="flex-none w-auto max-w-full px-3 my-auto bg-white">
-                    <div class="h-full">
-                        <h5 class="mb-1 uppercase">Contributions Record</h5>
-                        <p class="mb-0 font-semibold leading-normal text-sm mt-4"><b>Contributor:</b>  {{ employee.email }} </p>
-                        <p class="mb-0 font-semibold leading-normal text-sm mt-2"><b>From:</b>  {{ employee.date_joined|date:"F Y" }} </p>
-                        {% if contributions %}
-                        <p class="mb-0 font-semibold leading-normal text-sm mt-2"><b>To:</b>  {{ contributions.0.created_at|date:"F d, Y" }} </p>
-                        {% endif %}                        
-                        <p class="mb-0 font-semibold leading-normal text-sm mt-2">Contributed: NGN{{ total_contributed|intcomma}}</p>
-                        <a href="javascript:history.back()" class="text-blue-500 hover:underline">
-                            <i class="fa fa-arrow-left inline-block"></i>
-                            Back
-                        </a>
+        <div class="flex flex-wrap -mx-3">
+            <div class="w-full max-w-full px-3 mt-6 md:w-7/12 md:flex-none">
+                <div class="relative flex flex-col min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
+                    <div class="p-6 px-4 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
+                        <h6 class="mb-0 text-lg font-semibold text-gray-700">Record Contribution</h6>
+                    </div>
+                    <div class="flex-auto p-4 pt-6">
+                        <form method="post" class="px-6">
+                                {% csrf_token %}
+                                <div class="flex flex-wrap -mx-3">
+                                    {% for field in form %}
+                                    {% if field.name == 'amount' %}
+                                    <div class="w-full md:w-12/12 px-3 mb-4">
+                                        <label for="{{ field.id_for_label }}" class="mb-2 ml-1 font-bold text-xs text-gray-800">{{ field.label_tag }}</label>
+                                        <span class="text-xs text-red-500">{{ field.errors }}</span>
+                                        {{ field }}
+                                        {% if field.help_text %}
+                                        <span class="text-xs text-gray-500">{{ field.help_text }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% else %}
+                                    <div class="w-full md:w-6/12 px-3 mb-4">
+                                        <label for="{{ field.id_for_label }}" class="mb-2 ml-1 font-bold text-xs text-gray-800">{{ field.label_tag }}</label>
+                                        <span class="text-xs text-red-500">{{ field.errors }}</span>
+                                        {{ field }}
+                                        {% if field.help_text %}
+                                        <span class="text-xs text-gray-500">{{ field.help_text }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% endfor %}
+                                </div>
+                                <button type="submit" name="save-record" value="save" class="inline-block px-4 py-2 uppercase text-sm mr-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-all">
+                                    Save Record
+                                </button>
+                                <a href="javascript:history.back()" class="inline-block px-4 py-2 mb-0 font-bold text-center uppercase align-middle transition-all bg-gray-200 border border-solid rounded-lg shadow-none cursor-pointer leading-pro ease-soft-in text-xs hover:scale-102 active:shadow-soft-xs tracking-tight-soft border-gray-500 text-gray-700 hover:border-gray-600 hover:bg-gray-300 hover:text-gray-900">
+                                    ← Back
+                                </a>                        
+                        </form>
                     </div>
                 </div>
-               
+            </div>                                                     
+            <!-- Withdrawal Information -->
+            <div class="w-full max-w-full px-3 mt-6 md:w-5/12 md:flex-none">
+            <div class="relative flex flex-col min-w-0 break-words bg-white border-0 shadow-soft-xl rounded-2xl bg-clip-border">
+                <div class="p-6 px-4 pb-0 mb-0 bg-white border-b-0 rounded-t-2xl">
+                    <h6 class="mb-0 text-lg font-semibold text-gray-800">Contributions Record</h6>
+                </div>
+                <div class="p-6">
+                    <div class="bg-gray-100 text-xl p-4 rounded-2xl">
+                        <p class="text-gray-800 ">
+                            <b>Contributor:</b>  {{ employee.full_name }} </p>
+                        </p>
+                        <p class="mb-0 leading-normal mt-2"><b>Contributed:</b> NGN{{ total_contributed|intcomma}}</p>
+
+                    </div>
+                    <h6 class="mb-0 text-sm font-bold text-gray-800 mt-4">Duration:</h6>
+                    <div class="pl-4">
+                        <p class="mb-0 font-semibold leading-normal text-sm mt-2"><b>From:</b>  {{ employee.date_joined|date:"F Y" }} </p>
+                        {% if contributions %}
+                        <p class="mb-0 font-semibold leading-normal text-sm mt-2"><b>To:</b>  {{ contributions.0.created_at|date:"F Y" }} </p>
+                        {% endif %} 
+                    </div>
+
+                    
+                </div>
+            </div>
             </div>
         </div>
     </div>
@@ -51,14 +101,15 @@ Contributor Contributions | Benevolence Cooperative
                     <div class="flex-auto p-6 px-0 pb-2">
                         <div class="p-4">
                             {% if contributions %}
-                            <table id="contributionsTable" class="w-full mb-0 align-top border-gray-200 text-slate-500 ">
+                            <table id="contributionsTable" class="w-full mb-0 align-top border-gray-200 text-slate-500 overflow-x-auto overflow-y-auto">
                                 <thead class="align-bottom">
                                     <tr>
-                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800 ">S/N</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800 ">Month</th>
-                                        <th class="px-6 py-3 pl-2 font-bold tracking-normal text-left uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Year</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle  text-sm border-b letter border-b-solid  whitespace-nowrap border-b-gray-200 text-gray-800">Amount</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Date Recorded</th>
+                                        <th class="py-3 font-bold tracking-normal uppercase text-left align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800 ">S/N</th>
+                                        <th class="py-3 font-bold tracking-normal uppercase text-left align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800 ">Month</th>
+                                        <th class="py-3 pl-2 font-bold tracking-normal text-left uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Year</th>
+                                        <th class="py-3 font-bold tracking-normal uppercase text-left align-middle  text-sm border-b letter border-b-solid  whitespace-nowrap border-b-gray-200 text-gray-800">Amount</th>
+                                        <th class="py-3 font-bold tracking-normal uppercase text-left align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Date Recorded</th>
+                                        <th class="py-3 font-bold tracking-normal uppercase text-left align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -79,6 +130,9 @@ Contributor Contributions | Benevolence Cooperative
                                        
                                         <td class="p-2 bg-transparent border-b whitespace-nowrap ">
                                             <h6 class="mb-0 leading-normal text-sm">{{ record.created_at }}</h6>
+                                        </td>
+                                        <td class="p-2 bg-transparent border-b whitespace-nowrap ">
+                                            <a href="{% url 'delete_contribution' record.id %}" class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600" onclick="return confirm('Are you sure you want to delete this contribution?');">Delete</a>
                                         </td>
                                     </tr>
                                     
@@ -109,6 +163,29 @@ $(document).ready(function() {
         "scrollX": true,
         "autoWidth": false,
     });
+});
+
+const amountInput = document.getElementById('amount');
+
+amountInput.addEventListener('input', function(e) {
+    // Remove any non-numeric characters except decimal
+    let value = this.value.replace(/[^0-9.]/g, '');
+    
+    // Split into whole number and decimal parts
+    let parts = value.split('.');
+    let wholeNumber = parts[0];
+    let decimal = parts[1] || '';
+
+    // Add commas to whole number part
+    wholeNumber = wholeNumber.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    
+    // Limit decimal to 2 places if exists
+    if (decimal) {
+        decimal = decimal.slice(0, 2);
+        this.value = wholeNumber + '.' + decimal;
+    } else {
+        this.value = wholeNumber;
+    }
 });
 </script>
 {% endblock %}

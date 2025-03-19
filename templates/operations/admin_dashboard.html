@@ -76,10 +76,10 @@ Admin Dashboard | Benevolence Cooperative
                         <div class="flex flex-row -mx-3">
                             <div class="flex-none w-2/3 max-w-full px-3">
                                 <div>
-                                    <p class="mb-0 font-sans font-semibold leading-normal text-sm">Total Balance</p>
+                                    <p class="mb-0 font-sans font-semibold leading-normal text-sm">Avail Balance</p>
                                     <h6 class="mb-0 font-bold text-gray-900">
                                         
-                                        <span class="balance">₦{{ total_amount_raised|intcomma }}</span>
+                                        <span class="balance">₦{{ total_remained|intcomma }}</span>
                                         <span class="hidden-balance hidden-b"> *** </span>
                                         <br>
                                         <span class="leading-normal text-lime-500 text-sm font-weight-bolder">100%</span>
@@ -88,7 +88,7 @@ Admin Dashboard | Benevolence Cooperative
                             </div>
                             <div class="px-3 text-right basis-1/3">
                                 <div class="inline-block w-12 h-12 text-center rounded-lg bg-green-500">
-                                    <i class="fas fa-balance-scale leading-none text-lg relative top-3.5 text-white"></i>
+                                    <i class="fas fa-check-circle leading-none text-lg relative top-3.5 text-white"></i>
                                 </div>
                             </div>
                         </div>
@@ -230,7 +230,7 @@ Admin Dashboard | Benevolence Cooperative
                                             <h6 class="mb-0 leading-normal text-sm text-gray-900">{{ forloop.counter }}</h6>
                                         </td>
                                         <td class=" ml-3 p-2 align-middle bg-transparent border-b whitespace-nowrap ">
-                                            <h6 class="mb-0 leading-normal text-sm text-gray-900">{{ record.employee.email }}</h6>
+                                            <h6 class="mb-0 leading-normal text-sm text-gray-900">{{ record.employee.full_name }}</h6>
                                         </td>
                                         <td class=" ml-3 p-2 align-middle bg-transparent border-b whitespace-nowrap ">
                                             <h6 class="mb-0 leading-normal text-sm text-gray-900">{{ record.month|month_name }}</h6>

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% load l10n %}
+{% load humanize %}
 {% load custom_filters %}
 {% block title %}
 Target Saving List | Benevolence Cooperative
@@ -64,7 +65,7 @@ Target Saving List | Benevolence Cooperative
                                             </div>
                                         </td>
                                         <td class="p-2 align-middle bg-transparent whitespace-nowrap text-left border">
-                                            <h6 class="mb-0 leading-normal text-sm">{{ target.total_savings }}</h6>
+                                            <h6 class="mb-0 leading-normal text-sm">NGN{{ target.total_savings|intcomma }}</h6>
                                         </td>
                                         <td class="border p-2 align-middle bg-transparent whitespace-nowrap text-left">
                                             <h6 class="mb-0 leading-normal text-sm">{{ target.created_at }}</h6>

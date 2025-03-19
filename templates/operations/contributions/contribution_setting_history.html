@@ -2,6 +2,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% load l10n %}
+{% load humanize %}
 {% load custom_filters %}
 {% block title %}
 Contributions Settings | Benevolence Cooperative
@@ -55,34 +56,30 @@ Contributions Settings | Benevolence Cooperative
                             <table id="contributionsTable" class="items-center w-full mb-0 align-top border-gray-200 text-slate-500">
                                 <thead class="align-bottom">
                                     <tr>
-                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800 ">Amount (₦)</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800 ">Amount (NGN)</th>
                                         <th class="px-6 py-3 pl-2 font-bold tracking-normal text-left uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Start Date</th>
                                         <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle  text-sm border-b letter border-b-solid  whitespace-nowrap border-b-gray-200 text-gray-800">End Date</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800 ">Duration (Days)</th>
                                         <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Duration (Months)</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Total Paid (₦)</th>
+                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Total Paid (NGN)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for record in contribution_durations %}
                                     <tr>
-                                        <td class=" ml-3 p-2 align-middle bg-transparent border-b whitespace-nowrap text-center">
-                                            <h6 class="mb-0 leading-normal text-sm">₦{{ record.amount }}</h6>
+                                        <td class=" ml-3 p-2 align-middle bg-transparent border-b whitespace-nowrap">
+                                            <h6 class="mb-0 leading-normal text-sm">NGN{{ record.amount|intcomma }}</h6>
                                         </td>
-                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap text-center">
-                                            <h6 class="mb-0 leading-normal text-sm">{{ record.start_date }}</h6>
+                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap">
+                                            <h6 class="mb-0 leading-normal text-sm">{{ record.start_date|date:"F, Y" }}</h6>
                                         </td>
-                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap text-center">
-                                            <h6 class="mb-0 leading-normal text-sm">{{ record.end_date }}</h6>
+                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap">
+                                            <h6 class="mb-0 leading-normal text-sm">{{ record.end_date|format_date }}</h6>
                                         </td>
-                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap text-center">
-                                            <h6 class="mb-0 leading-normal text-sm">{{ record.duration_days }}</h6>
-                                        </td>
-                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap text-center">
+                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap">
                                             <h6 class="mb-0 leading-normal text-sm">{{ record.duration_months }}</h6>
                                         </td>
-                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap text-center">
-                                            <h6 class="mb-0 leading-normal text-sm">₦{{ record.total_paid }}</h6>
+                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap">
+                                            <h6 class="mb-0 leading-normal text-sm">NGN{{ record.total_paid|intcomma }}</h6>
                                         </td>
                                     </tr>
                                     {% empty %}

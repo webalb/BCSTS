@@ -103,6 +103,28 @@
     </section>
 </main>
 <script>
-// ... (Your JavaScript for closing alerts remains the same)
-</script>
+    
+    const amountInput = document.getElementById('id_contribution_amount');
+
+    amountInput.addEventListener('input', function(e) {
+        console.log(e)
+        // Remove any non-numeric characters except decimal
+        let value = this.value.replace(/[^0-9.]/g, '');
+        
+        // Split into whole number and decimal parts
+        let parts = value.split('.');
+        let wholeNumber = parts[0];
+        let decimal = parts[1] || '';
+    
+        // Add commas to whole number part
+        wholeNumber = wholeNumber.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        
+        // Limit decimal to 2 places if exists
+        if (decimal) {
+            decimal = decimal.slice(0, 2);
+            this.value = wholeNumber + '.' + decimal;
+        } else {
+            this.value = wholeNumber;
+        }
+    });</script>
 {% endblock %}

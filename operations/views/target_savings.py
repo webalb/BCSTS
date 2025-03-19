@@ -41,7 +41,7 @@ def member_target_savings_page(request):
                 user=request.user,
                 heading="Target Savings Created",
                 message="Your target savings has been created successfully.",
-                link=""
+                link=reverse("member_target_savings_page")
             )
             admin_users = CustomUser.objects.filter(groups__name='Admin')
             for admin in admin_users:
@@ -49,7 +49,7 @@ def member_target_savings_page(request):
                     user=admin,
                     heading="New Target Savings Created",
                     message=f"New target savings created by {request.user.username}.",
-                    link=""
+                    link=reverse("admin_target_savings_page")
                 )
             messages.success(request, "Target savings created successfully.")
             return redirect('member_target_savings_page')
@@ -127,6 +127,10 @@ def target_savings_detail(request, target_id):
 
     if request.method == 'POST':
         if 'add_target' in request.POST:
+                    # Replace currency comma with empty string for amount
+            if 'amount' in request.POST:
+                request.POST = request.POST.copy()  # Make POST mutable
+                request.POST['amount'] = request.POST['amount'].replace(',', '')
             transaction_form = TargetTransactionForm(request.POST, request.FILES)
             if transaction_form.is_valid():
                 transaction = transaction_form.save(commit=False)

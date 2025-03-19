@@ -8,6 +8,8 @@ from decimal import Decimal
 from notification.services import NotificationService
 from notification.models   import Notification
 from django.urls import reverse
+from django.utils.timezone import make_aware
+from datetime import datetime
 
 class ContributionSetting(models.Model):
     """ Stores employee's preferred contribution amount and its history. """
@@ -118,6 +120,11 @@ class ContributionRecord(models.Model):
         unique_together = ('employee', 'month', 'year')
         ordering = ['-year', '-month']
 
+
+    def get_date_based_on_month_and_year(self):
+        """Returns a datetime object representing the first day of the given month and year."""
+        return make_aware(datetime(self.year, self.month, 1))
+
     def save(self, *args, **kwargs):
         if not self.id:
             while True:
@@ -155,7 +162,8 @@ class ContributionRecord(models.Model):
 
         # Exclude superusers and users in 'Admin' group
         employees = CustomUser.objects.filter(
-            contribution_setting__isnull=False
+            contribution_setting__isnull=False,
+            is_active=True,
         ).filter(
             ~Q(is_superuser=True) & ~Q(groups__name="Admin")
         )
@@ -175,15 +183,6 @@ class ContributionRecord(models.Model):
                     status='paid' 
                 )
                 
-                # # Send email notification
-                # send_mail(
-                #     subject="Monthly Contribution Deducted",
-                #     message=f"Dear {employee.nitda_id},\n\nYour monthly contribution of {contribution_amount} "
-                #             f"has been recorded for {current_month}/{current_year}. Please ensure timely payment.",
-                #     from_email="no-reply@bcs.org.ng",
-                #     recipient_list=[employee.email],
-                #     fail_silently=True
-                # )
                 message=f"Dear {employee.full_name},\n\nYour monthly contribution of {contribution_amount} has been recorded for {current_month}/{current_year}.",
                 NotificationService.send_notification(
                     employee,
@@ -196,7 +195,6 @@ class ContributionRecord(models.Model):
                 records_created += 1
 
         return records_created  # Return number of created records
-
 
 
 class TargetSavings(models.Model):
@@ -252,3 +250,32 @@ class TargetSavingsTransaction(models.Model):
 
     def __str__(self):
         return f"{self.transaction_type.capitalize()} of ₦{self.amount} on {self.transaction_date}"
+
+class Expense(models.Model):
+    """Tracks expenses with an auto-generated unique ID."""
+    id = models.CharField(primary_key=True, max_length=7, unique=True, editable=False)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    description = models.TextField(blank=True, null=True)
+    created_at = models.DateField(auto_now_add=True)
+
+    @classmethod
+    def get_total_expenses(cls):
+        """Calculate the total sum of all expenses."""
+        total = cls.objects.aggregate(total=Sum('amount'))['total']
+        return total or Decimal('0.00')
+
+    def save(self, *args, **kwargs):
+        """Generate a unique 7-character ID if not set."""
+        if not self.id:
+            while True:
+                new_id = uuid.uuid4().hex[:7]
+                if not Expense.objects.filter(id=new_id).exists():
+                    self.id = new_id
+                    break
+        super().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.amount} - ({self.created_at})"

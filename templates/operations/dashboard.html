@@ -75,20 +75,20 @@ Contributor Dashboard | Benevolence Cooperative
                         <div class="flex flex-row -mx-3">
                             <div class="flex-none w-2/3 max-w-full px-3">
                                 <div>
-                                    <p class="mb-0 font-sans font-semibold leading-normal text-sm">Total Balance</p>
+                                    <p class="mb-0 font-sans font-semibold leading-normal text-sm">Avail Balance</p>
                                     <h6 class="mb-0 font-bold">
                                         
                                         <span class="balance">₦{{ total_remained_balance|intcomma }}</span>
                                        <span class="hidden-balance hidden-b"> *** </span>
                                         <br>
-                                        <span class="text-xs">Remained
+                                        <span class="text-xs">
                                         <span class="leading-normal text-lime-500 text-sm font-weight-bolder">100%</span></span>
                                     </h6>
                                 </div>
                             </div>
                             <div class="px-3 text-right basis-1/3">
                                 <div class="inline-block w-12 h-12 text-center rounded-lg bg-green-500">
-                                    <i class="fas leading-none fa-balance-scale text-lg relative top-3.5 text-white"></i>
+                                    <i class="fas leading-none fa-check-circle text-lg relative top-3.5 text-white"></i>
                                 </div>
                             </div>
                         </div>
@@ -203,34 +203,34 @@ Contributor Dashboard | Benevolence Cooperative
                         </div>
                     </div>
                     <div class="flex-auto p-6 px-0 pb-2">
-                        <div class="overflow-x-auto">
-                            <table class="items-center w-full mb-0 align-top border-gray-200 text-slate-500">
+                        <div class="overflow-x-auto flex">
+                            <table class="items-center w-full mb-0 align-top border-gray-200 px- overflow-x-auto overflow-y-auto p-6 text-center">
                                 <thead class="align-bottom">
                                     <tr>
-                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800 ">Month</th>
-                                        <th class="px-6 py-3 pl-2 font-bold tracking-normal text-left uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Year</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle  text-sm border-b letter border-b-solid  whitespace-nowrap border-b-gray-200 text-gray-800">Amount</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800 ">Status</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal text-center uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Date Recorded</th>
+                                        <th class="py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800 ">S/N</th>
+                                        <th class="py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800 ">Month</th>
+                                        <th class="py-3 pl-2 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Year</th>
+                                        <th class="py-3 font-bold tracking-normal uppercase align-middle  text-sm border-b letter border-b-solid  whitespace-nowrap border-b-gray-200 text-gray-800">Amount</th>
+                                        <th class="py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Date Recorded</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                    {% for record in contribution_records %}
                                     <tr>
-                                        <td class=" ml-3 p-2 align-middle bg-transparent border-b whitespace-nowrap text-center"> 
+                                        <td class=" ml-3 p-2 bg-transparent border-b whitespace-nowrap">
+                                            <h6 class="mb-0 leading-normal text-sm">{{ forloop.counter }}</h6>
+                                        </td>
+                                        <td class=" ml-3 p-2 align-middle bg-transparent border-b whitespace-nowrap"> 
                                           <h6 class="mb-0 leading-normal text-sm">{{ record.month|month_name }}</h6>
                                         </td>
-                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap text-center">
+                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap">
                                           <h6 class="mb-0 leading-normal text-sm">{{ record.year }}</h6>
                                         </td>
-                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap text-center">
-                                          <h6 class="mb-0 leading-normal text-sm">₦{{ record.amount }}</h6>
+                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap">
+                                          <h6 class="mb-0 leading-normal text-sm">NGN{{ record.amount|intcomma }}</h6>
                                         </td>
-                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap text-center">
-                                          <h6 class="mb-0 leading-normal text-sm">₦{{ record.get_status_display }}</h6>
-                                        </td>
-                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap text-center">
-                                          <h6 class="mb-0 leading-normal text-sm">{{ record.created_at }}</h6>
+                                        <td class="p-2 align-middle bg-transparent border-b whitespace-nowrap ">
+                                          <h6 class="mb-0 leading-normal text-sm">{{ record.created_at|date:"d M Y" }}</h6>
                                         </td>
 
                                     </tr>

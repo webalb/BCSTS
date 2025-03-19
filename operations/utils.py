@@ -1,6 +1,6 @@
 from django.db.models import Sum
 from decimal import Decimal
-from operations.models import ContributionRecord
+from operations.models import ContributionRecord, Expense
 from withdrawal.models import Withdrawals
 from credit.models import Credit
 from django.db.models import Q
@@ -61,19 +61,23 @@ def get_system_financial_summary():
     repaid_percentage = (repaid_credits / disbursed_credits * Decimal(100.00)) if disbursed_credits > 0 else Decimal(0.00)
 
     # Calculate balances using Decimal to maintain precision
-    total_system_savings_balance = (Decimal(0.60) * total_system_contributions) - total_withdrawn
-    total_system_investment_balance = Decimal(0.40) * total_system_contributions
-    total_remained_balance = total_system_contributions - total_withdrawn
-    total_remained_balance = (total_remained_balance - Decimal(disbursed_credits)) + Decimal(repaid_credits)
+    total_system_savings_balance = (Decimal(0.60) * total_system_contributions)     - total_withdrawn
+    total_system_savings_balance = (total_system_savings_balance - Decimal(disbursed_credits)) + Decimal(repaid_credits)
+
+    # Calculate investment balance (40%) and subtract any expenses
+    total_expenses = Expense.get_total_expenses()
+    total_system_investment_balance = (Decimal(0.40) * total_system_contributions) - total_expenses
+
+    total_remained_balance = total_system_savings_balance + total_system_investment_balance
 
     return {
         "total_system_contributions": total_system_contributions,
         "total_system_savings_balance": round(max(total_system_savings_balance, Decimal(0.00)), 2),  # Prevent negative balance
         "total_system_investment_balance": round(max(total_system_investment_balance, Decimal(0.00)), 2),
-        "total_remained_balance": max(total_remained_balance, Decimal(0.00)),  # Ensure it doesn't go negative
-        "total_withdrawn": max(total_withdrawn, Decimal(0.00)),
+        "total_remained_balance": round(max(total_remained_balance, Decimal(0.00)), 2),  # Ensure it doesn't go negative
+        "total_withdrawn": round(max(total_withdrawn, Decimal(0.00)), 2),
         "took_credits": disbursed_credits,
         "repaid_credits": repaid_credits,
         "repaid_percentage": repaid_percentage,
-
+        "total_expenses": total_expenses,
     }

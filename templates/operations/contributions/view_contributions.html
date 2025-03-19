@@ -6,9 +6,6 @@
 {% block title %}
 Member Contributions | Benevolence Cooperative
 {% endblock title %}
-{% block style %}
-
-{% endblock style %}
 {% block header %}
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 {% endblock header %}
@@ -35,23 +32,23 @@ Member Contributions | Benevolence Cooperative
                                     </div>
                                     <div>
                                         <h6 class="text-gray-800 font-semibold">Your Complete Contributions in History</h6>
-                                        <p class="text-green-500 font-bold">Contributed: ₦{{ total_contributed|intcomma }}</p>
+                                        <p class="text-green-500 font-bold">Contributed: NGN{{ total_contributed|intcomma }}</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    
                     <div class="flex-auto p-6 px-0 pb-2">
-                        <div class="p-4">
-                            <table id="contributionsTable" class="w-full mb-0 align-top border-gray-200 text-slate-500 ">
+                        <div class="p-4 overflow-y-auto overflow-x-auto">
+                            <table id="contributionsTable" class="w-full mb-0 align-top border-gray-200 text-slate-500 overflow-x-auto overflow-y-auto">
                                 <thead class="align-bottom">
                                     <tr>
-                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800 ">S/N</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800 ">Month</th>
-                                        <th class="px-6 py-3 pl-2 font-bold tracking-normal text-left uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Year</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle  text-sm border-b letter border-b-solid  whitespace-nowrap border-b-gray-200 text-gray-800">Amount</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800 ">Status</th>
-                                        <th class="px-6 py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Date Recorded</th>
+                                        <th class="py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800 ">S/N</th>
+                                        <th class="py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800 ">Month</th>
+                                        <th class="py-3 pl-2 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Year</th>
+                                        <th class="py-3 font-bold tracking-normal uppercase align-middle  text-sm border-b letter border-b-solid  whitespace-nowrap border-b-gray-200 text-gray-800">Amount</th>
+                                        <th class="py-3 font-bold tracking-normal uppercase align-middle bg-transparent border-b letter border-b-solid text-sm whitespace-nowrap border-b-gray-200 text-gray-800">Date Recorded</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -67,13 +64,11 @@ Member Contributions | Benevolence Cooperative
                                             <h6 class="mb-0 leading-normal text-sm">{{ record.year }}</h6>
                                         </td>
                                         <td class="p-2 bg-transparent border-b whitespace-nowrap">
-                                            <h6 class="mb-0 leading-normal text-sm">₦{{ record.amount|intcomma }}</h6>
+                                            <h6 class="mb-0 leading-normal text-sm">NGN{{ record.amount|intcomma }}</h6>
                                         </td>
-                                        <td class="p-2 bg-transparent border-b whitespace-nowrap">
-                                            <h6 class="mb-0 leading-normal text-sm">{{ record.get_status_display }}</h6>
-                                        </td>
+                                  
                                         <td class="p-2 bg-transparent border-b whitespace-nowrap ">
-                                            <h6 class="mb-0 leading-normal text-sm">{{ record.created_at }}</h6>
+                                            <h6 class="mb-0 leading-normal text-sm">{{ record.created_at|date:"d M Y" }}</h6>
                                         </td>
                                     </tr>
                                     {% empty %}

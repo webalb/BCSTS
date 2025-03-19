@@ -182,6 +182,15 @@ Account Settings | Benevolence Cooperative
                                         </button>
                                     </div>
                                 {% endif %}
+                                <div class="bg-red-100 hidden border border-red-400 text-red-800 px-4 py-3 rounded relative" role="alert" id="bank-details-incorrect">
+                                    <strong class="font-bold">Error!</strong>
+                                    <span class="block sm:inline">
+                                        Account Number or Bank Name incorrect
+                                    </span>
+                                    <button class="absolute top-0 bottom-0 right-0 px-3 py-1 text-red-500 hover:text-red-800 focus:outline-none" type="button" data-dismiss="alert" aria-label="Close" id="b-close">
+                                        <span>&times;</span>
+                                    </button>
+                                </div>
         
                                 <label class="mb-2 ml-1 font-bold text-xs text-gray-800">Account Number</label>
                                 <div class="mb-4">
@@ -210,7 +219,7 @@ Account Settings | Benevolence Cooperative
         
                                 <label class="mb-2 ml-1 font-bold text-xs text-gray-800">Account Holder Name</label>
                                 <div class="mb-4">
-                                    <input type="text" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" placeholder="Account Holder Name" aria-label="Account Holder Name" id="account_holder_name" name="account_holder_name" value="{{ bank_form.account_name.value|default:'' }}" required />
+                                    <input type="text" class="text-sm focus:shadow-soft-primary-outline leading-5.6 ease-soft block w-full appearance-none rounded-lg border border-solid border-gray-300 bg-white bg-clip-padding py-2 px-3 font-normal text-gray-800 transition-all focus:border-fuchsia-300 focus:bg-white focus:text-gray-800 focus:outline-none focus:transition-shadow" readonly placeholder="Click on VERIFY to see your account name" aria-label="Account Holder Name" id="account_holder_name" name="account_holder_name" value="{{ bank_form.account_name.value|default:'' }}" required />
                                     {% if bank_form.account_name.errors %}
                                         <ul class="errorlist">
                                             {% for error in bank_form.account_name.errors %}
@@ -376,6 +385,7 @@ Account Settings | Benevolence Cooperative
     document.getElementById("verifyButton").addEventListener("click", function() {
         let accountNumber = document.getElementById("account_number").value;
         let bankName = document.getElementById("bank_name").value;
+        let bankerror = document.getElementById("bank-details-incorrect");
         let bankCode = bankData[bankName];
     
         if (!accountNumber || !bankCode) {
@@ -394,13 +404,38 @@ Account Settings | Benevolence Cooperative
                 document.getElementById("verifyButton").style.display = "none";
                 document.getElementById("saveButton").style.display = "block";
             } else {
-                alert("Account verification failed.");
+                bankerror.classList.remove("hidden")
             }
         }).catch(error => {
-            console.error("Verification error:", error);
-            alert("Error verifying account.");
+            bankerror.classList.remove("hidden")
         });
     });
+
+
+
+
+    const amountInput = document.getElementById('id_contribution-amount');
+
+amountInput.addEventListener('input', function(e) {
+    // Remove any non-numeric characters except decimal
+    let value = this.value.replace(/[^0-9.]/g, '');
+    
+    // Split into whole number and decimal parts
+    let parts = value.split('.');
+    let wholeNumber = parts[0];
+    let decimal = parts[1] || '';
+
+    // Add commas to whole number part
+    wholeNumber = wholeNumber.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    
+    // Limit decimal to 2 places if exists
+    if (decimal) {
+        decimal = decimal.slice(0, 2);
+        this.value = wholeNumber + '.' + decimal;
+    } else {
+        this.value = wholeNumber;
+    }
+});
     </script>
     {% endif %}
 {% endblock %}
