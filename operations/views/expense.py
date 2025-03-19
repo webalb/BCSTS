@@ -22,7 +22,7 @@ def manage_expenses(request):
     """View to list, add, and delete expenses."""
     
     expenses = Expense.objects.all().order_by("-created_at")  # Get all expenses sorted by date
-    finance = get_system_financial_summary()['total_system_investment_balance']
+    finance = get_system_financial_summary()
     total_expense = finance["total_expenses"]
     investment_balance = finance['total_system_investment_balance']
     if request.method == "POST":
