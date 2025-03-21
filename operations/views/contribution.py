@@ -59,7 +59,9 @@ def calculate_contribution_durations(employee):
                     employee=employee,
                     amount=entry.amount,  # Filter by entry amount
                     created_at__lte=entry.changed_at,  # Ensure it's within the timeframe
-                ).last().get_date_based_on_month_and_year() # type: ignore
+                ).last()
+                if start_date:
+                    start_date = start_date.get_date_based_on_month_and_year() 
 
             durations.append({
                 "id": entry.id, # type: ignore
@@ -100,7 +102,9 @@ def calculate_contribution_durations(employee):
                     employee=employee,
                     amount=previous_entry.amount,  # Filter by entry amount
                     created_at__lte=previous_entry.changed_at,  # Ensure it's within the timeframe
-                ).last().get_date_based_on_month_and_year() # type: ignore
+                ).last()
+            if start_date:
+                start_date = start_date.get_date_based_on_month_and_year() 
 
         durations.append({
             "id": entry.id, # type: ignore

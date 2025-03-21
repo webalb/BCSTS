@@ -123,7 +123,8 @@ class ContributionRecord(models.Model):
 
     def get_date_based_on_month_and_year(self):
         """Returns a datetime object representing the first day of the given month and year."""
-        return make_aware(datetime(self.year, self.month, 1))
+        if self.year and self.month:
+            return make_aware(datetime(self.year, self.month, 1))
 
     def save(self, *args, **kwargs):
         if not self.id:
