@@ -239,11 +239,10 @@ def approve_request(request, request_id):
         NotificationService.send_notification(
             withdrawal.employee,  # Send to the employee who requested the withdrawal
             "Withdrawal Request Approved",
-            f"Your withdrawal request #{withdrawal.id} has been approved.",  # Or withdrawal.pk
+            f"Your withdrawal request #{withdrawal.id} has been approved.", # Or withdrawal.pk
             link=reverse("withdrawal:employee_withdrawal_management"),  # Or a more specific link to withdrawal details
             notification_type=Notification.NotificationType.IN_APP
         )
-        messages.success(request, "Withdrawal request approved successfully.")
     return redirect('withdrawal:admin_withdrawal_management')
 
 from django.utils.timezone import now
@@ -267,7 +266,7 @@ def update_withdrawal_status(request):
             NotificationService.send_notification(
                 withdrawal.employee,  # Send to the employee who requested the withdrawal
                 "Withdrawal Request Declined",
-                f"Your withdrawal request #{withdrawal.id} has been Declined.",  # Or withdrawal.pk
+                f"Your withdrawal request #{withdrawal.id} has been Declined.", # Or withdrawal.pk
                 link=reverse("withdrawal:employee_withdrawal_management"),  # Or a more specific link to withdrawal details
                 notification_type=Notification.NotificationType.IN_APP
             )

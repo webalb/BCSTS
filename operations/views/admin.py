@@ -151,7 +151,7 @@ def record_individual_contribution(request, employee_id):
             year=selected_year,
             status='Paid'
         )
-        message=f"Dear {employee.full_name},\n\nYour monthly contribution of {employee.contribution_setting.amount} has been recorded for {selected_month}/{selected_year}.", # type: ignore
+        message=f"Dear {employee.full_name},\n\nYour monthly contribution of {employee.contribution_setting.amount} has been recorded for {selected_month}/{selected_year}." # type: ignore
         NotificationService.send_notification(
             employee,
             heading="Monthly Contribution Deducted",
@@ -188,9 +188,8 @@ def record_all_missing_contributions(request):
             amount=employee.contribution_setting.amount, # type: ignore
             month=selected_month,
             year=selected_year,
-            status='pending'
         )
-        message=f"Dear {employee.full_name},\n\nYour monthly contribution of {employee.contribution_setting.amount} has been recorded for {selected_month}/{selected_year}.", # type: ignore
+        message = f"Dear {employee.full_name},Your monthly contribution of {employee.contribution_setting.amount} has been recorded for {selected_month}/{selected_year}." # type: ignore # Corrected: no trailing comma
         NotificationService.send_notification(
             employee,
             heading="Monthly Contribution Deducted",
