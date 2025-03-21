@@ -430,7 +430,7 @@ def delete_contribution(request, contribution_id):
     contribution = get_object_or_404(ContributionRecord, id=contribution_id)
     contribution.delete()
     messages.success(request, "Contribution record deleted successfully.")
-    return redirect('manage_contributions')
+    return redirect('view_employee_contributions', employee_id=contribution.employee.id)
 
 @login_required
 @user_passes_test(is_admin)

@@ -127,6 +127,8 @@ class ContributionRecord(models.Model):
             return make_aware(datetime(self.year, self.month, 1))
 
     def save(self, *args, **kwargs):
+        if self.status and self.status == 'pending':
+            self.status = 'paid'
         if not self.id:
             while True:
                 new_id = uuid.uuid4().hex[:7]
